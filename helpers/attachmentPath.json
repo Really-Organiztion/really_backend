@@ -1,0 +1,11 @@
+{
+  "attachments": {
+    "communityAttachmentPath": "attachments/communities/",
+    "courseAttachmentPath": "attachments/courses/",
+    "lessonItemsPath": "attachments/lessons/items/",
+    "lessonTasksPath": "attachments/lessons/tasks/",
+    "lessonQuizzesPath": "attachments/lessons/quizzes/",
+    "teacherAttachmentPath": "attachments/teachers/",
+    "taskAttachmentPath": "attachments/tasks/"
+  }
+}

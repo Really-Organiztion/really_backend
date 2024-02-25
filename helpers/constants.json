@@ -1,0 +1,6 @@
+{
+  "rateLimit": {
+    "windowMs": 900000,
+    "maxRequestsNumber": 1000
+  }
+}

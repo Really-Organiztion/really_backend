@@ -1,0 +1,7 @@
+{
+  "db": "mongodb://165.227.107.33:27017/ReallyBooking",
+  "superAdmin": {
+    "username": "admin",
+    "password": "Admin12#$"
+  }
+}
