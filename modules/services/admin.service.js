@@ -62,7 +62,7 @@ function loginAsSuperAdmin(username, callback) {
       callback( err,null );
     });
 }
-
+ 
 function createSuperAdmin(callback) {
   callback = callback || {};
   bcrypt.genSalt(10, (err, salt) => {

@@ -18,6 +18,13 @@ const userSchema = new Schema({
     minlength: 3,
     maxlength: 50,
   },
+  username: {
+    type: String,
+    uniqe: [true, "username existing , Not available"],
+    minlength: 5,
+    maxlength: 20,
+    required: [true, "UserName Required ! "],
+  },
   email: {
     type: String,
     required: true,
@@ -31,42 +38,42 @@ const userSchema = new Schema({
   socialMediaToken: {
     type: String,
   },
-  phoneNumber: {
+  phone: {
     type: String,
     required: true,
   },
-  educationSystem: {
-    type: ObjectId,
-    ref: "educationSystem",
-    required: true,
+  status: {
+    type: String,
+    default: "normal",
+    enum: ["active", "normal", "bann"],
   },
-  grade: {
-    type: ObjectId,
-    ref: "grade",
-    required: true,
+  nationalID: {
+    type: String,
+    trim: true,
+    unique: [true, "National ID is injored"],
+    length: [14, "National ID must be at least 14 characters"],
   },
-  courses: [ObjectId],
-  lessons: [
-    {
-      courseId: ObjectId,
-      lessonId: ObjectId,
-      type: {
-        type: String,
-        enum: ["Code", "Credit"],
-      },
-      orderId: String,
-      merchantOrderId: String,
-      seen: {
-        type: Boolean,
-        default: false,
-      },
-      validFor: Number,
-      startDate: Date,
-      endDate: Date,
-    },
-  ],
-  favorites: [ObjectId],
-  promoCodes: [String],
+  role: {
+    type: String,
+    required: true,
+    enum: ["Investor", "Renter", "Owner"],
+  },
+  balance: {
+    type: Number,
+  },
+  bonus: {
+    type: Number,
+  },
+  currency: {
+    type: String,
+  },
+  image: {
+    type: String,
+  },
+  job: {
+    type: String,
+  },
+  phonesList: [String],
 });
 const genericOperations = require("../genericService");
 module.exports = {

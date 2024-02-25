@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const WebSocket = require("ws");
+const session = require('express-session');
 
 const server = require("http").createServer(app);
 const wss = new WebSocket.Server({ server, path: "/websocket" });
@@ -18,7 +19,12 @@ require("./helpers/db_handler")(); // this is for calling Data base
 app.get('/test', (req, res, next) => {
   res.send("App express on vrecel is done")
  })
-
+ app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }
+}))
 app.use("/api/", indexRoutes);
 app.use("/attachments", express.static(path.join(__dirname, "./attachments")));
 app.use(express.static("public"));
