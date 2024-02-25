@@ -15,6 +15,9 @@ const logger = require("./helpers/logging");
 require("./helpers/middleware")(app); // this is for calling middleware
 require("./helpers/websocket")(wss); // this is for calling middleware
 require("./helpers/db_handler")(); // this is for calling Data base
+app.get('/test', (req, res, next) => {
+  res.send("App express on vrecel is done")
+ })
 
 app.use("/api/", indexRoutes);
 app.use("/attachments", express.static(path.join(__dirname, "./attachments")));
