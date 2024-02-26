@@ -1,6 +1,7 @@
 {
   "attachments": {
     "imagesPath": "attachments/images/",
+    "imagesIdPath": "attachments/imagesId/",
     "courseAttachmentPath": "attachments/courses/",
     "lessonItemsPath": "attachments/lessons/items/",
     "lessonTasksPath": "attachments/lessons/tasks/",

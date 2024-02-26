@@ -1,5 +1,5 @@
 const fs = require("fs");
-const mkdirp = require("mkdirp");
+const mkdirp = require("mkdirp").mkdirp;
 
 saveFiles = (file, type, path) => {
   return new Promise((resolve, reject) => {

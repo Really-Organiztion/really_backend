@@ -44,8 +44,7 @@ const userSchema = new Schema({
   },
   status: {
     type: String,
-    default: "normal",
-    enum: ["active", "normal", "bann"],
+    enum: ["Active", "Hold", "Bann"],
   },
   nationalID: {
     type: String,
@@ -56,7 +55,7 @@ const userSchema = new Schema({
   role: {
     type: String,
     required: true,
-    enum: ["Investor", "Renter", "Owner"],
+    enum: ["Renter", "Investor", "Owner"],
   },
   balance: {
     type: Number,
@@ -68,6 +67,16 @@ const userSchema = new Schema({
     type: String,
   },
   image: {
+    type: String,
+  },
+  idType: {
+    type: String,
+    enum: ["Id", "Passport"],
+  },
+  imageId: {
+    type: String,
+  },
+  imageIdBack: {
     type: String,
   },
   job: {

@@ -5,7 +5,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const handleFiles = require("../../helpers/handleFiles");
 const attachmentPath = require("../../helpers/attachmentPath.json");
-const path = attachmentPath.attachments.imagesPath;
+const path = attachmentPath.attachments;
+const mailer = require("../../helpers/sendMail");
 
 findUser = async (req, res) => {
   const email = req.body.email;
@@ -353,21 +354,81 @@ addPromoIntoUser = async (req, res) => {
 };
 
 createUser = async (req, res) => {
-  if (req.body.image) {
+  if (req.body.role == "Renter") {
+    req.body.status = "Active";
+  } else {
+    req.body.status = "Hold";
+  }
+
+  if (!req.body.idType && req.body.role != "Renter") {
+    return res.status(500).send("idType is required");
+  }
+  if (req.body.imageId && req.body.imageId.startsWith("data:")) {
+    try {
+      req.body.imageId = await handleFiles.saveFiles(
+        req.body.imageId,
+        "imagesId",
+        path.imagesIdPath
+      );
+    } catch (error) {
+      return res.status(500).send(error);
+    }
+  } else if (!req.body.imageId && req.body.role != "Renter") {
+    return res.status(500).send("imageId is required");
+  }
+
+  if (req.body.imageIdBack && req.body.imageIdBack.startsWith("data:")) {
+    try {
+      req.body.imageIdBack = await handleFiles.saveFiles(
+        req.body.imageIdBack,
+        "imagesId",
+        path.imagesIdPath
+      );
+    } catch (error) {
+      return res.status(500).send(error);
+    }
+  } else if (
+    !req.body.imageIdBack &&
+    req.body.role != "Renter" &&
+    req.body.idType == "Id"
+  ) {
+    return res.status(500).send("imageIdBack is required");
+  }
+
+  if (req.body.image && req.body.image.startsWith("data:")) {
     try {
       req.body.image = await handleFiles.saveFiles(
         req.body.image,
-        "image",
-        path
+        "images",
+        path.imagesPath
       );
     } catch (error) {
       return res.status(500).send(error);
     }
   }
-  userModel.defaultSchema.create(req.body, function (err, cat) {
-    if (err) res.status(500).send(err);
-    else res.status(201).send(req.body);
-  });
+  userModel.defaultSchema
+    .create(req.body)
+    .then(function (models) {
+      let code = Math.floor(Math.random()*90000) + 10000;
+      let mailOptions = {
+        from: process.env.GMAILUSER,
+        to: req.body.email,
+        subject: 'Sending Email using Node.js[nodemailer]',
+        text: `Your Code is ${code}`
+      };
+
+      mailer.transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });  
+      res.status(200).send(req.body);
+    })
+    .catch(function (err) {
+      res.status(500).send(err);
+    });
 };
 module.exports = {
   deleteUser: userModel.genericSchema.delete,
