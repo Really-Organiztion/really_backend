@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 const userModel = require("../models/user.model");
+const userOptModel = require("../models/userOpt.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const handleFiles = require("../../helpers/handleFiles");
@@ -13,6 +14,8 @@ findUser = async (req, res) => {
   const password = req.body.password;
   let user = await userModel.defaultSchema.findOne({ email });
   if (!user) res.status(400).send("Invalid email or password");
+  else if (user && !user.emailVerify)
+    res.status(400).send("Mail must be verified before login");
   else {
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword)
@@ -352,7 +355,75 @@ addPromoIntoUser = async (req, res) => {
     );
   });
 };
+verifyEmail = async (req, res) => {
+  userOptModel.defaultSchema
+    .findOne({
+      email: req.body.email,
+      otp: req.body.otpCode,
+    })
+    .then(function (_obj) {
+      if (_obj) {
+        userModel.defaultSchema
+          .findOneAndUpdate(
+            { email: req.body.email },
+            { $set: { emailVerify: true } },
+            {
+              new: true,
+              setDefaultsOnInsert: true,
+            }
+          )
+          .then(function () {
+            res.status(200).send("Email verify is susses");
+          })
+          .catch(function (err) {
+            console.log(err);
 
+            res.status(500).send(err);
+          });
+      } else {
+        res.status(500).send("Opt Code is wrong");
+      }
+    })
+    .catch(function (err1) {
+      console.log(err1);
+      res.status(500).send(err1);
+    });
+};
+
+generatOptEmail = async (req, res) => {
+  userOptModel.defaultSchema
+    .findOne({
+      email: req.body.email,
+      otp: req.body.otpCode,
+    })
+    .then(function (_obj) {
+      if (_obj) {
+        userModel.defaultSchema
+          .findOneAndUpdate(
+            { email: req.body.email },
+            { $set: { emailVerify: true } },
+            {
+              new: true,
+              setDefaultsOnInsert: true,
+            }
+          )
+          .then(function () {
+            res.status(200).send("Email verify is susses");
+          })
+          .catch(function (err) {
+            console.log(err);
+
+            res.status(500).send(err);
+          });
+      } else {
+        res.status(500).send("Opt Code is wrong");
+      }
+    })
+    .catch(function (err1) {
+      console.log(err1);
+      res.status(500).send(err1);
+    });
+};
 createUser = async (req, res) => {
   if (req.body.role == "Renter") {
     req.body.status = "Active";
@@ -406,25 +477,31 @@ createUser = async (req, res) => {
       return res.status(500).send(error);
     }
   }
+  let optModel = {
+    otp: Math.floor(Math.random() * 90000) + 10000,
+    email: req.body.email,
+  };
+  req.body.emailVerify = false;
   userModel.defaultSchema
     .create(req.body)
     .then(function (models) {
-      let code = Math.floor(Math.random()*90000) + 10000;
-      let mailOptions = {
-        from: process.env.GMAILUSER,
-        to: req.body.email,
-        subject: 'Sending Email using Node.js[nodemailer]',
-        text: `Your Code is ${code}`
-      };
+      userOptModel.defaultSchema.create(optModel).then(function (models1) {
+        let mailOptions = {
+          from: process.env.GMAILUSER,
+          to: optModel.email,
+          subject: "Really Booking Verify Email Code",
+          text: `Your Code is ${optModel.otp}`,
+        };
 
-      mailer.transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });  
-      res.status(200).send(req.body);
+        mailer.transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Email sent: " + info.response);
+          }
+        });
+        res.status(200).send(req.body);
+      });
     })
     .catch(function (err) {
       res.status(500).send(err);
@@ -436,6 +513,8 @@ module.exports = {
   findById: userModel.genericSchema.findById,
   create: createUser,
   findAll: findAllUsers,
+  verifyEmail,
+  generatOptEmail,
   findUserAccount: findUser,
   addPurchaseIntoUser,
   findUserCourses,

@@ -69,6 +69,20 @@ deleteUser = (req, res) => {
     logger.error(error);
   }
 };
+verifyEmail = (req, res) => {
+  try {
+    userService.verifyEmail(req, res);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+generatOptEmail = (req, res) => {
+  try {
+    userService.generatOptEmail(req, res);
+  } catch (error) {
+    logger.error(error);
+  }
+};
 identifyUser = (req, res) => {
   try {
     userService.findUserAccount(req, res);
@@ -241,6 +255,8 @@ module.exports = {
   deleteUser,
   identifyUser,
   logout,
+  verifyEmail,
+  generatOptEmail,
   addPurchaseIntoUser,
   findUserCourses,
   findUserLessons,

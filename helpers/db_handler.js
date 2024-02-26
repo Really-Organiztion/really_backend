@@ -7,7 +7,6 @@ module.exports = function () {
 
   mongoose
     .connect(db, {
-    
     })
     .then(() => {
       logger.info(`The server connecting properly with Mongo DB URL at ${db}`);

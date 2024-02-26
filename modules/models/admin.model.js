@@ -24,6 +24,8 @@ const adminSchema = new Schema({
     required: true,
     enum: [0, 1, 2, 3, 4],
   },
+},{
+  timestamps: true
 });
 const genericOperations = require("../genericService");
 module.exports = {
