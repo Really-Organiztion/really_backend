@@ -219,7 +219,7 @@ deleteContent = async (req, res, lessonId, contentId) => {
         }
       }
     }
-  );
+  ); 
 };
 addQuizIntoLesson = async (req, res, id) => {
   for (const element of req.body.questions) {

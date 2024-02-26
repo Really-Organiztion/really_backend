@@ -1,6 +1,6 @@
 {
   "attachments": {
-    "communityAttachmentPath": "attachments/communities/",
+    "imagesPath": "attachments/images/",
     "courseAttachmentPath": "attachments/courses/",
     "lessonItemsPath": "attachments/lessons/items/",
     "lessonTasksPath": "attachments/lessons/tasks/",

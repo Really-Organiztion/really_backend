@@ -41,18 +41,68 @@ findById = (req, res) => {
     logger.error(error);
   }
 };
+changePassword = (req, res) => {
+  try {
+    const id = req.params.id;
+    adminService.changePassword(req, res, id);
+  } catch (error) {
+    logger.error(error);
+  }
+};
 updateAdmin = (req, res) => {
   try {
     const id = req.params.id;
+    delete req.body.role;
+    delete req.body.isDeleted;
+    delete req.body.password;
+
     adminService.updateAdmin(req, res, id);
   } catch (error) {
     logger.error(error);
   }
 };
-deleteAdmin = (req, res) => {
+updateRoleAdmin = async (req, res) => {
   try {
     const id = req.params.id;
-    adminService.deleteAdmin(req, res, id);
+    const admin = req.params.admin;
+    let userAdmin = await adminService.findAdminById(admin);
+    let user = await adminService.findAdminById(id);
+    if (!req.body || !req.body.role) {
+      return res.status(403).send("The roll must be sent in role");
+    }
+    if (userAdmin && user) {
+      if (user.role > userAdmin.role && req.body.role > userAdmin.role) {
+        req.body = { role: req.body.role };
+        adminService.updateAdminRole(req, res, id);
+      } else {
+        return res
+          .status(403)
+          .send("The user does not have permission to update role");
+      }
+    } else {
+      return res.status(403).send("User not found");
+    }
+  } catch (error) {
+    logger.error(error);
+  }
+};
+deleteAdmin = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const admin = req.params.admin;
+    let userAdmin = await adminService.findAdminById(admin);
+    let user = await adminService.findAdminById(id);
+    if (userAdmin && user) {
+      if (user.role > userAdmin.role) {
+        adminService.deleteAdmin(req, res, id);
+      } else {
+        return res
+          .status(403)
+          .send("The user does not have permission to delete");
+      }
+    } else {
+      return res.status(403).send("User not found");
+    }
   } catch (error) {
     logger.error(error);
   }
@@ -90,8 +140,10 @@ module.exports = {
   createAdmin,
   findById,
   updateAdmin,
+  updateRoleAdmin,
   deleteAdmin,
   identifyAdmin,
   logout,
   findAdminById,
+  changePassword,
 };

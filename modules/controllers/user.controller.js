@@ -12,9 +12,7 @@ getAllData = (req, res) => {
 };
 
 createUser = (req, res, next) => {
-  console.log("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
   try {
-    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
     if (req.body.password.length < 6) {
       return res.status(403).send("Password must be at least 6 chars");
     }

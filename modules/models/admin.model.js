@@ -15,6 +15,15 @@ const adminSchema = new Schema({
     type: String,
     required: true,
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
+  role: {
+    type: Number,
+    required: true,
+    enum: [0, 1, 2, 3, 4],
+  },
 });
 const genericOperations = require("../genericService");
 module.exports = {

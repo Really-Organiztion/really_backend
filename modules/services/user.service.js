@@ -3,6 +3,9 @@ const ObjectId = mongoose.Types.ObjectId;
 const userModel = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const handleFiles = require("../../helpers/handleFiles");
+const attachmentPath = require("../../helpers/attachmentPath.json");
+const path = attachmentPath.attachments.imagesPath;
 
 findUser = async (req, res) => {
   const email = req.body.email;
@@ -229,7 +232,6 @@ addFavoriteIntoUser = async (req, res, id) => {
   );
 };
 removeUserFavorite = async (req, res, id, courseId) => {
-  console.log();
   userModel.defaultSchema.findByIdAndUpdate(
     id,
     { $pull: { favorites: courseId } },
@@ -349,11 +351,29 @@ addPromoIntoUser = async (req, res) => {
     );
   });
 };
+
+createUser = async (req, res) => {
+  if (req.body.image) {
+    try {
+      req.body.image = await handleFiles.saveFiles(
+        req.body.image,
+        "image",
+        path
+      );
+    } catch (error) {
+      return res.status(500).send(error);
+    }
+  }
+  userModel.defaultSchema.create(req.body, function (err, cat) {
+    if (err) res.status(500).send(err);
+    else res.status(201).send(req.body);
+  });
+};
 module.exports = {
   deleteUser: userModel.genericSchema.delete,
   updateUser: userModel.genericSchema.update,
   findById: userModel.genericSchema.findById,
-  create: userModel.genericSchema.create,
+  create: createUser,
   findAll: findAllUsers,
   findUserAccount: findUser,
   addPurchaseIntoUser,
