@@ -32,6 +32,7 @@ findUser = async (req, res) => {
           expiresIn: ONE_WEEK,
         }
       );
+
       let newUser = { password, ...user };
       delete newUser._doc.password;
       return res.status(200).send({
@@ -303,21 +304,25 @@ changePassword = async (req, res, id) => {
             return next(err);
           }
           req.body.newPassword = hash;
-          userModel.defaultSchema.findByIdAndUpdate(
-            id,
-            { $set: { password: req.body.newPassword } },
-            {
-              // While Update: show last updated document with new values
-              new: true,
-              // While Update: the default values will inserted without passing values explicitly
-              setDefaultsOnInsert: true,
-            },
-            function (err, data) {
-              if (err) res.status(500).send(err);
-              else if (data === null) res.status(404).send("ID is not found");
-              else res.status(200).send(data);
-            }
-          );
+          userModel.defaultSchema
+            .findByIdAndUpdate(
+              id,
+              { $set: { password: req.body.newPassword } },
+              {
+                // While Update: show last updated document with new values
+                new: true,
+                // While Update: the default values will inserted without passing values explicitly
+                setDefaultsOnInsert: true,
+              }
+            )
+            .then(function () {
+              res
+                .status(200)
+                .send("The password has been changed successfully");
+            })
+            .catch(function (err) {
+              res.status(500).send(err);
+            });
         });
       });
     }
@@ -376,8 +381,6 @@ verifyEmail = async (req, res) => {
             res.status(200).send("Email verify is susses");
           })
           .catch(function (err) {
-            console.log(err);
-
             res.status(500).send(err);
           });
       } else {
@@ -385,12 +388,11 @@ verifyEmail = async (req, res) => {
       }
     })
     .catch(function (err1) {
-      console.log(err1);
       res.status(500).send(err1);
     });
 };
-
-generatOptEmail = async (req, res) => {
+forgetPassword = async (req, res) => {
+  let email = req.body.emai
   userOptModel.defaultSchema
     .findOne({
       email: req.body.email,
@@ -398,29 +400,94 @@ generatOptEmail = async (req, res) => {
     })
     .then(function (_obj) {
       if (_obj) {
-        userModel.defaultSchema
-          .findOneAndUpdate(
-            { email: req.body.email },
-            { $set: { emailVerify: true } },
-            {
-              new: true,
-              setDefaultsOnInsert: true,
+        bcrypt.genSalt(10, (err, salt) => {
+          if (err) {
+            return callback(err);
+          }
+          bcrypt.hash(req.body.newPassword, salt, (err, hash) => {
+            if (err) {
+              return next(err);
             }
-          )
-          .then(function () {
-            res.status(200).send("Email verify is susses");
-          })
-          .catch(function (err) {
-            console.log(err);
-
-            res.status(500).send(err);
+            req.body.newPassword = hash;
+            userModel.defaultSchema
+              .findByIdAndUpdate(
+                email,
+                { $set: { password: req.body.newPassword } },
+                {
+                  new: true,
+                  setDefaultsOnInsert: true,
+                }
+              )
+              .then(function (_obj) {
+                console.log(_obj,"ggggggggggggggggggggggggggggggggggggggggggggggggg",req.body.newPassword);
+                res
+                  .status(200)
+                  .send("The password has been changed successfully");
+              })
+              .catch(function (err) {
+                res.status(500).send(err);
+              });
           });
+        });
       } else {
-        res.status(500).send("Opt Code is wrong");
+        res.status(400).send("There is no code");
       }
     })
     .catch(function (err1) {
-      console.log(err1);
+      res.status(500).send(err1);
+    });
+};
+getOptEmail = async (req, res) => {
+  userOptModel.defaultSchema
+    .findOne({
+      email: req.body.email,
+    })
+    .then(function (_obj) {
+      if (_obj) {
+        res.status(200).send(_obj);
+      } else {
+        res.status(400).send("There is no code");
+      }
+    })
+    .catch(function (err1) {
+      res.status(500).send(err1);
+    });
+};
+generatOptEmail = async (req, res) => {
+  userOptModel.defaultSchema
+    .findOne({
+      email: req.body.email,
+    })
+    .then(function (_obj) {
+      if (_obj) {
+        res
+          .status(400)
+          .send("You must wait 5 minutes before sending another code");
+      } else {
+        let optModel = {
+          otp: Math.floor(Math.random() * 90000) + 10000,
+          email: req.body.email,
+        };
+        userOptModel.defaultSchema.create(optModel).then(function (models1) {
+          let mailOptions = {
+            from: process.env.GMAILUSER,
+            to: optModel.email,
+            subject: "Really Booking Verify Email Code",
+            text: `Your Code is ${optModel.otp}`,
+          };
+
+          mailer.transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log("Email sent: " + info.response);
+            }
+          });
+          res.status(200).send("The code has been sent to your email");
+        });
+      }
+    })
+    .catch(function (err1) {
       res.status(500).send(err1);
     });
 };
@@ -515,13 +582,14 @@ module.exports = {
   findAll: findAllUsers,
   verifyEmail,
   generatOptEmail,
+  getOptEmail,
+  forgetPassword,
   findUserAccount: findUser,
   addPurchaseIntoUser,
   findUserCourses,
   findUserLessons,
   addFavoriteIntoUser,
   findUserFavorites,
-  changePassword,
   updateUserLessonPurchase,
   checkUserCourseInFavorite,
   findUserById,

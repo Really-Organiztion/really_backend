@@ -42,10 +42,13 @@ module.exports = function (Collection) {
   };
 
   db.findById = (req, res, id) => {
-    Collection.findById(id, function (err, data) {
-      if (err) res.status(500).send(err);
-      else res.status(200).send(data);
-    });
+    Collection.findById(id)
+      .then(function (data) {
+        res.status(200).send(data);
+      })
+      .catch(function (err) {
+        res.status(500).send(err);
+      });
   };
 
   db.update = (req, res, id) => {

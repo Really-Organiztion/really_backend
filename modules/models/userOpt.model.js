@@ -17,7 +17,7 @@ const userSchema = new Schema(
     createdAt: {
       type: Date,
       default: Date.now,
-      expires: '2m' // Set expiration time for OTPs (e.g., 5 minutes)
+      expires: '5m' // Set expiration time for OTPs (e.g., 5 minutes)
     }
   }
 );

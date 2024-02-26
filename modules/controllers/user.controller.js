@@ -83,6 +83,13 @@ generatOptEmail = (req, res) => {
     logger.error(error);
   }
 };
+getOptEmail = (req, res) => {
+  try {
+    userService.getOptEmail(req, res);
+  } catch (error) {
+    logger.error(error);
+  }
+};
 identifyUser = (req, res) => {
   try {
     userService.findUserAccount(req, res);
@@ -109,8 +116,7 @@ addPurchaseIntoUser = async (req, res) => {
         req.body.courseId,
         id
       );
-      if (result)
-        userService.addPurchaseIntoUser(req, res, id, "default");
+      if (result) userService.addPurchaseIntoUser(req, res, id, "default");
     } catch (error) {
       res.send(error);
     }
@@ -126,8 +132,7 @@ addPurchaseIntoUserByCode = async (req, res) => {
         req.body.courseId,
         id
       );
-      if (result)
-        return userService.addPurchaseIntoUser(req, res, id, "other");
+      if (result) return userService.addPurchaseIntoUser(req, res, id, "other");
     } catch (error) {
       res.send(error);
     }
@@ -197,7 +202,14 @@ checkUserCourseInFavorite = (req, res) => {
 changePassword = (req, res) => {
   try {
     const id = req.params.id;
-    userService.changePassword(req, res, id);
+    userService.generatOptEmail(req, res);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+forgetPassword = (req, res) => {
+  try {
+    userService.forgetPassword(req, res);
   } catch (error) {
     logger.error(error);
   }
@@ -213,11 +225,7 @@ findUserCourseByCourseId = async (req, res) => {
   try {
     const userId = req.params.userId;
     const courseId = req.params.courseId;
-    let course = await courseController.findUserCourseById(
-      req,
-      res,
-      courseId
-    );
+    let course = await courseController.findUserCourseById(req, res, courseId);
     let userLessons = await userService.findUserLessons(
       req,
       res,
@@ -257,12 +265,14 @@ module.exports = {
   logout,
   verifyEmail,
   generatOptEmail,
+  getOptEmail,
   addPurchaseIntoUser,
   findUserCourses,
   findUserLessons,
   addFavoriteIntoUser,
   findUserFavorites,
   changePassword,
+  forgetPassword,
   updateUserLessonPurchase,
   findUserCourseByCourseId,
   checkUserCourseInFavorite,

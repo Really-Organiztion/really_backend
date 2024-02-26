@@ -26,6 +26,12 @@ authRouter.post("/verifyEmail", (req, res, next) => {
 authRouter.post("/generatOptEmail", (req, res, next) => {
   userController.generatOptEmail(req, res);
 });
+authRouter.get("/getOptEmail", (req, res, next) => {
+  userController.getOptEmail(req, res);
+});
+authRouter.route("/forgetPassword").put((req, res) => {
+  userController.forgetPassword(req, res);
+});
 authRouter.get("/logout", (req, res, next) => {
   userController.logout(req, res);
 });

@@ -7,9 +7,8 @@ userRouter.get("/", userController.getAllData);
 
 userRouter.route("/").post((req, res) => {
   // Validation
- 
-      userController.createUser(req, res);
-  
+
+  userController.createUser(req, res);
 });
 userRouter.get(
   "/course/:userId/:courseId",
@@ -24,27 +23,22 @@ userRouter.post("/purchase/:id", userController.addPurchaseIntoUser);
 // );
 userRouter.get("/favorite/:id", userController.findUserFavorites);
 userRouter.put("/favorite/:id", userController.addFavoriteIntoUser);
-userRouter.delete(
-  "/favorite/:id/:courseId",
-  userController.removeUserFavorite
-);
+userRouter.delete("/favorite/:id/:courseId", userController.removeUserFavorite);
 userRouter.get(
   "/checkFavorite/:userId/:courseId",
   userController.checkUserCourseInFavorite
 );
 userRouter.route("/changePassword/:id").put((req, res) => {
-
-        const id = req.params.id;
-        userController.changePassword(req, res, id);
-   
+  const id = req.params.id;
+  userController.changePassword(req, res, id);
 });
+
+
 userRouter.get("/:id", userController.findById);
 
 userRouter.route("/:id").put((req, res) => {
- 
-      const id = req.params.id;
-      userController.updateUser(req, res, id);
- 
+  const id = req.params.id;
+  userController.updateUser(req, res, id);
 });
 userRouter.delete("/:id", userController.deleteUser);
 
