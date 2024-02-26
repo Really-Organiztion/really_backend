@@ -30,6 +30,7 @@ findAdmin = async (req, res) => {
       let returnIdentity = {
         username,
         id: admin._id,
+        role : admin.role,
       };
       //Send the response back
       return res.status(200).send({
