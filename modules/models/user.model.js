@@ -93,7 +93,6 @@ const userSchema = new Schema(
     },
     phonesList: [String],
   },
-
   {
     timestamps: true,
     useCreateIndex: true,
