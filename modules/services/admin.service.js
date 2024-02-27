@@ -108,7 +108,7 @@ updateAdminRole =  (req, res, id) => {
     })
     .catch(function (err) {
       res.status(500).send(err)
-    });;
+    });
 };
 changePassword = async (req, res, id) => {
   let user = await adminModel.defaultSchema.findOne({ _id: id });

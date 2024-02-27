@@ -41,10 +41,15 @@ const userSchema = new Schema(
     },
     phone: {
       type: String,
-      required: true,
+      unique: true,
+    },
+    verifyIdentityType: {
+      type: String,
+      enum: ["Active", "Request", "Refused", "Empty"],
     },
     status: {
       type: String,
+      default: "Active",
       enum: ["Active", "Hold", "Bann"],
     },
     nationalID: {
@@ -88,7 +93,7 @@ const userSchema = new Schema(
     },
     phonesList: [String],
   },
- 
+
   {
     timestamps: true,
     useCreateIndex: true,

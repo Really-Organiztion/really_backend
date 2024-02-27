@@ -46,43 +46,41 @@ findUser = async (req, res) => {
 };
 socialMediaLogin = async (req, res) => {
   const email = req.body.email;
-  userModel.defaultSchema.findOneAndUpdate(
-    { email },
-    { $set: { socialMediaToken: req.body.socialMediaToken } },
-    {
-      // While Update: show last updated document with new values
-      new: true,
-      // While Update: the default values will inserted without passing values explicitly
-      setDefaultsOnInsert: true,
-    },
-    function (err, user) {
-      if (err) res.status(500).send(err);
-      else {
-        if (!user) res.status(400).send("Invalid email");
-        else {
-          const ONE_WEEK = 604800;
-          //Generating the token
-          const token = jwt.sign(
-            {
-              id: user._id,
-            },
-            process.env.SECRET,
-            {
-              expiresIn: ONE_WEEK,
-            }
-          );
-          let newUser = { ...user };
-          delete newUser._doc.password;
-          return res.status(200).send({
-            success: true,
-            message: "You can login now",
-            user: newUser._doc,
-            token,
-          });
-        }
+  userModel.defaultSchema
+    .findOneAndUpdate(
+      { email },
+      { $set: { socialMediaToken: req.body.socialMediaToken } },
+      {
+        new: true,
+        setDefaultsOnInsert: true,
       }
-    }
-  );
+    )
+    .then(function (user) {
+      if (!user) res.status(400).send("Invalid email");
+      else {
+        const ONE_WEEK = 604800;
+        const token = jwt.sign(
+          {
+            id: user._id,
+          },
+          process.env.SECRET,
+          {
+            expiresIn: ONE_WEEK,
+          }
+        );
+        let newUser = { ...user };
+        delete newUser._doc.password;
+        return res.status(200).send({
+          success: true,
+          message: "You can login now",
+          user: newUser._doc,
+          token,
+        });
+      }
+    })
+    .catch(function (err1) {
+      res.status(500).send(err1);
+    });
 };
 findAllUsers = async (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
@@ -91,7 +89,6 @@ findAllUsers = async (req, res) => {
     .find()
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
-    .populate(["educationSystem", "grade"])
     .select({ password: 0, __v: 0 });
   if (!users) res.status(500).send("No Users Found");
   else return res.status(200).send(users);
@@ -392,7 +389,6 @@ verifyEmail = async (req, res) => {
     });
 };
 forgetPassword = async (req, res) => {
-  let email = req.body.emai
   userOptModel.defaultSchema
     .findOne({
       email: req.body.email,
@@ -404,28 +400,26 @@ forgetPassword = async (req, res) => {
           if (err) {
             return callback(err);
           }
-          bcrypt.hash(req.body.newPassword, salt, (err, hash) => {
-            if (err) {
-              return next(err);
+          bcrypt.hash(req.body.newPassword, salt, (err2, hash) => {
+            if (err2) {
+              return next(err2);
             }
             req.body.newPassword = hash;
             userModel.defaultSchema
-              .findByIdAndUpdate(
-                email,
+              .findOneAndUpdate(
+                { email: req.body.email },
                 { $set: { password: req.body.newPassword } },
                 {
                   new: true,
-                  setDefaultsOnInsert: true,
                 }
               )
               .then(function (_obj) {
-                console.log(_obj,"ggggggggggggggggggggggggggggggggggggggggggggggggg",req.body.newPassword);
                 res
                   .status(200)
                   .send("The password has been changed successfully");
               })
-              .catch(function (err) {
-                res.status(500).send(err);
+              .catch(function (err1) {
+                res.status(500).send(err1);
               });
           });
         });
@@ -437,6 +431,7 @@ forgetPassword = async (req, res) => {
       res.status(500).send(err1);
     });
 };
+
 getOptEmail = async (req, res) => {
   userOptModel.defaultSchema
     .findOne({
@@ -491,13 +486,55 @@ generatOptEmail = async (req, res) => {
       res.status(500).send(err1);
     });
 };
-createUser = async (req, res) => {
-  if (req.body.role == "Renter") {
-    req.body.status = "Active";
-  } else {
-    req.body.status = "Hold";
+updateIdentity = async (req, res, id) => {
+  if (req.body.imageId && req.body.imageId.startsWith("data:")) {
+    try {
+      req.body.imageId = await handleFiles.saveFiles(
+        req.body.imageId,
+        "imagesId",
+        path.imagesIdPath
+      );
+    } catch (error) {
+      return res.status(500).send(error);
+    }
+  } else if (!req.body.imageId) {
+    return res.status(500).send("imageId is required");
   }
 
+  if (req.body.imageIdBack && req.body.imageIdBack.startsWith("data:")) {
+    try {
+      req.body.imageIdBack = await handleFiles.saveFiles(
+        req.body.imageIdBack,
+        "imagesId",
+        path.imagesIdPath
+      );
+    } catch (error) {
+      return res.status(500).send(error);
+    }
+  } else if (!req.body.imageIdBack && req.body.idType == "Id") {
+    return res.status(500).send("imageIdBack is required");
+  }
+  let editObject = {
+    ...req.body,
+    verifyIdentityType: "Request",
+  };
+  userModel.defaultSchema
+    .findByIdAndUpdate(
+      id,
+      { $set: editObject },
+      {
+        new: true,
+        setDefaultsOnInsert: true,
+      }
+    )
+    .then(function (data) {
+      res.status(200).send(data);
+    })
+    .catch(function (err) {
+      res.status(500).send(err);
+    });
+};
+createUser = async (req, res) => {
   if (!req.body.idType && req.body.role != "Renter") {
     return res.status(500).send("idType is required");
   }
@@ -544,6 +581,17 @@ createUser = async (req, res) => {
       return res.status(500).send(error);
     }
   }
+  if (req.body.idType == "Id" && req.body.imageId && !req.body.imageIdBack) {
+    return res.status(400).send("imageIdBack is required");
+  }
+  if (req.body.imageId && req.body.idType) {
+    req.body.verifyIdentityType = "Request";
+  } else {
+    req.body.verifyIdentityType = "Empty";
+  }
+  if (!req.body.phone) {
+    return res.status(400).send("Phone is required");
+  }
   let optModel = {
     otp: Math.floor(Math.random() * 90000) + 10000,
     email: req.body.email,
@@ -552,23 +600,28 @@ createUser = async (req, res) => {
   userModel.defaultSchema
     .create(req.body)
     .then(function (models) {
-      userOptModel.defaultSchema.create(optModel).then(function (models1) {
-        let mailOptions = {
-          from: process.env.GMAILUSER,
-          to: optModel.email,
-          subject: "Really Booking Verify Email Code",
-          text: `Your Code is ${optModel.otp}`,
-        };
+      userOptModel.defaultSchema
+        .create(optModel)
+        .then(function (models1) {
+          let mailOptions = {
+            from: process.env.GMAILUSER,
+            to: optModel.email,
+            subject: "Really Booking Verify Email Code",
+            text: `Your Code is ${optModel.otp}`,
+          };
 
-        mailer.transporter.sendMail(mailOptions, function (error, info) {
-          if (error) {
-            console.log(error);
-          } else {
-            console.log("Email sent: " + info.response);
-          }
+          mailer.transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log("Email sent: " + info.response);
+            }
+          });
+          res.status(200).send(models);
+        })
+        .catch(function (err) {
+          res.status(500).send(err);
         });
-        res.status(200).send(req.body);
-      });
     })
     .catch(function (err) {
       res.status(500).send(err);
@@ -578,12 +631,14 @@ module.exports = {
   deleteUser: userModel.genericSchema.delete,
   updateUser: userModel.genericSchema.update,
   findById: userModel.genericSchema.findById,
+  createSocialMedia: userModel.genericSchema.create,
   create: createUser,
   findAll: findAllUsers,
   verifyEmail,
   generatOptEmail,
   getOptEmail,
   forgetPassword,
+  updateIdentity,
   findUserAccount: findUser,
   addPurchaseIntoUser,
   findUserCourses,
@@ -593,6 +648,7 @@ module.exports = {
   updateUserLessonPurchase,
   checkUserCourseInFavorite,
   findUserById,
+  changePassword,
   removeUserFavorite,
   socialMediaLogin,
   addPromoIntoUser,

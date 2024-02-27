@@ -28,11 +28,13 @@ userRouter.get(
   "/checkFavorite/:userId/:courseId",
   userController.checkUserCourseInFavorite
 );
-userRouter.route("/changePassword/:id").put((req, res) => {
-  const id = req.params.id;
-  userController.changePassword(req, res, id);
-});
 
+userRouter.route("/changePassword/:id").put((req, res) => {
+  userController.changePassword(req, res);
+});
+userRouter.route("/updateIdentity/:id").put((req, res) => {
+  userController.updateIdentity(req, res);
+});
 
 userRouter.get("/:id", userController.findById);
 

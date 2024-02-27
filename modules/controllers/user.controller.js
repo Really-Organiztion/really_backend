@@ -37,7 +37,7 @@ createUser = (req, res, next) => {
 };
 socialMediaRegister = (req, res) => {
   try {
-    userService.create(req, res);
+    userService.createSocialMedia(req, res);
   } catch (error) {
     logger.error(error);
   }
@@ -55,6 +55,8 @@ updateUser = (req, res) => {
     const id = req.params.id;
     if (req.body.email) {
       return res.status(403).send("Email Cannot be updated");
+    } else if (req.body.password) {
+      return res.status(403).send("Password Cannot be updated");
     }
     userService.updateUser(req, res, id);
   } catch (error) {
@@ -202,7 +204,15 @@ checkUserCourseInFavorite = (req, res) => {
 changePassword = (req, res) => {
   try {
     const id = req.params.id;
-    userService.generatOptEmail(req, res);
+    userService.changePassword(req, res,id);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+updateIdentity = (req, res) => {
+  try {
+    const id = req.params.id;
+    userService.updateIdentity(req, res,id);
   } catch (error) {
     logger.error(error);
   }
@@ -272,6 +282,7 @@ module.exports = {
   addFavoriteIntoUser,
   findUserFavorites,
   changePassword,
+  updateIdentity,
   forgetPassword,
   updateUserLessonPurchase,
   findUserCourseByCourseId,
