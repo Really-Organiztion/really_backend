@@ -43,19 +43,11 @@ deleteCountry = (req, res) => {
     logger.error(error);
   }
 };
-findCountryByEducationSystem = (req, res) => {
-  try {
-    const educationSystemId = req.params.educationSystemId;
-    countryService.findCountryByEducationSystem(req, res, educationSystemId);
-  } catch (error) {
-    logger.error(error);
-  }
-};
+
 module.exports = {
   getAllData,
   create,
   findById,
   updateCountry,
   deleteCountry,
-  findCountryByEducationSystem,
 };

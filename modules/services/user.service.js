@@ -310,9 +310,6 @@ changePassword = async (req, res, id) => {
               id,
               { $set: { password: req.body.newPassword } },
               {
-                // While Update: show last updated document with new values
-                new: true,
-                // While Update: the default values will inserted without passing values explicitly
                 setDefaultsOnInsert: true,
               }
             )

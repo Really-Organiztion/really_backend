@@ -1,9 +1,9 @@
-const currencyService = require("../services/currency.service");
+const walletService = require("../services/wallet.service");
 const logger = require("../../helpers/logging");
 
 getAllData = (req, res) => {
   try {
-    currencyService.findAll(req, res);
+    walletService.findAll(req, res);
   } catch (error) {
     logger.error(error);
   }
@@ -11,7 +11,7 @@ getAllData = (req, res) => {
 
 create = (req, res) => {
   try {
-    currencyService.create(req, res);
+    walletService.create(req, res);
   } catch (error) {
     logger.error(error);
   }
@@ -20,23 +20,31 @@ create = (req, res) => {
 findById = (req, res) => {
   try {
     const id = req.params.id;
-    currencyService.findById(req, res, id);
+    walletService.findById(req, res, id);
   } catch (error) {
     logger.error(error);
   }
 };
-updateCurrency = (req, res) => {
+updateWalletStatus = (req, res) => {
   try {
     const id = req.params.id;
-    currencyService.updateCurrency(req, res, id);
+    walletService.updateWalletStatus(req, res, id);
   } catch (error) {
     logger.error(error);
   }
 };
-deleteCurrency = (req, res) => {
+updateWallet = (req, res) => {
   try {
     const id = req.params.id;
-    currencyService.deleteCurrency(req, res, id);
+    walletService.updateWallet(req, res, id);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+deleteWallet = (req, res) => {
+  try {
+    const id = req.params.id;
+    walletService.deleteWallet(req, res, id);
   } catch (error) {
     logger.error(error);
   }
@@ -46,6 +54,7 @@ module.exports = {
   getAllData,
   create,
   findById,
-  updateCurrency,
-  deleteCurrency,
+  updateWalletStatus,
+  updateWallet,
+  deleteWallet,
 };
