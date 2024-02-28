@@ -20,10 +20,10 @@ module.exports = function (Collection) {
   db.create = (req, res) => {
     Collection.create(req.body)
       .then(function (_obj) {
-        res.status(201).send(req.body);
+        res.status(201).send(_obj);
       })
       .catch(function (err) {
-        res.status(500).send(err);
+        res.status(400).send(err);
       });
   };
 
@@ -36,7 +36,7 @@ module.exports = function (Collection) {
       );
     }
     Collection.create(req.body, function (err, cat) {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else res.status(201).send(req.body);
     });
   };
@@ -47,7 +47,7 @@ module.exports = function (Collection) {
         res.status(200).send(data);
       })
       .catch(function (err) {
-        res.status(500).send(err);
+        res.status(400).send(err);
       });
   };
 
@@ -56,11 +56,11 @@ module.exports = function (Collection) {
       new: true,
       setDefaultsOnInsert: true,
     })
-      .then(function (models) {
-        res.status(200).send("Updated is done");
+      .then(function (data) {
+        res.status(200).send(data);
       })
       .catch(function (err) {
-        res.status(500).send(err);
+        res.status(400).send(err);
       });
   };
 
@@ -72,7 +72,7 @@ module.exports = function (Collection) {
         res.status(200).send("Deleted is done");
       })
       .catch(function (err) {
-        res.status(500).send(err);
+        res.status(400).send(err);
       });
   };
   db.deleteReturn = (req, res, id) => {
@@ -83,7 +83,7 @@ module.exports = function (Collection) {
         res.status(200).send("Deleted is done");
       })
       .catch(function (err) {
-        res.status(500).send(err);
+        res.status(400).send(err);
       });
   };
   db.deActivate = (req, res, id) => {
@@ -94,7 +94,7 @@ module.exports = function (Collection) {
         isActive: req.body.isActive,
       },
       function (err, result) {
-        if (err) res.status(500).send(err);
+        if (err) res.status(400).send(err);
         else res.status(200).send(req.body.isActive);
       }
     );
@@ -122,10 +122,10 @@ module.exports = function (Collection) {
         sort: sort,
       },
       function (err, results) {
-        if (err) res.status(500).send(err);
+        if (err) res.status(400).send(err);
         else
           Collection.countDocuments(convertedValues, (err, count) => {
-            if (err) res.status(500).send(err);
+            if (err) res.status(400).send(err);
             else
               res.send({
                 count,

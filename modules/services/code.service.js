@@ -10,7 +10,7 @@ createCodes = (req, res) => {
       return { code: crypto.randomBytes(6).toString("hex"), isUsed: false };
     });
   codeModel.defaultSchema.create(req.body, function (err, result) {
-    if (err) res.status(500).send(err);
+    if (err) res.status(400).send(err);
     else res.status(201).send(result);
   });
 };
@@ -111,7 +111,7 @@ findAll = (req, res) => {
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .exec((err, data) => {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else res.status(200).send(data);
     });
 };
@@ -125,7 +125,7 @@ checkCode = (req, res) => {
       .select({ __v: 0 })
       .sort({ date: -1 })
       .exec((err, data) => {
-        if (err) res.status(500).send(err);
+        if (err) res.status(400).send(err);
         else {
           if (data) resolve(data);
           else res.status(404).send("Not Found");
@@ -150,7 +150,7 @@ updateCheckedCode = (req, res, id) => {
     )
     .select({ courseId: 1 })
     .exec((err, data) => {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else res.status(200).send(data);
     });
 };

@@ -9,7 +9,7 @@ findAll = (req, res) => {
     .aggregate([
       {
         $lookup: {
-          from: "lessons",
+          from: "lessons", 
           localField: "_id",
           foreignField: "chapterId",
           as: "lessons",
@@ -30,7 +30,7 @@ findAll = (req, res) => {
 };
 create = (req, res) => {
   chapterModel.defaultSchema.create(req.body, function (err, result) {
-    if (err) res.status(500).send(err);
+    if (err) res.status(400).send(err);
     else res.status(201).send(result);
   });
 };

@@ -39,6 +39,10 @@ const userSchema = new Schema(
     socialMediaToken: {
       type: String,
     },
+    countryId: {
+      type: ObjectId,
+      ref: "country",
+    },
     phone: {
       type: String,
       unique: true,
@@ -65,14 +69,13 @@ const userSchema = new Schema(
     },
     balance: {
       type: Number,
+      default: 0,
     },
     bonus: {
       type: Number,
+      default: 0,
     },
-    currency: {
-      type: String,
-    },
-    image: {
+    profileImage: {
       type: String,
     },
     idType: {
@@ -88,6 +91,16 @@ const userSchema = new Schema(
     job: {
       type: String,
     },
+    deviceToken: {
+      type: String,
+    },
+    gender: {
+      type: String,
+      enum: ["Male", "Female"],
+    },
+    birthDate: {
+      type: Date,
+    },
     emailVerify: {
       type: Boolean,
     },
@@ -100,7 +113,11 @@ const userSchema = new Schema(
   }
 );
 const genericOperations = require("../genericService");
-
+// userSchema.virtual("countries", {
+//   ref: "country",
+//   foreignField: "countryId",
+//   localField: "_id"
+// });
 module.exports = {
   genericSchema: genericOperations(mongoose.model("user", userSchema)),
   defaultSchema: mongoose.model("user", userSchema),

@@ -104,7 +104,7 @@ findAll = (req, res, type) => {
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .exec((err, data) => {
-        if (err) res.status(500).send(err);
+        if (err) res.status(400).send(err);
         else {
           if (type === "other") {
             resolve(data);

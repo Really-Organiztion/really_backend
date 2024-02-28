@@ -49,7 +49,7 @@ socialMediaLogin = async (req, res) => {
       setDefaultsOnInsert: true,
     },
     function (err, teacher) {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else {
         if (!teacher) res.status(400).send("Invalid email");
         else {
@@ -86,7 +86,7 @@ findAllTeachers = async (req, res) => {
     .limit(pageSize)
     .select({ password: 0, __v: 0 })
     .sort({ date: -1 });
-  if (!teachers) res.status(500).send("No Teachers Found");
+  if (!teachers) res.status(400).send("No Teachers Found");
   else return res.status(200).send(teachers);
 };
 findAllApprovedTeachers = async (req, res) => {
@@ -98,7 +98,7 @@ findAllApprovedTeachers = async (req, res) => {
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .sort({ date: -1 });
-  if (!teachers) res.status(500).send("No Teachers Found");
+  if (!teachers) res.status(400).send("No Teachers Found");
   else return res.status(200).send(teachers);
 };
 createTeacher = async (req, res) => {
@@ -137,16 +137,16 @@ createTeacher = async (req, res) => {
       .then((values) => {
         req.body.bio = `${req.body.firstName} ${req.body.lastName} - ${req.body.specialization}`;
         teacherModel.defaultSchema.create(req.body, function (err, data) {
-          if (err) res.status(500).send(err);
+          if (err) res.status(400).send(err);
           else res.status(201).send(req.body);
         });
       })
       .catch((err) => {
-        res.status(500).send(err);
+        res.status(400).send(err);
       });
   } catch (err) {
     console.log("err", err);
-    return res.status(500).send(err);
+    return res.status(400).send(err);
   }
 };
 updateTeacherPersonalImage = async (req, res, id) => {
@@ -161,7 +161,7 @@ updateTeacherPersonalImage = async (req, res, id) => {
         path
       );
     } catch (error) {
-      return res.status(500).send(error);
+      return res.status(400).send(error);
     }
   }
   teacherModel.defaultSchema.findByIdAndUpdate(
@@ -174,7 +174,7 @@ updateTeacherPersonalImage = async (req, res, id) => {
       setDefaultsOnInsert: true,
     },
     function (err, data) {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else if (data === null) res.status(404).send("ID is not found");
       else res.status(200).send(data);
     }
@@ -209,7 +209,7 @@ changePassword = async (req, res, id) => {
               setDefaultsOnInsert: true,
             },
             function (err, data) {
-              if (err) res.status(500).send(err);
+              if (err) res.status(400).send(err);
               else if (data === null) res.status(404).send("ID is not found");
               else res.status(200).send(data);
             }
@@ -230,7 +230,7 @@ updateTeacherStatus = async (req, res, id) => {
       setDefaultsOnInsert: true,
     },
     function (err, data) {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else if (data === null) res.status(404).send("ID is not found");
       else res.status(200).send(data);
     }

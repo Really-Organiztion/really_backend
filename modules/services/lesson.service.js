@@ -39,7 +39,7 @@ findAll = (req, res) => {
 
 create = (req, res) => {
   lessonModel.defaultSchema.create(req.body, function (err, result) {
-    if (err) res.status(500).send(err);
+    if (err) res.status(400).send(err);
     else res.status(201).send(result);
   });
 };
@@ -52,7 +52,7 @@ addContentIntoLesson = async (req, res, id) => {
         itemPath
       );
     } catch (error) {
-      return res.status(500).send(error);
+      return res.status(400).send(error);
     }
   }
   lessonModel.defaultSchema.findByIdAndUpdate(
@@ -65,7 +65,7 @@ addContentIntoLesson = async (req, res, id) => {
       setDefaultsOnInsert: true,
     },
     function (err, data) {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else if (data === null) res.status(404).send("ID is not found");
       else res.status(200).send(data);
     }
@@ -82,7 +82,7 @@ addTaskIntoLesson = async (req, res, id) => {
             taskPath
           );
         } catch (error) {
-          return res.status(500).send(error);
+          return res.status(400).send(error);
         }
       }
     }
@@ -96,7 +96,7 @@ addTaskIntoLesson = async (req, res, id) => {
         setDefaultsOnInsert: true,
       },
       function (err, data) {
-        if (err) res.status(500).send(err);
+        if (err) res.status(400).send(err);
         else if (data === null) res.status(404).send("ID is not found");
         else res.status(200).send(data);
       }
@@ -106,7 +106,7 @@ addTaskIntoLesson = async (req, res, id) => {
 deleteLesson = async (req, res, id) => {
   allAttachments = [];
   lessonModel.defaultSchema.findByIdAndRemove(id, function (err, data) {
-    if (err) res.status(500).send(err);
+    if (err) res.status(400).send(err);
     else {
       if (data === null) res.sendStatus(404);
       else {
@@ -144,7 +144,7 @@ updateContent = async (req, res, lessonId, contentId) => {
         itemPath
       );
     } catch (error) {
-      return res.status(500).send(error);
+      return res.status(400).send(error);
     }
   }
   lessonModel.defaultSchema
@@ -179,7 +179,7 @@ updateTask = async (req, res, lessonId, taskId) => {
             taskPath
           );
         } catch (error) {
-          return res.status(500).send(error);
+          return res.status(400).send(error);
         }
       }
     }
@@ -208,7 +208,7 @@ deleteContent = async (req, res, lessonId, contentId) => {
     { $pull: { items: { _id: contentId }, tasks: { _id: contentId } } },
     { safe: true, multi: true },
     function (err, data) {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else {
         if (data === null) res.sendStatus(404);
         else {
@@ -231,7 +231,7 @@ addQuizIntoLesson = async (req, res, id) => {
           quizPath
         );
       } catch (error) {
-        return res.status(500).send(error);
+        return res.status(400).send(error);
       }
     }
     for (const answer of element.answers) {
@@ -243,7 +243,7 @@ addQuizIntoLesson = async (req, res, id) => {
             quizPath
           );
         } catch (error) {
-          return res.status(500).send(error);
+          return res.status(400).send(error);
         }
       }
     }
@@ -258,7 +258,7 @@ addQuizIntoLesson = async (req, res, id) => {
           quizPath
         );
       } catch (error) {
-        return res.status(500).send(error);
+        return res.status(400).send(error);
       }
     }
   }
@@ -272,7 +272,7 @@ addQuizIntoLesson = async (req, res, id) => {
       setDefaultsOnInsert: true,
     },
     function (err, data) {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else if (data === null) res.status(404).send("ID is not found");
       else res.status(200).send(data);
     }
@@ -297,7 +297,7 @@ updateQuiz = async (req, res, lessonId, quizId) => {
             quizPath
           );
         } catch (error) {
-          return res.status(500).send(error);
+          return res.status(400).send(error);
         }
       }
       for (const answer of element.answers) {
@@ -309,7 +309,7 @@ updateQuiz = async (req, res, lessonId, quizId) => {
               quizPath
             );
           } catch (error) {
-            return res.status(500).send(error);
+            return res.status(400).send(error);
           }
         }
       }
@@ -324,7 +324,7 @@ updateQuiz = async (req, res, lessonId, quizId) => {
             quizPath
           );
         } catch (error) {
-          return res.status(500).send(error);
+          return res.status(400).send(error);
         }
       }
     }
@@ -353,7 +353,7 @@ deleteQuiz = async (req, res, lessonId, quizId) => {
     { $pull: { quizzes: { _id: quizId } } },
     { safe: true, multi: true },
     function (err, data) {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else {
         if (data === null) res.sendStatus(404);
         else {

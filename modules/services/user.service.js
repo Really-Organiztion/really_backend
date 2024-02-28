@@ -79,18 +79,22 @@ socialMediaLogin = async (req, res) => {
       }
     })
     .catch(function (err1) {
-      res.status(500).send(err1);
+      res.status(400).send(err1);
     });
 };
 findAllUsers = async (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
+  const lang = req.query.lang ? req.query.lang : "en";
+  const toFound = lang === "en" ? "name" : "nameAr";
   let users = await userModel.defaultSchema
     .find()
+    .populate("countryId", [`${toFound}`, "code","numericCode"])
+
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .select({ password: 0, __v: 0 });
-  if (!users) res.status(500).send("No Users Found");
+  if (!users) res.status(400).send("No Users Found");
   else return res.status(200).send(users);
 };
 addPurchaseIntoUser = async (req, res, id, type) => {
@@ -114,7 +118,7 @@ addPurchaseIntoUser = async (req, res, id, type) => {
         setDefaultsOnInsert: true,
       },
       function (err, data) {
-        if (err) res.status(500).send(err);
+        if (err) res.status(400).send(err);
         else if (data === null) res.status(404).send("User ID is not found");
         else {
           if (type === "other") {
@@ -176,7 +180,7 @@ findUserCourses = async (req, res, id) => {
       .limit(pageSize)
       .select({ courses: 1, lessons: 1 })
       .exec((err, data) => {
-        if (err) res.status(500).send(err);
+        if (err) res.status(400).send(err);
         else {
           if (data[0].courses.length > 0) {
             resolve(data);
@@ -201,7 +205,7 @@ findUserLessons = async (req, res, id, type) => {
       .limit(pageSize)
       .select({ lessons: 1 })
       .exec((err, data) => {
-        if (err) res.status(500).send(err);
+        if (err) res.status(400).send(err);
         else {
           if (type === "other") {
             resolve(data);
@@ -227,7 +231,7 @@ addFavoriteIntoUser = async (req, res, id) => {
       setDefaultsOnInsert: true,
     },
     function (err, data) {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else if (data === null) res.status(404).send("ID is not found");
       else res.status(200).send(data);
     }
@@ -239,7 +243,7 @@ removeUserFavorite = async (req, res, id, courseId) => {
     { $pull: { favorites: courseId } },
     { safe: true, multi: true },
     function (err, data) {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else if (data === null) res.status(404).send("ID is not found");
       else res.sendStatus(200);
     }
@@ -255,7 +259,7 @@ findUserFavorites = async (req, res, id) => {
       .limit(pageSize)
       .select({ favorites: 1 })
       .exec((err, data) => {
-        if (err) res.status(500).send(err);
+        if (err) res.status(400).send(err);
         else {
           if (data[0].favorites.length > 0) {
             resolve(data[0].favorites);
@@ -275,7 +279,7 @@ checkUserCourseInFavorite = async (req, res, userId, courseId) => {
     .limit(pageSize)
     .select({ favorites: 1 })
     .exec((err, data) => {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else {
         if (data && data.length > 0) res.status(200).send("Found");
         else res.status(404).send("Not Found");
@@ -318,7 +322,7 @@ changePassword = async (req, res, id) => {
                 .send("The password has been changed successfully");
             })
             .catch(function (err) {
-              res.status(500).send(err);
+              res.status(400).send(err);
             });
         });
       });
@@ -378,14 +382,14 @@ verifyEmail = async (req, res) => {
             res.status(200).send("Email verify is susses");
           })
           .catch(function (err) {
-            res.status(500).send(err);
+            res.status(400).send(err);
           });
       } else {
-        res.status(500).send("Opt Code is wrong");
+        res.status(400).send("Opt Code is wrong");
       }
     })
     .catch(function (err1) {
-      res.status(500).send(err1);
+      res.status(400).send(err1);
     });
 };
 forgetPassword = async (req, res) => {
@@ -419,7 +423,7 @@ forgetPassword = async (req, res) => {
                   .send("The password has been changed successfully");
               })
               .catch(function (err1) {
-                res.status(500).send(err1);
+                res.status(400).send(err1);
               });
           });
         });
@@ -428,7 +432,7 @@ forgetPassword = async (req, res) => {
       }
     })
     .catch(function (err1) {
-      res.status(500).send(err1);
+      res.status(400).send(err1);
     });
 };
 
@@ -445,7 +449,7 @@ getOptEmail = async (req, res) => {
       }
     })
     .catch(function (err1) {
-      res.status(500).send(err1);
+      res.status(400).send(err1);
     });
 };
 generatOptEmail = async (req, res) => {
@@ -483,7 +487,7 @@ generatOptEmail = async (req, res) => {
       }
     })
     .catch(function (err1) {
-      res.status(500).send(err1);
+      res.status(400).send(err1);
     });
 };
 updateIdentity = async (req, res, id) => {
@@ -495,10 +499,10 @@ updateIdentity = async (req, res, id) => {
         path.imagesIdPath
       );
     } catch (error) {
-      return res.status(500).send(error);
+      return res.status(400).send(error);
     }
   } else if (!req.body.imageId) {
-    return res.status(500).send("imageId is required");
+    return res.status(400).send("imageId is required");
   }
 
   if (req.body.imageIdBack && req.body.imageIdBack.startsWith("data:")) {
@@ -509,10 +513,10 @@ updateIdentity = async (req, res, id) => {
         path.imagesIdPath
       );
     } catch (error) {
-      return res.status(500).send(error);
+      return res.status(400).send(error);
     }
   } else if (!req.body.imageIdBack && req.body.idType == "Id") {
-    return res.status(500).send("imageIdBack is required");
+    return res.status(400).send("imageIdBack is required");
   }
   let editObject = {
     ...req.body,
@@ -531,12 +535,12 @@ updateIdentity = async (req, res, id) => {
       res.status(200).send(data);
     })
     .catch(function (err) {
-      res.status(500).send(err);
+      res.status(400).send(err);
     });
 };
 createUser = async (req, res) => {
   if (!req.body.idType && req.body.role != "Renter") {
-    return res.status(500).send("idType is required");
+    return res.status(400).send("idType is required");
   }
   if (req.body.imageId && req.body.imageId.startsWith("data:")) {
     try {
@@ -546,10 +550,10 @@ createUser = async (req, res) => {
         path.imagesIdPath
       );
     } catch (error) {
-      return res.status(500).send(error);
+      return res.status(400).send(error);
     }
   } else if (!req.body.imageId && req.body.role != "Renter") {
-    return res.status(500).send("imageId is required");
+    return res.status(400).send("imageId is required");
   }
 
   if (req.body.imageIdBack && req.body.imageIdBack.startsWith("data:")) {
@@ -560,25 +564,25 @@ createUser = async (req, res) => {
         path.imagesIdPath
       );
     } catch (error) {
-      return res.status(500).send(error);
+      return res.status(400).send(error);
     }
   } else if (
     !req.body.imageIdBack &&
     req.body.role != "Renter" &&
     req.body.idType == "Id"
   ) {
-    return res.status(500).send("imageIdBack is required");
+    return res.status(400).send("imageIdBack is required");
   }
 
-  if (req.body.image && req.body.image.startsWith("data:")) {
+  if (req.body.profileImage && req.body.profileImage.startsWith("data:")) {
     try {
-      req.body.image = await handleFiles.saveFiles(
-        req.body.image,
+      req.body.profileImage = await handleFiles.saveFiles(
+        req.body.profileImage,
         "images",
         path.imagesPath
       );
     } catch (error) {
-      return res.status(500).send(error);
+      return res.status(400).send(error);
     }
   }
   if (req.body.idType == "Id" && req.body.imageId && !req.body.imageIdBack) {
@@ -620,11 +624,11 @@ createUser = async (req, res) => {
           res.status(200).send(models);
         })
         .catch(function (err) {
-          res.status(500).send(err);
+          res.status(400).send(err);
         });
     })
     .catch(function (err) {
-      res.status(500).send(err);
+      res.status(400).send(err);
     });
 };
 module.exports = {

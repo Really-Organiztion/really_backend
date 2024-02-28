@@ -11,7 +11,7 @@ findAll = (req, res, type) => {
       .select({ __v: 0 })
       .sort({ date: -1 })
       .exec((err, data) => {
-        if (err) res.status(500).send(err);
+        if (err) res.status(400).send(err);
         else {
           if (type === "other") {
             resolve(data);
@@ -32,7 +32,7 @@ findPromoValueByCode = (req, res) => {
     .limit(pageSize)
     .select({ value: 1, discount: 1 })
     .exec((err, data) => {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else {
         if (data) res.status(200).send(data);
         else res.status(404).send("Not Found");

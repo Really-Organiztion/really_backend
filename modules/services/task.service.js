@@ -14,11 +14,11 @@ createTaskWithAttachment = async (req, res) => {
         path
       );
     } catch (error) {
-      return res.status(500).send(error);
+      return res.status(400).send(error);
     }
   }
   taskModel.defaultSchema.create(req.body, function (err, cat) {
-    if (err) res.status(500).send(err);
+    if (err) res.status(400).send(err);
     else res.status(201).send(req.body);
   });
 };
@@ -29,7 +29,7 @@ checkUserTask = (req, res, taskId, userId) => {
     .select({ __v: 0 })
     .sort({ date: -1 })
     .exec((err, data) => {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else {
         if (data && data._id) {
           res.status(200).send("Found");
@@ -82,7 +82,7 @@ replaceTaskAttachment = async (req, res, id) => {
         path
       );
     } catch (error) {
-      return res.status(500).send(error);
+      return res.status(400).send(error);
     }
   }
   taskModel.defaultSchema.findByIdAndUpdate(
@@ -95,7 +95,7 @@ replaceTaskAttachment = async (req, res, id) => {
       setDefaultsOnInsert: true,
     },
     function (err, data) {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else if (data === null) res.status(404).send("ID is not found");
       else res.status(200).send(data);
     }

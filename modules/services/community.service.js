@@ -68,7 +68,7 @@ addAnswerIntoCommunity = async (req, res, id) => {
         path
       );
     } catch (error) {
-      return res.status(500).send(error);
+      return res.status(400).send(error);
     }
   }
   communityModel.defaultSchema.findByIdAndUpdate(
@@ -81,7 +81,7 @@ addAnswerIntoCommunity = async (req, res, id) => {
       setDefaultsOnInsert: true,
     },
     function (err, data) {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else if (data === null) res.status(404).send("ID is not found");
       else res.status(200).send(data);
     }
@@ -101,7 +101,7 @@ addMultipleAnswersIntoCommunity = async (req, res, id) => {
             );
             allAttachments.push(answer.value);
           } catch (error) {
-            return res.status(500).send(error);
+            return res.status(400).send(error);
           }
         } else {
           allAttachments.push(answer.value);
@@ -121,7 +121,7 @@ addMultipleAnswersIntoCommunity = async (req, res, id) => {
         setDefaultsOnInsert: true,
       },
       function (err, data) {
-        if (err) res.status(500).send(err);
+        if (err) res.status(400).send(err);
         else if (data === null) res.status(404).send("ID is not found");
         else res.status(200).send(data);
       }
@@ -161,7 +161,7 @@ createCommunity = async (req, res) => {
   });
   promise.then(() => {
     communityModel.defaultSchema.create(req.body, function (err, data) {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else res.status(201).send(req.body);
     });
   });
@@ -173,7 +173,7 @@ deleteCommunity = async (req, res, id) => {
     }
   }
   communityModel.defaultSchema.findByIdAndRemove(id, function (err, data) {
-    if (err) res.status(500).send(err);
+    if (err) res.status(400).send(err);
     else {
       if (data === null) res.sendStatus(404);
       else res.sendStatus(200);

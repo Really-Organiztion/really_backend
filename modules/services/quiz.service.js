@@ -51,7 +51,7 @@ checkUserQuiz = (req, res, quizId, userId) => {
     .select({ __v: 0 })
     .sort({ date: -1 })
     .exec((err, data) => {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else {
         if (data && data._id) {
           res.status(200).send("Found");

@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
+const countryRouter = require("./routers/country.router");
+const currencyRouter = require("./routers/currency.router");
 const adminRouter = require("./routers/admin.router");
 const promoCodeRouter = require("./routers/promoCode.router");
 const giftCardRouter = require("./routers/giftCard.router");
@@ -21,6 +23,8 @@ const codeRouter = require("./routers/code.router");
 const notificationRouter = require("./routers/notification.router");
 
 router.use("/admin", adminRouter);
+router.use("/country", countryRouter);
+router.use("/currency", currencyRouter);
 router.use("/promoCode", promoCodeRouter);
 router.use("/giftCard", giftCardRouter);
 router.use("/community", communityRouter);

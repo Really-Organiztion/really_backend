@@ -76,11 +76,11 @@ createWithAttachment = async (req, res) => {
         path
       );
     } catch (error) {
-      return res.status(500).send(error);
+      return res.status(400).send(error);
     }
   }
   courseModel.defaultSchema.create(req.body, function (err, cat) {
-    if (err) res.status(500).send(err);
+    if (err) res.status(400).send(err);
     else res.status(201).send(req.body);
   });
 };
@@ -221,7 +221,7 @@ callCourseAggregateFunc = (req, res, obj, type) => {
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .exec((err, data) => {
-        if (err) res.status(500).send(err);
+        if (err) res.status(400).send(err);
         else {
           if (type === "user") {
             resolve(data);
@@ -448,7 +448,7 @@ findCourseBasicInfo = async (req, res, obj) => {
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .exec((err, data) => {
-      if (err) res.status(500).send(err);
+      if (err) res.status(400).send(err);
       else {
         if (req.body.lessons && req.body.lessons.length > 0) {
           for (const lesson of req.body.lessons) {

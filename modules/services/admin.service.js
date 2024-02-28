@@ -56,7 +56,7 @@ findAllAdmins = async (req, res) => {
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .select({ password: 0, __v: 0 });
-  if (!admins) res.status(500).send("No Admins Found");
+  if (!admins) res.status(400).send("No Admins Found");
   else return res.status(200).send(admins);
 };
 function loginAsSuperAdmin(username, callback) {
@@ -107,7 +107,7 @@ updateAdminRole =  (req, res, id) => {
       res.status(201).send('Role update is done')
     })
     .catch(function (err) {
-      res.status(500).send(err)
+      res.status(400).send(err)
     });
 };
 changePassword = async (req, res, id) => {
@@ -140,7 +140,7 @@ changePassword = async (req, res, id) => {
             res.status(200).send("Updated password is done");
           })
           .catch(function (err) {
-            res.status(500).send(err);
+            res.status(400).send(err);
           });
         });
       });
