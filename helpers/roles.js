@@ -16,6 +16,17 @@ const getToken = (headers) => {
   }
 };
 
+const logOut = async (req, res) => {
+  try {
+    res.clearCookie("jwt_token");
+    req.session.destroy();
+    // await   jwt.destroy(getToken(req.headers), process.env.SECRET);
+    res.status(200).send("User logout is susses");
+  } catch (err) {
+    res.status(400).send("Token Not Correct");
+  }
+};
+
 const getDecodedToken = (headers) => {
   try {
     return jwt.decode(getToken(headers), process.env.SECRET);
@@ -52,6 +63,7 @@ const isAuthenticatedAsAdmin = async (req, res, next) => {
 };
 
 module.exports = {
+  logOut,
   getToken,
   getDecodedToken,
   isAuthenticatedAsTeacher,

@@ -76,17 +76,41 @@ const userSchema = new Schema(
       default: 0,
     },
     profileImage: {
-      type: String,
+      url : {
+        type: String,
+      },
+      path : {
+        type: String,
+      },
+      size : {
+        type: String,
+      },
     },
     idType: {
       type: String,
       enum: ["Id", "Passport"],
     },
     imageId: {
-      type: String,
+      url : {
+        type: String,
+      },
+      path : {
+        type: String,
+      },
+      size : {
+        type: String,
+      },
     },
     imageIdBack: {
-      type: String,
+      url : {
+        type: String,
+      },
+      path : {
+        type: String,
+      },
+      size : {
+        type: String,
+      },
     },
     job: {
       type: String,

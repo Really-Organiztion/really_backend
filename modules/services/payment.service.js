@@ -118,7 +118,6 @@ notificationCallback = async (type, payload, res) => {
     };
     await create(obj);
     if (type === "TRANSACTION" && payload.success) {
-      console.log("aaaaaaaaaaaaa");
     } else {
       res.send("Received failed payment callback");
     }

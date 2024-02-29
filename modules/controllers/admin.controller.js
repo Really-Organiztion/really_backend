@@ -2,6 +2,8 @@ const adminService = require("../services/admin.service");
 const bcrypt = require("bcryptjs");
 const logger = require("../../helpers/logging");
 const config = require("../../config/default.json");
+const roles = require("../../helpers/roles");
+const jwt = require("jsonwebtoken");
 
 getAllData = (req, res) => {
   try {
@@ -115,8 +117,8 @@ identifyAdmin = (req, res) => {
   }
 };
 logout = (req, res) => {
-  admin = {};
-  token = null;
+ roles.logOut
+  // roles.logOut(req.headers);
 };
 function loginAsSuperAdmin() {
   adminService.loginAsSuperAdmin(config.superAdmin.username, (err, data) => {

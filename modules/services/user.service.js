@@ -89,7 +89,7 @@ findAllUsers = async (req, res) => {
   const toFound = lang === "en" ? "name" : "nameAr";
   let users = await userModel.defaultSchema
     .find()
-    .populate("countryId", [`${toFound}`, "code","numericCode"])
+    .populate("countryId", [`${toFound}`, "code", "numericCode"])
 
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
@@ -488,31 +488,10 @@ generatOptEmail = async (req, res) => {
     });
 };
 updateIdentity = async (req, res, id) => {
-  if (req.body.imageId && req.body.imageId.startsWith("data:")) {
-    try {
-      req.body.imageId = await handleFiles.saveFiles(
-        req.body.imageId,
-        "imagesId",
-        path.imagesIdPath
-      );
-    } catch (error) {
-      return res.status(400).send(error);
-    }
-  } else if (!req.body.imageId) {
+  if (!req.body.imageId) {
     return res.status(400).send("imageId is required");
   }
-
-  if (req.body.imageIdBack && req.body.imageIdBack.startsWith("data:")) {
-    try {
-      req.body.imageIdBack = await handleFiles.saveFiles(
-        req.body.imageIdBack,
-        "imagesId",
-        path.imagesIdPath
-      );
-    } catch (error) {
-      return res.status(400).send(error);
-    }
-  } else if (!req.body.imageIdBack && req.body.idType == "Id") {
+  if (!req.body.imageIdBack && req.body.idType == "Id") {
     return res.status(400).send("imageIdBack is required");
   }
   let editObject = {
@@ -539,48 +518,16 @@ createUser = async (req, res) => {
   if (!req.body.idType && req.body.role != "Renter") {
     return res.status(400).send("idType is required");
   }
-  if (req.body.imageId && req.body.imageId.startsWith("data:")) {
-    try {
-      req.body.imageId = await handleFiles.saveFiles(
-        req.body.imageId,
-        "imagesId",
-        path.imagesIdPath
-      );
-    } catch (error) {
-      return res.status(400).send(error);
-    }
-  } else if (!req.body.imageId && req.body.role != "Renter") {
+  if (!req.body.imageId && req.body.role != "Renter") {
     return res.status(400).send("imageId is required");
   }
 
-  if (req.body.imageIdBack && req.body.imageIdBack.startsWith("data:")) {
-    try {
-      req.body.imageIdBack = await handleFiles.saveFiles(
-        req.body.imageIdBack,
-        "imagesId",
-        path.imagesIdPath
-      );
-    } catch (error) {
-      return res.status(400).send(error);
-    }
-  } else if (
+  if (
     !req.body.imageIdBack &&
     req.body.role != "Renter" &&
     req.body.idType == "Id"
   ) {
     return res.status(400).send("imageIdBack is required");
-  }
-
-  if (req.body.profileImage && req.body.profileImage.startsWith("data:")) {
-    try {
-      req.body.profileImage = await handleFiles.saveFiles(
-        req.body.profileImage,
-        "images",
-        path.imagesPath
-      );
-    } catch (error) {
-      return res.status(400).send(error);
-    }
   }
   if (req.body.idType == "Id" && req.body.imageId && !req.body.imageIdBack) {
     return res.status(400).send("imageIdBack is required");

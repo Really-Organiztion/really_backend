@@ -2,6 +2,8 @@ const userService = require("../services/user.service");
 const bcrypt = require("bcryptjs");
 const logger = require("../../helpers/logging");
 const courseController = require("./course.controller");
+const jwt = require("jsonwebtoken");
+const roles = require("../../helpers/roles");
 
 getAllData = (req, res) => {
   try {
@@ -107,8 +109,8 @@ socialMediaLogin = (req, res) => {
   }
 };
 logout = (req, res) => {
-  user = {};
-  token = null;
+  jwt.destroy(roles.getDecodedToken(req.headers));
+  res.status(200).send("User logout is susses");
 };
 addPurchaseIntoUser = async (req, res) => {
   try {

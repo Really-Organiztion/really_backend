@@ -11,9 +11,7 @@ getAllData = (req, res) => {
 
 create = (req, res) => {
   try {
-  
-          notificationService.create(req, res);
-      
+    notificationService.create(req, res);
   } catch (error) {
     logger.error(error);
   }

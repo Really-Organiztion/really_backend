@@ -1,5 +1,38 @@
 const fs = require("fs");
 const mkdirp = require("mkdirp").mkdirp;
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "attachments/");
+  },
+  filename: function (req, file, cb) {
+    const unqieName = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, unqieName + "-" + file.originalname);
+  },
+});
+const upload = multer({ storage: storage });
+
+const handleFileUpload = (req, res) => {
+  upload.single("file")(req, res, function (err) {
+    if (err) {
+      return res.status(400).send(err,"Error uploading file");
+    }
+
+    if (req.file) {
+      // Store the file path in the request object
+      return res.status(200).send({
+        url : req.file.destination + req.file.filename,
+        path : req.file.path,
+        size : req.file.size,
+      });
+    } else {
+      return res.status(400).send("Error uploading file");
+    }
+
+    // Call the next middleware
+  });
+};
 
 saveFiles = (file, type, path) => {
   return new Promise((resolve, reject) => {
@@ -50,6 +83,7 @@ readFile = async (key) => {
 };
 
 module.exports = {
+  handleFileUpload,
   saveFiles,
   readFile,
   deleteFile,
