@@ -18,7 +18,7 @@ const adminSchema = new Schema({
   isDeleted: {
     type: Boolean,
     default: false,
-  },
+  }, 
   role: {
     type: Number,
     required: true,
