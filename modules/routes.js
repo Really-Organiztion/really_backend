@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const countryRouter = require("./routers/country.router");
+const requestRouter = require("./routers/request.router");
 const currencyRouter = require("./routers/currency.router");
 const walletRouter = require("./routers/wallet.router");
 const adminRouter = require("./routers/admin.router");
@@ -26,6 +27,7 @@ const codeRouter = require("./routers/code.router");
 const notificationRouter = require("./routers/notification.router");
 
 router.use("/admin", adminRouter);
+router.use("/request", requestRouter);
 router.use("/country", countryRouter);
 router.use("/currency", currencyRouter);
 router.use("/wallet", walletRouter);

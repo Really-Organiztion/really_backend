@@ -4,18 +4,17 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
 const walletSchema = new Schema({
-
   activeBalance: {
     type: Number,
-    default : 0,
+    default: 0,
   },
   holdBalance: {
     type: Number,
-    default : 0,
+    default: 0,
   },
   bonus: {
     type: Number,
-    default : 0,
+    default: 0,
   },
   currencyId: {
     type: ObjectId,
@@ -25,7 +24,7 @@ const walletSchema = new Schema({
   userId: {
     type: ObjectId,
     required: true,
-    ref :'user'
+    ref: "user",
   },
   pin: {
     type: String,
@@ -34,13 +33,13 @@ const walletSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['UnderReview','Working','Stopped'],
-    default : "UnderReview"
+    enum: ["UnderReview", "Working", "Stopped"],
+    default: "UnderReview",
   },
-  isDeleted : {
-    type : Boolean,
-    default : false
-  }
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 const genericOperations = require("../genericService");
 module.exports = {
