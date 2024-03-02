@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 const userModel = require("../models/user.model");
 const userOptModel = require("../models/userOpt.model");
+const requestModel = require("../models/request.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const handleFiles = require("../../helpers/handleFiles");
@@ -547,7 +548,7 @@ createUser = async (req, res) => {
   req.body.emailVerify = false;
   userModel.defaultSchema
     .create(req.body)
-    .then(function (models) {
+    .then(function (user) {
       userOptModel.defaultSchema
         .create(optModel)
         .then(function (models1) {
@@ -565,7 +566,20 @@ createUser = async (req, res) => {
               console.log("Email sent: " + info.response);
             }
           });
-          res.status(200).send(models);
+          let request = {
+            details: "أريد تحديث البطاقةالشخصية",
+            type: "Identify",
+            target: "User",
+            userId: user._id,
+          };
+          requestModel.defaultSchema
+            .create(request)
+            .then(function (_request) {
+              res.status(200).send(user);
+            })
+            .catch(function (err) {
+              res.status(400).send(err);
+            });
         })
         .catch(function (err) {
           res.status(400).send(err);
@@ -594,7 +608,7 @@ module.exports = {
   addFavoriteIntoUser,
   findUserFavorites,
   updateUserLessonPurchase,
-  checkUserCourseInFavorite,
+  checkUserCourseInFavorite, 
   findUserById,
   changePassword,
   removeUserFavorite,
