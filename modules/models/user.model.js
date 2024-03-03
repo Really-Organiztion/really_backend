@@ -79,12 +79,7 @@ const userSchema = new Schema(
       url : {
         type: String,
       },
-      path : {
-        type: String,
-      },
-      size : {
-        type: String,
-      },
+     
     },
     idType: {
       type: String,
@@ -93,24 +88,12 @@ const userSchema = new Schema(
     imageId: {
       url : {
         type: String,
-      },
-      path : {
-        type: String,
-      },
-      size : {
-        type: String,
-      },
+      }
     },
     imageIdBack: {
       url : {
         type: String,
-      },
-      path : {
-        type: String,
-      },
-      size : {
-        type: String,
-      },
+      }
     },
     job: {
       type: String,

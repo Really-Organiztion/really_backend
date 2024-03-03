@@ -28,14 +28,19 @@ const handleFileUpload = (req, res) => {
     }
     if (req.file) {
       return res.status(200).send({
-        url: '/api/uploadFile/' + req.params.pathName + "/" + req.params.fileType + "/" + req.file.filename,
-        path: req.file.path,
+        url:
+          "/api/uploadFile/" +
+          req.params.pathName +
+          "/" +
+          req.params.fileType +
+          "/" +
+          req.file.filename,
+        type: req.file.mimetype,
         size: req.file.size,
       });
     } else {
       return res.status(400).send("Error uploading file");
     }
-
   });
 };
 
