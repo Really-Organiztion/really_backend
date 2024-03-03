@@ -6,6 +6,7 @@ const requestModel = require("../models/request.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const handleFiles = require("../../helpers/handleFiles");
+const webSocket = require("../../helpers/websocket");
 const attachmentPath = require("../../helpers/attachmentPath.json");
 const path = attachmentPath.attachments;
 const mailer = require("../../helpers/sendMail");
@@ -575,11 +576,15 @@ createUser = async (req, res) => {
           requestModel.defaultSchema
             .create(request)
             .then(function (_request) {
+              webSocket.sendAdminMessage(_request)
+            
+
               res.status(200).send(user);
             })
             .catch(function (err) {
               res.status(400).send(err);
             });
+
         })
         .catch(function (err) {
           res.status(400).send(err);
@@ -608,7 +613,7 @@ module.exports = {
   addFavoriteIntoUser,
   findUserFavorites,
   updateUserLessonPurchase,
-  checkUserCourseInFavorite, 
+  checkUserCourseInFavorite,
   findUserById,
   changePassword,
   removeUserFavorite,

@@ -25,10 +25,11 @@ const handleFileUpload = (req, res) => {
     if (err) {
       return res.status(400).send(err, "Error uploading file");
     }
-
+    console.log(req.file);
     if (req.file) {
       // Store the file path in the request object
       return res.status(200).send({
+        // api : `/api/downloadFile?name=${req.file.destination}${req.file.filename}`,
         url: req.file.destination + req.file.filename,
         path: req.file.path,
         size: req.file.size,
@@ -40,6 +41,10 @@ const handleFileUpload = (req, res) => {
     // Call the next middleware
   });
 };
+
+// downloadFile = (req , res , path){
+//   res.sendFile('')
+// }
 
 saveFiles = (file, type, path) => {
   return new Promise((resolve, reject) => {
