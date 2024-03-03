@@ -29,9 +29,15 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: true,
-      minlength: 5,
-      maxlength: 255,
+      minlength: 10,
+      maxlength: 50,
       unique: true,
+      trim: true,
+      lowercase: true,
+      match: [
+        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        "Please fill a valid email address",
+      ],
     },
     password: {
       type: String,
@@ -76,24 +82,23 @@ const userSchema = new Schema(
       default: 0,
     },
     profileImage: {
-      url : {
+      url: {
         type: String,
       },
-     
     },
     idType: {
       type: String,
       enum: ["Id", "Passport"],
     },
     imageId: {
-      url : {
+      url: {
         type: String,
-      }
+      },
     },
     imageIdBack: {
-      url : {
+      url: {
         type: String,
-      }
+      },
     },
     job: {
       type: String,

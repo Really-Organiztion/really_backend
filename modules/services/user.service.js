@@ -516,6 +516,51 @@ updateIdentity = async (req, res, id) => {
       res.status(400).send(err);
     });
 };
+changeEmail = async (req, res, id) => {
+  if (!req.body.email) {
+    return res.status(400).send("email is required");
+  }
+
+  let editObject = {
+    email: req.body.email,
+    emailVerify: false,
+  };
+  userModel.defaultSchema
+    .findByIdAndUpdate(
+      id,
+      { $set: editObject },
+      {
+        new: true,
+        setDefaultsOnInsert: true,
+      }
+    )
+    .then(function (data) {
+      res.status(200).send(data);
+      let optModel = {
+        otp: Math.floor(Math.random() * 90000) + 10000,
+        email: req.body.email,
+      };
+      userOptModel.defaultSchema.create(optModel).then(function (models1) {
+        let mailOptions = {
+          from: process.env.GMAILUSER,
+          to: optModel.email,
+          subject: "Really Booking Verify Email Code",
+          text: `Your Code is ${optModel.otp}`,
+        };
+
+        mailer.transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Email sent: " + info.response);
+          }
+        });
+      });
+    })
+    .catch(function (err) {
+      res.status(400).send(err);
+    });
+};
 createUser = async (req, res) => {
   if (!req.body.idType && req.body.role != "Renter") {
     return res.status(400).send("idType is required");
@@ -576,15 +621,13 @@ createUser = async (req, res) => {
           requestModel.defaultSchema
             .create(request)
             .then(function (_request) {
-              webSocket.sendAdminMessage(_request)
-            
+              webSocket.sendAdminMessage(_request);
 
               res.status(200).send(user);
             })
             .catch(function (err) {
               res.status(400).send(err);
             });
-
         })
         .catch(function (err) {
           res.status(400).send(err);
@@ -606,6 +649,7 @@ module.exports = {
   getOptEmail,
   forgetPassword,
   updateIdentity,
+  changeEmail,
   findUserAccount: findUser,
   addPurchaseIntoUser,
   findUserCourses,

@@ -219,6 +219,14 @@ updateIdentity = (req, res) => {
     logger.error(error);
   }
 };
+changeEmail = (req, res) => {
+  try {
+    const id = req.params.id;
+    userService.changeEmail(req, res,id);
+  } catch (error) {
+    logger.error(error);
+  }
+};
 forgetPassword = (req, res) => {
   try {
     userService.forgetPassword(req, res);
@@ -285,6 +293,7 @@ module.exports = {
   findUserFavorites,
   changePassword,
   updateIdentity,
+  changeEmail,
   forgetPassword,
   updateUserLessonPurchase,
   findUserCourseByCourseId,

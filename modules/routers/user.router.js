@@ -36,6 +36,11 @@ userRouter.route("/updateIdentity/:id").put((req, res) => {
   userController.updateIdentity(req, res);
 });
 
+userRouter.route("/changeEmail/:id").put((req, res) => {
+  userController.changeEmail(req, res);
+});
+
+
 userRouter.get("/:id", userController.findById);
 
 userRouter.route("/:id").put((req, res) => {
