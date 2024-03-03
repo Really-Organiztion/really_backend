@@ -99,7 +99,10 @@ saveFiles = (file, type, path) => {
 };
 
 deleteFile = (req, res) => {
-  const path = `attachments/${req.params.pathName}/${req.params.fileType}/${req.params.fileName}`;
+  if (!req.body || !req.body.url) {
+    return res.status(400).send("Url not found");
+  }
+  const path = req.body.url.replace("/api/uploadFile", "attachments");
   fs.unlink(path, (err) => {
     if (err) {
       return res.status(400).send(err);
