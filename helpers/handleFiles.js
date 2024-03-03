@@ -54,7 +54,6 @@ const getFile = async (req, res) => {
   const options = {
     root: path.join("."),
   };
-  console.log(__dirname);
   const fileName = req.params.fileName;
   res.sendFile(
     `attachments/${req.params.pathName}/${req.params.fileType}/${req.params.fileName}`,
@@ -98,16 +97,15 @@ saveFiles = (file, type, path) => {
     }
   });
 };
-deleteFile = (file, attachmentPath) => {
-  return new Promise((resolve, reject) => {
-    const path = `${attachmentPath}/${file}`;
-    fs.unlink(path, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
+
+deleteFile = (req, res) => {
+  const path = `attachments/${req.params.pathName}/${req.params.fileType}/${req.params.fileName}`;
+  fs.unlink(path, (err) => {
+    if (err) {
+      return res.status(400).send(err);
+    } else {
+      return res.status(200).send("Deleted successfully");
+    }
   });
 };
 
