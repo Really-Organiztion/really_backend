@@ -8,7 +8,7 @@ sendAdminMessage = (msg) => {
     }
   });
 };
-sendMessageByID = (msg , id) => {
+sendMessageByID = (msg, id) => {
   clientsList.forEach((client) => {
     if (client.id == id) {
       client.ws.send(msg);
@@ -22,7 +22,6 @@ module.exports = function (wss) {
       role: "-----",
     });
     ws.on("message", async (msg) => {
-
       if (msg.type == "role") {
         clientsList.forEach((client, i) => {
           if (client.ws.id == ws.id) {
@@ -46,6 +45,7 @@ module.exports = function (wss) {
         ws.send("No Notifications Found");
       }
     });
+
     ws.on("close", async (msg) => {
       clientsList.forEach((client, i) => {
         if (client.ws.id == ws.id) {
@@ -54,7 +54,13 @@ module.exports = function (wss) {
       });
     });
 
+    ws.on("error", async (msg) => {
+      clientsList.forEach((client, i) => {
+        if (client.ws.id == ws.id) {
+          clientsList.splice(i, 1);
+        }
+      });
+    });
     ws.send("Connected To Websocket Server");
   });
-
 };
