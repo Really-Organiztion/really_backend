@@ -3,6 +3,7 @@ const mkdirp = require("mkdirp").mkdirp;
 const multer = require("multer");
 const validPathesNames = ["user", "unit"];
 const validFilesTypes = ["image", "file", "video"];
+const path = require("path");
 
 const handleFileUpload = (req, res) => {
   if (!validPathesNames.includes(req.params.pathName)) {
@@ -25,12 +26,9 @@ const handleFileUpload = (req, res) => {
     if (err) {
       return res.status(400).send(err, "Error uploading file");
     }
-    console.log(req.file);
     if (req.file) {
-      // Store the file path in the request object
       return res.status(200).send({
-        // api : `/api/downloadFile?name=${req.file.destination}${req.file.filename}`,
-        url: req.file.destination + req.file.filename,
+        url: '/api/uploadFile/' + req.params.pathName + "/" + req.params.fileType + "/" + req.file.filename,
         path: req.file.path,
         size: req.file.size,
       });
@@ -38,8 +36,32 @@ const handleFileUpload = (req, res) => {
       return res.status(400).send("Error uploading file");
     }
 
-    // Call the next middleware
   });
+};
+
+const getFile = async (req, res) => {
+  if (!validPathesNames.includes(req.params.pathName)) {
+    return res.status(400).send("The pathName is incorrect");
+  }
+  if (!validFilesTypes.includes(req.params.fileType)) {
+    return res.status(400).send("The fileType is incorrect");
+  }
+  const options = {
+    root: path.join("."),
+  };
+  console.log(__dirname);
+  const fileName = req.params.fileName;
+  res.sendFile(
+    `attachments/${req.params.pathName}/${req.params.fileType}/${req.params.fileName}`,
+    options,
+    function (err) {
+      if (err) {
+        console.error("Error sending file:", err);
+      } else {
+        console.log("Sent:", fileName);
+      }
+    }
+  );
 };
 
 // downloadFile = (req , res , path){
@@ -96,6 +118,7 @@ readFile = async (key) => {
 
 module.exports = {
   handleFileUpload,
+  getFile,
   saveFiles,
   readFile,
   deleteFile,

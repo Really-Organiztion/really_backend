@@ -6,7 +6,7 @@ const roles = require("../../helpers/roles");
 countryRouter.get("/", countryController.getAllData);
 countryRouter.post("/", roles.isAuthenticatedAsAdmin, countryController.create);
 
-countryRouter.get("/:id", roles.isAuthenticatedAsAdmin, countryController.findById);
+countryRouter.get("/:id",countryController.findById);
 countryRouter.put(
   "/:id",
   roles.isAuthenticatedAsAdmin,

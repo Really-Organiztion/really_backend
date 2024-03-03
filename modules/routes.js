@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 
-const countryRouter = require("./routers/country.router");
 const requestRouter = require("./routers/request.router");
 const currencyRouter = require("./routers/currency.router");
 const walletRouter = require("./routers/wallet.router");
@@ -10,7 +9,6 @@ const promoCodeRouter = require("./routers/promoCode.router");
 const giftCardRouter = require("./routers/giftCard.router");
 const communityRouter = require("./routers/community.router");
 const userRouter = require("./routers/user.router");
-const uploadFileRouter = require("./routers/uploadFile.router");
 const fcmRouter = require("./routers/fcm.router");
 const teacherRouter = require("./routers/teacher.router");
 const courseRouter = require("./routers/course.router");
@@ -28,14 +26,12 @@ const notificationRouter = require("./routers/notification.router");
 
 router.use("/admin", adminRouter);
 router.use("/request", requestRouter);
-router.use("/country", countryRouter);
 router.use("/currency", currencyRouter);
 router.use("/wallet", walletRouter);
 router.use("/promoCode", promoCodeRouter);
 router.use("/giftCard", giftCardRouter);
 router.use("/community", communityRouter);
 router.use("/user", userRouter);
-router.use("/uploadFile", uploadFileRouter);
 router.use("/fcm", fcmRouter);
 router.use("/teacher", teacherRouter);
 router.use("/course", courseRouter);
