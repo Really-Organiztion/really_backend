@@ -509,8 +509,23 @@ updateIdentity = async (req, res, id) => {
         setDefaultsOnInsert: true,
       }
     )
-    .then(function (data) {
-      res.status(200).send(data);
+    .then(function (user) {
+      let request = {
+        details: "أريد تحديث البطاقةالشخصية",
+        type: "Identify",
+        target: "User",
+        userId: user._id,
+      };
+      requestModel.defaultSchema
+        .create(request)
+        .then(function (_request) {
+          webSocket.sendAdminMessage(_request);
+          res.status(200).send(user);
+
+        })
+        .catch(function (err) {
+          res.status(400).send(err);
+        });
     })
     .catch(function (err) {
       res.status(400).send(err);
