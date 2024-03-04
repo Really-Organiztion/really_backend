@@ -636,19 +636,22 @@ createUser = async (req, res) => {
           requestModel.defaultSchema
             .create(request)
             .then(function (_request) {
-              webSocket.sendAdminMessage(_request);
+              // webSocket.sendAdminMessage(_request);
 
               res.status(200).send(user);
             })
             .catch(function (err) {
+              console.log(err);
               res.status(400).send(err);
             });
         })
         .catch(function (err) {
+          console.log(err);
           res.status(400).send(err);
         });
     })
     .catch(function (err) {
+      console.log(err);
       res.status(400).send(err);
     });
 };

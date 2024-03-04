@@ -31,7 +31,7 @@ const userSchema = new Schema(
       required: true,
       minlength: 10,
       maxlength: 50,
-      unique: true,
+      uniqe: [true, "Email existing , Not available"],
       trim: true,
       lowercase: true,
       match: [
@@ -65,7 +65,11 @@ const userSchema = new Schema(
     nationalID: {
       type: String,
       trim: true,
-      unique: [true, "National ID is injored"],
+      index: {
+        unique: true,
+        partialFilterExpression: {nationalID: {$type: 'string'}},
+      },
+      set: v => (v === '' ? null : v),
       length: [14, "National ID must be at least 14 characters"],
     },
     role: {

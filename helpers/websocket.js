@@ -1,20 +1,20 @@
 const notificationController = require("../modules/controllers/notification.controller");
 let clientsList = [];
 
-sendAdminMessage = (msg) => {
-  clientsList.forEach((client) => {
-    if (client.type == "admin") {
-      client.ws.send(msg);
-    }
-  });
-};
-sendMessageByID = (msg, id) => {
-  clientsList.forEach((client) => {
-    if (client.id == id) {
-      client.ws.send(msg);
-    }
-  });
-};
+// sendAdminMessage = (msg) => {
+//   clientsList.forEach((client) => {
+//     if (client.type == "admin") {
+//       client.ws.send(msg);
+//     }
+//   });
+// };
+// sendMessageByID = (msg, id) => {
+//   clientsList.forEach((client) => {
+//     if (client.id == id) {
+//       client.ws.send(msg);
+//     }
+//   });
+// };
 module.exports = function (wss) {
   wss.on("connection", (ws) => {
     clientsList.push({
