@@ -519,7 +519,7 @@ updateIdentity = async (req, res, id) => {
       requestModel.defaultSchema
         .create(request)
         .then(function (_request) {
-          webSocket.sendAdminMessage(_request);
+          // webSocket.sendAdminMessage(_request);
           res.status(200).send(user);
 
         })
