@@ -13,23 +13,33 @@ getAllData = (req, res) => {
   }
 };
 
-createAdmin = (req, res, next) => {
+createAdmin = async (req, res, next) => {
   try {
-    if (req.body.password.length < 6) {
-      return res.status(403).send("Password must be at least 6 chars");
-    }
-    bcrypt.genSalt(10, (err, salt) => {
-      if (err) {
-        return callback(err);
+    let admin = await adminService.findAdminById(req.body.adminId);
+    if (admin) {
+      if (admin.role >= req.body.role) {
+        return res
+          .status(400)
+          .send("The admin is not authorized to add this roll");
       }
-      bcrypt.hash(req.body.password, salt, (err, hash) => {
+      if (req.body.password.length < 6) {
+        return res.status(400).send("Password must be at least 6 chars");
+      }
+      bcrypt.genSalt(10, (err, salt) => {
         if (err) {
-          return next(err);
+          return callback(err);
         }
-        req.body.password = hash;
-        adminService.create(req, res);
+        bcrypt.hash(req.body.password, salt, (err, hash) => {
+          if (err) {
+            return next(err);
+          }
+          req.body.password = hash;
+          adminService.create(req, res);
+        });
       });
-    });
+    } else {
+      return res.status(400).send("Admin is not found");
+    }
   } catch (error) {
     logger.error(error);
   }
@@ -117,7 +127,7 @@ identifyAdmin = (req, res) => {
   }
 };
 logout = (req, res) => {
- roles.logOut
+  roles.logOut;
   // roles.logOut(req.headers);
 };
 function loginAsSuperAdmin() {

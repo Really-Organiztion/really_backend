@@ -1,8 +1,14 @@
 const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
+const ObjectId = Schema.ObjectId;
 
 const adminSchema = new Schema({
+  adminId: {
+    type: ObjectId,
+    required: true,
+    ref: "admin",
+  },
   username: {
     type: String,
     required: true,
@@ -22,7 +28,7 @@ const adminSchema = new Schema({
   role: {
     type: Number,
     required: true,
-    enum: [0, 1, 2, 3, 4],
+    enum: [0, 1, 2, 3, 4,5,6,7,8,9,10],
   },
 },{
   timestamps: true,

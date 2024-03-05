@@ -206,7 +206,7 @@ checkUserCourseInFavorite = (req, res) => {
 changePassword = (req, res) => {
   try {
     const id = req.params.id;
-    userService.changePassword(req, res,id);
+    userService.changePassword(req, res, id);
   } catch (error) {
     logger.error(error);
   }
@@ -214,15 +214,19 @@ changePassword = (req, res) => {
 updateIdentity = (req, res) => {
   try {
     const id = req.params.id;
-    userService.updateIdentity(req, res,id);
+    userService.updateIdentity(req, res, id);
   } catch (error) {
     logger.error(error);
   }
 };
-changeEmail = (req, res) => {
+changeEmail = async (req, res) => {
   try {
     const id = req.params.id;
-    userService.changeEmail(req, res,id);
+    let user = await userService.findUserByEmail(req.body.email);
+    if (user && user.email === req.body.email) {
+      return res.status(400).send("Email is exist");
+    }
+    userService.changeEmail(req, res, id);
   } catch (error) {
     logger.error(error);
   }

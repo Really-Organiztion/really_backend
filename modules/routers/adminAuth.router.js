@@ -7,7 +7,7 @@ authRouter.post("/login", (req, res, next) => {
   adminController.identifyAdmin(req, res);
 });
 
-authRouter.post("/register", (req, res, next) => {
+authRouter.post("/register", roles.isAuthenticatedAsAdmin, (req, res, next) => {
   adminController.createAdmin(req, res);
 });
 

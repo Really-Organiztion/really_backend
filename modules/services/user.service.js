@@ -335,6 +335,12 @@ findUserById = (id) => {
     else reject(user);
   });
 };
+findUserByEmail = (email) => {
+  return new Promise(async (resolve, reject) => {
+    const user = await userModel.defaultSchema.findOne({ email });
+     resolve(user);
+  });
+};
 addPromoIntoUser = async (req, res) => {
   return new Promise((resolve, reject) => {
     userModel.defaultSchema.updateOne(
@@ -521,7 +527,6 @@ updateIdentity = async (req, res, id) => {
         .then(function (_request) {
           // webSocket.sendAdminMessage(_request);
           res.status(200).send(user);
-
         })
         .catch(function (err) {
           res.status(400).send(err);
@@ -641,17 +646,14 @@ createUser = async (req, res) => {
               res.status(200).send(user);
             })
             .catch(function (err) {
-              console.log(err);
               res.status(400).send(err);
             });
         })
         .catch(function (err) {
-          console.log(err);
           res.status(400).send(err);
         });
     })
     .catch(function (err) {
-      console.log(err);
       res.status(400).send(err);
     });
 };
@@ -677,6 +679,7 @@ module.exports = {
   updateUserLessonPurchase,
   checkUserCourseInFavorite,
   findUserById,
+  findUserByEmail,
   changePassword,
   removeUserFavorite,
   socialMediaLogin,
