@@ -112,6 +112,20 @@ deleteFile = (req, res) => {
   });
 };
 
+deleteFileCb = async (url, cb) => {
+  if (!url) {
+    return cb({ msg: "Url not found", done: false });
+  }
+  const path = url.replace("/api/uploadFile", "attachments");
+  fs.unlink(path, (err) => {
+    if (err) {
+      return cb({ msg: err, done: false });
+    } else {
+      return cb({ msg: "Deleted successfully", done: true });
+    }
+  });
+};
+
 readFile = async (key) => {
   firstPart = key.split(",")[0];
   secondPart = key.split(",")[1];
@@ -128,4 +142,5 @@ module.exports = {
   saveFiles,
   readFile,
   deleteFile,
+  deleteFileCb,
 };
