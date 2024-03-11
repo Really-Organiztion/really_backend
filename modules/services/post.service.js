@@ -16,6 +16,11 @@ findAll = (req, res) => {
   if (req.body && req.body.userId) {
     $match.userId = new ObjectId(req.body.userId);
   }
+  if (req.body && req.body.unitsIds) {
+    let unitsIds = req.body.unitsIds.map((_obj) => _obj._id);
+    console.log(unitsIds);
+    $match.unitId = { $in: unitsIds };
+  }
   if (req.body && req.body.unitId) {
     $match.unitId = new ObjectId(req.body.unitId);
   }
@@ -25,11 +30,49 @@ findAll = (req, res) => {
         $match,
       },
       {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "units",
+          localField: "unitId",
+          foreignField: "_id",
+          as: "unit",
+        },
+      },
+      {
+        $unwind: {
+          path: "$unit",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $group: {
           _id: "$_id",
           description: { $first: `$description` },
+          target: { $first: `$target` },
           userId: { $first: `$userId` },
           unitId: { $first: `$unitId` },
+          name: { $first: `$unit.${toFound}` },
+          address: { $first: `$unit.address` },
+          type: { $first: `$unit.type` },
+          imagesList: { $first: `$unit.imagesList` },
+          rate: { $first: `$unit.rate` },
+          isTrusted: { $first: `$unit.isTrusted` },
+          isSeparated: { $first: `$unit.isSeparated` },
+          // phone: { $first: `$user.phone` },
+          // phonesList: { $first: `$user.phonesList` },
         },
       },
     ])

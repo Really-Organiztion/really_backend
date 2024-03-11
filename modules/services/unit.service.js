@@ -7,27 +7,16 @@ findAll = (req, res) => {
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
-  let $match = {};
+  let where = {};
   if (req.body && req.body.isDeleted) {
-    $match = { isDeleted: true };
+    where = { isDeleted: true };
   } else {
-    $match = { isDeleted: false };
+    where = { isDeleted: false };
   }
   unitModel.defaultSchema
-    .aggregate([
-      {
-        $match,
-      },
-      {
-        $group: {
-          _id: "$_id",
-          name: { $first: `$${toFound}` },
-          numericCode: { $first: `$numericCode` },
-          code: { $first: `$code` },
-          flag: { $first: `$flag` },
-        },
-      },
-    ])
+    .find(where)
+    .populate("countryId", [`${toFound}`, "code", "numericCode"])
+    .populate("userId", ["username", "phone", "profileImage"])
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (data) {
@@ -37,26 +26,62 @@ findAll = (req, res) => {
       res.status(400).send(err);
     });
 };
+
+findAllFilterCb = (req, res) => {
+  return new Promise((resolve, reject) => {
+    let where = {};
+    if (req.body) {
+      if (req.body.isDeleted) {
+        where = { isDeleted: true };
+      } else {
+        where = { isDeleted: false };
+      }
+      if (req.body.isTrusted) {
+        where["isTrusted"] = true;
+      }
+      if (req.body.isSeparated) {
+        where["isSeparated"] = true;
+      }
+      if (req.body.targetType) {
+        where["targetType"] = req.body.targetType;
+      }
+    }
+    if (req.body.search) {
+      where.$or = [
+        { name: { $regex: req.body.search, $options: "i" } },
+        { nameAr: { $regex: req.body.search, $options: "i" } },
+        { address: { $regex: req.body.search, $options: "i" } },
+        { additionsServices: { $regex: req.body.search, $options: "i" } },
+      ];
+    }
+
+    unitModel.defaultSchema
+      .find(where, { _id: 1 })
+      .then(function (data) {
+        resolve(data);
+      })
+      .catch(function (err) {
+        reject(null);
+      });
+  });
+};
+
 updateUnitRateCb = (obj, id) => {
   return new Promise((resolve, reject) => {
-
-  unitModel.defaultSchema
-    .findOneAndUpdate(
-      {
-        _id: id,
-      },
-      obj
-  
-    )
-    .then(function (res) {
-      resolve(res);
-    })
-    .catch(function (err) {
-      reject(null);
-    
-    });
+    unitModel.defaultSchema
+      .findOneAndUpdate(
+        {
+          _id: id,
+        },
+        obj
+      )
+      .then(function (res) {
+        resolve(res);
+      })
+      .catch(function (err) {
+        reject(null);
+      });
   });
-
 };
 module.exports = {
   deleteUnit: unitModel.genericSchema.delete,
@@ -65,4 +90,5 @@ module.exports = {
   create: unitModel.genericSchema.create,
   updateUnitRateCb,
   findAll,
+  findAllFilterCb,
 };

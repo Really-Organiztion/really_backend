@@ -8,6 +8,11 @@ const postSchema = new Schema({
     type: String,
     required: true,
   },
+  target: {
+    type: String,
+    required: true,
+    enum : ['Investment', 'Rent']
+  },
   userId: {
     type: ObjectId,
     required: true,
@@ -23,6 +28,8 @@ const postSchema = new Schema({
     default : false
   }
 });
+postSchema.index({ target: 1, unitId: 1, userId: 1 }, { unique: true });
+
 const genericOperations = require("../genericService");
 module.exports = {
   genericSchema: genericOperations(mongoose.model("post", postSchema)),

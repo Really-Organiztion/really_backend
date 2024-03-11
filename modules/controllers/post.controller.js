@@ -1,9 +1,28 @@
 const postService = require("../services/post.service");
+const unitService = require("../services/unit.service");
 const logger = require("../../helpers/logging");
 
 getAllData = (req, res) => {
   try {
     postService.findAll(req, res);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+
+getAllDataFilterPost = async (req, res) => {
+  try {
+    const unitsIds = await unitService.findAllFilterCb(req, res);
+    if (unitsIds) {
+      if (req.body) {
+        req.body.unitsIds = unitsIds;
+      } else {
+        req.body = { unitsIds: unitsIds };
+      }
+      postService.findAll(req, res);
+    } else {
+      res.status(400).send("Posts not found");
+    }
   } catch (error) {
     logger.error(error);
   }
@@ -43,9 +62,10 @@ deletePost = (req, res) => {
 };
 
 module.exports = {
-  getAllData,
+  getAllDataFilterPost,
   create,
   findById,
   updatePost,
   deletePost,
+  getAllData,
 };

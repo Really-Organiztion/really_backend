@@ -4,6 +4,7 @@ const postController = require("../controllers/post.controller");
 const roles = require("../../helpers/roles");
 
 postRouter.get("/", postController.getAllData);
+postRouter.get("/filterPost", postController.getAllDataFilterPost);
 postRouter.post("/", roles.isAuthenticatedAsAdmin, postController.create);
 postRouter.get("/:id", roles.isAuthenticatedAsAdmin, postController.findById);
 postRouter.put(
