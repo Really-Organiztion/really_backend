@@ -13,6 +13,10 @@ findAll = (req, res) => {
   } else {
     where = { isDeleted: false };
   }
+  if (req.body && req.body.userId) {
+    where["userId"] = new ObjectId(req.body.userId);
+  }
+  console.log(where);
   unitModel.defaultSchema
     .find(where)
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
