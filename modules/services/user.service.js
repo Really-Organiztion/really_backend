@@ -89,8 +89,55 @@ findAllUsers = async (req, res) => {
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
+  let where = req.body || {};
+  if (where["username"]) {
+    where["username"] = { $regex: where["username"], $options: "i" };
+  }
+
+  if (where["countryId"]) {
+    where["countryId"] = new ObjectId(where["countryId"]);
+  }
+
+  if (where.birthDate) {
+    let d1 = new Date(where.birthDate);
+    let d2 = new Date(where.birthDate);
+    d2.setDate(d2.getDate() + 1);
+    where.birthDate = {
+      $gte: d1,
+      $lt: d2,
+    };
+  }
+
+  if (where.createdAt) {
+    let d1 = new Date(where.createdAt);
+    let d2 = new Date(where.createdAt);
+    d2.setDate(d2.getDate() + 1);
+    where.createdAt = {
+      $gte: d1,
+      $lt: d2,
+    };
+  }
+
+  if (where.updatedAt) {
+    let d1 = new Date(where.updatedAt);
+    let d2 = new Date(where.updatedAt);
+    d2.setDate(d2.getDate() + 1);
+    where.updatedAt = {
+      $gte: d1,
+      $lt: d2,
+    };
+  }
+
+  if (where["fullName"]) {
+    where.$or = [
+      { firstName: { $regex: where["fullName"], $options: "i" } },
+      { lastName: { $regex: where["fullName"], $options: "i" } },
+    ];
+    delete where["fullName"];
+  }
+  console.log(where);
   let users = await userModel.defaultSchema
-    .find()
+    .find(where)
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
 
     .skip((pageNumber - 1) * pageSize)
@@ -338,7 +385,7 @@ findUserById = (id) => {
 findUserByEmail = (email) => {
   return new Promise(async (resolve, reject) => {
     const user = await userModel.defaultSchema.findOne({ email });
-     resolve(user);
+    resolve(user);
   });
 };
 addPromoIntoUser = async (req, res) => {
