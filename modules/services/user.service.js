@@ -94,6 +94,10 @@ findAllUsers = async (req, res) => {
     where["username"] = { $regex: where["username"], $options: "i" };
   }
 
+  if (where["job"]) {
+    where["job"] = { $regex: where["job"], $options: "i" };
+  }
+
   if (where["countryId"]) {
     where["countryId"] = new ObjectId(where["countryId"]);
   }
@@ -128,6 +132,25 @@ findAllUsers = async (req, res) => {
     };
   }
 
+  if (where["search"]) {
+    where.$or = [
+      { firstName: { $regex: where["search"], $options: "i" } },
+      { lastName: { $regex: where["search"], $options: "i" } },
+      { username: { $regex: where["search"], $options: "i" } },
+      { email: { $regex: where["search"], $options: "i" } },
+      { phone: { $regex: where["search"], $options: "i" } },
+      { status: { $regex: where["search"], $options: "i" } },
+      { verifyIdentityType: { $regex: where["search"], $options: "i" } },
+      { nationalID: { $regex: where["search"], $options: "i" } },
+      { role: { $regex: where["search"], $options: "i" } },
+      { idType: { $regex: where["search"], $options: "i" } },
+      { job: { $regex: where["search"], $options: "i" } },
+      { phonesList: { $regex: where["search"], $options: "i" } },
+      { gender: { $regex: where["search"], $options: "i" } },
+    ];
+    delete where["search"];
+  }
+
   if (where["fullName"]) {
     where.$or = [
       { firstName: { $regex: where["fullName"], $options: "i" } },
@@ -135,7 +158,14 @@ findAllUsers = async (req, res) => {
     ];
     delete where["fullName"];
   }
-  console.log(where);
+
+  if (where["phone"]) {
+    where.$or = [
+      { phone: { $regex: where["phone"], $options: "i" } },
+      { phonesList: { $regex: where["phone"], $options: "i" } },
+    ];
+  }
+
   let users = await userModel.defaultSchema
     .find(where)
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
