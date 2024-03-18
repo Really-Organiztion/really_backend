@@ -44,6 +44,7 @@ findAll = (req, res) => {
 
 module.exports = {
   deleteCurrency: currencyModel.genericSchema.delete,
+  deleteReturn: currencyModel.genericSchema.deleteReturn,
   updateCurrency: currencyModel.genericSchema.update,
   findById: currencyModel.genericSchema.findById,
   create: currencyModel.genericSchema.create,

@@ -78,6 +78,7 @@ findAll = (req, res) => {
 
 module.exports = {
   deleteCountry: countryModel.genericSchema.delete,
+  deleteReturn: countryModel.genericSchema.deleteReturn,
   updateCountry: countryModel.genericSchema.update,
   findById: countryModel.genericSchema.findById,
   create: countryModel.genericSchema.create,

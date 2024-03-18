@@ -17,4 +17,9 @@ currencyRouter.delete(
   currencyController.deleteCurrency
 );
 
+currencyRouter.put(
+  "/deleteReturn/:id",
+  roles.isAuthenticatedAsAdmin,
+  currencyController.deleteReturn
+);
 module.exports = currencyRouter;

@@ -42,10 +42,20 @@ deleteCurrency = (req, res) => {
   }
 };
 
+deleteReturn = (req, res) => {
+  try {
+    const id = req.params.id;
+    countryService.deleteReturn(req, res, id);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+
 module.exports = {
   getAllData,
   create,
   findById,
   updateCurrency,
   deleteCurrency,
+  deleteReturn,
 };

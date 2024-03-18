@@ -18,4 +18,10 @@ countryRouter.delete(
   countryController.deleteCountry
 );
 
+countryRouter.put(
+  "/deleteReturn/:id",
+  roles.isAuthenticatedAsAdmin,
+  countryController.deleteReturn
+);
+
 module.exports = countryRouter;

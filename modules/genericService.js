@@ -80,7 +80,7 @@ module.exports = function (Collection) {
       isDeleted: false,
     })
       .then(function (models) {
-        res.status(200).send("Deleted is done");
+        res.status(200).send("Deleted Returned is done");
       })
       .catch(function (err) {
         res.status(400).send(err);
