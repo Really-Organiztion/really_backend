@@ -13,6 +13,22 @@ findAll = (req, res) => {
   } else {
     $match = { isDeleted: false };
   }
+  let $group = {
+    _id: "$_id",
+    name: { $first: `$${toFound}` },
+    numericCode: { $first: `$numericCode` },
+    code: { $first: `$code` },
+    currencyId: { $first: `$currencyId` },
+    currencyName: { $first: `$currency.${toFound}` },
+    timezones: { $first: `$timezones` },
+    latitude: { $first: `$latitude` },
+    longitude: { $first: `$longitude` },
+    flag: { $first: `$flag` },
+  };
+  if (!req.query.lang) {
+    $group["nameAr"] = { $first: `$nameAr` };
+    $group["currencyNameAr"] = { $first: `$currency.nameAr` };
+  }
   countryModel.defaultSchema
     .aggregate([
       {
@@ -35,6 +51,7 @@ findAll = (req, res) => {
       {
         $project: {
           name: 1,
+          nameAr: 1,
           numericCode: 1,
           code: 1,
           currencyId: 1,
@@ -46,18 +63,7 @@ findAll = (req, res) => {
         },
       },
       {
-        $group: {
-          _id: "$_id",
-          name: { $first: `$${toFound}` },
-          numericCode: { $first: `$numericCode` },
-          code: { $first: `$code` },
-          currencyId: { $first: `$currencyId` },
-          currencyName: { $first: `$currency.${toFound}` },
-          timezones: { $first: `$timezones` },
-          latitude: { $first: `$latitude` },
-          longitude: { $first: `$longitude` },
-          flag: { $first: `$flag` },
-        },
+        $group,
       },
     ])
     .skip((pageNumber - 1) * pageSize)

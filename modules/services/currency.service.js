@@ -13,19 +13,23 @@ findAll = (req, res) => {
   } else {
     $match = { isDeleted: false };
   }
+  let $group = {
+    _id: "$_id",
+    name: { $first: `$${toFound}` },
+    numericCode: { $first: `$numericCode` },
+    code: { $first: `$code` },
+    flag: { $first: `$flag` },
+  };
+  if (!req.query.lang) {
+    $group["nameAr"] = { $first: `$nameAr` };
+  }
   currencyModel.defaultSchema
     .aggregate([
       {
         $match,
       },
       {
-        $group: {
-          _id: "$_id",
-          name: { $first: `$${toFound}` },
-          numericCode: { $first: `$numericCode` },
-          code: { $first: `$code` },
-          flag: { $first: `$flag` },
-        },
+        $group,
       },
     ])
     .skip((pageNumber - 1) * pageSize)
