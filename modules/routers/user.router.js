@@ -4,7 +4,7 @@ const logger = require("../../helpers/logging");
 const userController = require("../controllers/user.controller");
 const roles = require("../../helpers/roles");
 
-userRouter.get("/", userController.getAllData);
+userRouter.post("/all", userController.getAllData);
 
 userRouter.route("/").post((req, res) => {
   // Validation
