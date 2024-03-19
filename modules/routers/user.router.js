@@ -24,6 +24,11 @@ userRouter.post("/purchase/:id", userController.addPurchaseIntoUser);
 userRouter.get("/favorite/:id", userController.findUserFavorites);
 userRouter.put("/favorite/:id", userController.addFavoriteIntoUser);
 userRouter.delete("/favorite/:id/:courseId", userController.removeUserFavorite);
+userRouter.delete("/:id", userController.deleteUser);
+userRouter.put(
+  "/deleteReturn/:id",
+  userController.deleteReturn
+);
 userRouter.get(
   "/checkFavorite/:userId/:courseId",
   userController.checkUserCourseInFavorite

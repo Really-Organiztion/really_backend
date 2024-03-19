@@ -104,7 +104,7 @@ updateAdminRole =  (req, res, id) => {
       }
     )
     .then(function () {
-      res.status(201).send('Role update is done')
+      res.status(200).send('Role update is done')
     })
     .catch(function (err) {
       res.status(400).send(err)

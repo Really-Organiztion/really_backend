@@ -138,7 +138,7 @@ createTeacher = async (req, res) => {
         req.body.bio = `${req.body.firstName} ${req.body.lastName} - ${req.body.specialization}`;
         teacherModel.defaultSchema.create(req.body, function (err, data) {
           if (err) res.status(400).send(err);
-          else res.status(201).send(req.body);
+          else res.status(200).send(req.body);
         });
       })
       .catch((err) => {

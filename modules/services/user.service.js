@@ -16,9 +16,11 @@ findUser = async (req, res) => {
   const password = req.body.password;
   let user = await userModel.defaultSchema.findOne({ email });
   if (!user) res.status(400).send("Invalid email or password");
-  else if (user && !user.emailVerify)
+  else if (user && !user.emailVerify) {
     res.status(400).send("Mail must be verified before login");
-  else {
+  } else if (user && user.isDeleted) {
+    res.status(400).send("This user was deleted");
+  } else {
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword)
       return res.status(400).send("Invalid email or password");
@@ -90,6 +92,11 @@ findAllUsers = async (req, res) => {
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
   let where = req.body || {};
+  if(req.body && req.body.isDeleted) {
+    where['isDeleted'] = true
+  } else {
+    where['isDeleted'] = false
+  }
   if (where["username"]) {
     where["username"] = { $regex: where["username"], $options: "i" };
   }
@@ -735,6 +742,7 @@ createUser = async (req, res) => {
     });
 };
 module.exports = {
+  deleteReturn: userModel.genericSchema.deleteReturn,
   deleteUser: userModel.genericSchema.delete,
   updateUser: userModel.genericSchema.update,
   findById: userModel.genericSchema.findById,

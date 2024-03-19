@@ -31,7 +31,7 @@ findAll = (req, res) => {
 create = (req, res) => {
   chapterModel.defaultSchema.create(req.body, function (err, result) {
     if (err) res.status(400).send(err);
-    else res.status(201).send(result);
+    else res.status(200).send(result);
   });
 };
 deleteChapter = async (req, res, id) => {

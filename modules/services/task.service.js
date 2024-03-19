@@ -19,7 +19,7 @@ createTaskWithAttachment = async (req, res) => {
   }
   taskModel.defaultSchema.create(req.body, function (err, cat) {
     if (err) res.status(400).send(err);
-    else res.status(201).send(req.body);
+    else res.status(200).send(req.body);
   });
 };
 

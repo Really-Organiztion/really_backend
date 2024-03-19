@@ -7,11 +7,20 @@ findAll = (req, res) => {
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
+  req.body = req.body || {};
   let $match = {};
   if (req.body && req.body.isDeleted) {
     $match = { isDeleted: true };
   } else {
     $match = { isDeleted: false };
+  }
+  if (req.body["search"]) {
+    $match.$or = [
+      { numericCode: { $regex: req.body["search"], $options: "i" } },
+      { name: { $regex: req.body["search"], $options: "i" } },
+      { nameAr: { $regex: req.body["search"], $options: "i" } },
+      { code: { $regex: req.body["search"], $options: "i" } },
+    ];
   }
   let $group = {
     _id: "$_id",

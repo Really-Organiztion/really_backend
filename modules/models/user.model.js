@@ -67,9 +67,9 @@ const userSchema = new Schema(
       trim: true,
       index: {
         unique: true,
-        partialFilterExpression: {nationalID: {$type: 'string'}},
+        partialFilterExpression: { nationalID: { $type: "string" } },
       },
-      set: v => (v === '' ? null : v),
+      set: (v) => (v === "" ? null : v),
       length: [14, "National ID must be at least 14 characters"],
     },
     role: {
@@ -121,6 +121,10 @@ const userSchema = new Schema(
       type: Boolean,
     },
     phonesList: [String],
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

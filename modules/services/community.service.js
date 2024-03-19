@@ -162,7 +162,7 @@ createCommunity = async (req, res) => {
   promise.then(() => {
     communityModel.defaultSchema.create(req.body, function (err, data) {
       if (err) res.status(400).send(err);
-      else res.status(201).send(req.body);
+      else res.status(200).send(req.body);
     });
   });
 };

@@ -3,7 +3,7 @@ const currencyRouter = express.Router();
 const currencyController = require("../controllers/currency.controller");
 const roles = require("../../helpers/roles");
 
-currencyRouter.get("/", currencyController.getAllData);
+currencyRouter.post("/all", currencyController.getAllData);
 currencyRouter.post("/", roles.isAuthenticatedAsAdmin, currencyController.create);
 currencyRouter.get("/:id", roles.isAuthenticatedAsAdmin, currencyController.findById);
 currencyRouter.put(

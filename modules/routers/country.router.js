@@ -3,7 +3,7 @@ const countryRouter = express.Router();
 const countryController = require("../controllers/country.controller");
 const roles = require("../../helpers/roles");
 
-countryRouter.get("/", countryController.getAllData);
+countryRouter.post("/all", countryController.getAllData);
 countryRouter.post("/", roles.isAuthenticatedAsAdmin, countryController.create);
 
 countryRouter.get("/:id",countryController.findById);

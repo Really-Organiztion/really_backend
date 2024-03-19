@@ -279,12 +279,32 @@ addPromoIntoUser = (req, res) => {
     logger.error(error);
   }
 };
+
+deleteUser = (req, res) => {
+  try {
+    const id = req.params.id;
+    userService.deleteUser(req, res, id);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+
+deleteReturn = (req, res) => {
+  try {
+    const id = req.params.id;
+    userService.deleteReturn(req, res, id);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+
 module.exports = {
   getAllData,
   createUser,
   findById,
   updateUser,
   deleteUser,
+  deleteReturn,
   identifyUser,
   logout,
   verifyEmail,
