@@ -21,8 +21,7 @@ const userSchema = new Schema(
     },
     username: {
       type: String,
-      uniqe: [true, "username existing , Not available"],
-      required: [true, "UserName Required ! "],
+      unique: true,
       minlength: 5,
       maxlength: 20,
     },
@@ -31,7 +30,7 @@ const userSchema = new Schema(
       required: true,
       minlength: 10,
       maxlength: 50,
-      uniqe: [true, "Email existing , Not available"],
+      unique: true,
       trim: true,
       lowercase: true,
       match: [
