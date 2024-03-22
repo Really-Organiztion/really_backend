@@ -1,9 +1,8 @@
-const WebSocket = require("ws");
-const wss = new WebSocket.Server({ port: 4001 });
-const notificationController = require("../modules/controllers/notification.controller");
+// const WebSocket = require("ws");
+// const wss = new WebSocket.Server({ port: 4001 });
+// const notificationController = require("../modules/controllers/notification.controller");
 let clientsList = [];
 const crypto = require("crypto");
-
 sendAdminMessage = (msg, res) => {
  let  data = JSON.stringify(msg);
   clientsList.forEach((client) => {
@@ -20,6 +19,9 @@ sendMessageByUserID = (msg, id) => {
     }
   });
 };
+  
+function webs (wss) {
+
 wss.on("connection", (ws) => {
   ws.id = crypto.randomBytes(6).toString("hex");
 
@@ -72,8 +74,10 @@ wss.on("connection", (ws) => {
   });
   ws.send("Connected To Websocket Server");
 });
+
+};
 module.exports = {
-  wss,
+  webs,
   sendAdminMessage,
   sendMessageByUserID,
 };
