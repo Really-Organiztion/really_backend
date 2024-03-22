@@ -19,7 +19,7 @@ sendMessageByUserID = (msg, id) => {
     }
   });
 };
-  
+
 function webs (wss) {
 
 wss.on("connection", (ws) => {
