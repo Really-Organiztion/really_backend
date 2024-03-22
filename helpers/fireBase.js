@@ -38,7 +38,6 @@ const sendFcm = (ibj, callback) => {
       if (err) {
         callback({ err });
       } else {
-        console.log("rrrrrrrrrrrrrrrrrrrrrrrr", JSON.parse(response));
         // return res.status(200).send(JSON.parse(response));
         callback({ response: JSON.parse(response) });
       }

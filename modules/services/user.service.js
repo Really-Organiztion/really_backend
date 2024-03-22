@@ -609,8 +609,7 @@ updateIdentity = async (req, res, id) => {
       requestModel.defaultSchema
         .create(request)
         .then(function (_request) {
-          // webSocket.sendAdminMessage(_request);
-          res.status(200).send(user);
+           webSocket.sendAdminMessage(_request,res);
         })
         .catch(function (err) {
           res.status(400).send(err);
@@ -716,6 +715,8 @@ createUser = async (req, res) => {
               console.log("Email sent: " + info.response);
             }
           });
+          if(user.nationalID && user.idType){
+
           let request = {
             details: "أريد تحديث البطاقةالشخصية",
             type: "Identify",
@@ -725,13 +726,17 @@ createUser = async (req, res) => {
           requestModel.defaultSchema
             .create(request)
             .then(function (_request) {
-              // webSocket.sendAdminMessage(_request);
-
-              res.status(200).send(user);
+              webSocket.sendAdminMessage(_request,res);
+              
             })
             .catch(function (err) {
               res.status(400).send(err);
             });
+          } else {
+            res.status(200).send(user);
+
+          }
+
         })
         .catch(function (err) {
           res.status(400).send(err);
