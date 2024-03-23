@@ -30,7 +30,7 @@ wss.on("connection", (ws) => {
     role: "-----",
   });
   ws.on("message", async (msg) => {
-    // msg = JSON.parse(msg);
+    msg = JSON.parse(msg);
     if (msg.role) {
       clientsList.forEach((client, i) => {
         if (client.ws.id == ws.id) {
