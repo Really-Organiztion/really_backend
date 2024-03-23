@@ -1,5 +1,6 @@
 const requestService = require("../services/request.service");
 const logger = require("../../helpers/logging");
+const crypto = require("crypto");
 
 getAllData = (req, res) => {
   try {
@@ -11,9 +12,8 @@ getAllData = (req, res) => {
 
 create = (req, res) => {
   try {
-  
-        requestService.create(req, res);
-   
+    req.body.code = crypto.randomBytes(6).toString("hex");
+    requestService.create(req, res);
   } catch (error) {
     logger.error(error);
   }
