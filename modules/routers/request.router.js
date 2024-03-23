@@ -3,7 +3,7 @@ const requestRouter = express.Router();
 const requestController = require("../controllers/request.controller");
 const roles = require("../../helpers/roles");
 
-requestRouter.get("/", requestController.getAllData);
+requestRouter.post("/all", requestController.getAllData);
 requestRouter.post("/", roles.isAuthenticatedAsAdmin, requestController.create);
 requestRouter.get("/:id", requestController.findById);
 requestRouter.put(

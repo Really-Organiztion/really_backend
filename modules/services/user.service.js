@@ -10,6 +10,7 @@ const webSocket = require("../../helpers/websocket");
 const attachmentPath = require("../../helpers/attachmentPath.json");
 const path = attachmentPath.attachments;
 const mailer = require("../../helpers/sendMail");
+const crypto = require("crypto");
 
 findUser = async (req, res) => {
   const email = req.body.email;
@@ -601,7 +602,8 @@ updateIdentity = async (req, res, id) => {
     )
     .then(function (user) {
       let request = {
-        details: "أريد تحديث البطاقةالشخصية",
+        details: "I want to update my ID card",
+        code : crypto.randomBytes(6).toString("hex"),
         type: "Identify",
         target: "User",
         userId: user._id,
@@ -718,7 +720,8 @@ createUser = async (req, res) => {
           if(user.nationalID && user.idType){
 
           let request = {
-            details: "أريد تحديث البطاقةالشخصية",
+            details: "I want to update my ID card",
+            code: crypto.randomBytes(6).toString("hex"),
             type: "Identify",
             target: "User",
             userId: user._id,

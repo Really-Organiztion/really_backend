@@ -14,6 +14,9 @@ const requestSchema = new Schema(
       enum: ["Identify"],
       required: true,
     },
+    code: {
+      type: String,
+    },
     respond: {
       type: String,
     },

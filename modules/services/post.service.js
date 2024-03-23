@@ -18,7 +18,6 @@ findAll = (req, res) => {
   }
   if (req.body && req.body.unitsIds) {
     let unitsIds = req.body.unitsIds.map((_obj) => _obj._id);
-    console.log(unitsIds);
     $match.unitId = { $in: unitsIds };
   }
   if (req.body && req.body.unitId) {
