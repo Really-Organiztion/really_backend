@@ -31,6 +31,7 @@ wss.on("connection", (ws) => {
   });
   ws.on("message", async (msg) => {
     msg = JSON.parse(msg);
+    
     console.log(msg,"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     if (msg.role) {
       clientsList.forEach((client, i) => {
