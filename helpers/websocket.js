@@ -31,8 +31,7 @@ wss.on("connection", (ws) => {
   });
   ws.on("message", async (msg) => {
     msg = JSON.parse(msg);
-    
-    console.log(msg,"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    if(typeof msg == "object"){
     if (msg.role) {
       clientsList.forEach((client, i) => {
         if (client.ws.id == ws.id) {
@@ -47,6 +46,7 @@ wss.on("connection", (ws) => {
         }
       });
     }
+  }
 
     // try {
     //   let result = await notificationController.callbackGetNotificationByUserId(
