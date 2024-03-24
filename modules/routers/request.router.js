@@ -11,8 +11,8 @@ requestRouter.put(
   roles.isAuthenticatedAsAdmin,
   requestController.updateRequest
 );
-requestRouter.delete("/:id", requestController.deleteRequest);
+requestRouter.delete("/:id",roles.isAuthenticatedAsAdmin, requestController.deleteRequest);
 requestRouter.delete("/isDelete/:id", requestController.isDeleteRequest);
-requestRouter.post("/deleteAll", requestController.deleteAllRequest);
+requestRouter.post("/deleteAll",roles.isAuthenticatedAsAdmin, requestController.deleteAllRequest);
 
 module.exports = requestRouter;

@@ -16,16 +16,19 @@ findAll = (req, res) => {
   if (req.body && req.body.userId) {
     where["userId"] = new ObjectId(req.body.userId);
   }
-  if (req.body && req.body.details) {
-    where["details"] =  { $regex: req.body["details"], $options: "i" };
+  if (req.body && req.body.adminId) {
+    where["adminId"] = new ObjectId(req.body.adminId);
   }
- 
+  if (req.body && req.body.details) {
+    where["details"] = { $regex: req.body["details"], $options: "i" };
+  }
 
-    requestModel.defaultSchema
+  requestModel.defaultSchema
     .find(where)
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
-     .populate("userId", ["username", "phone"])
+    .populate("userId", ["username", "phone"])
+    .populate("adminId", ["username", "role"])
     .then(function (data) {
       res.status(200).send(data);
     })
@@ -49,9 +52,13 @@ deleteRequest = async (req, res, id) => {
 
 deleteAllRequest = async (req, res) => {
   let where = req.body || {};
-  
+
   if (req.body && req.body.userId) {
     where["userId"] = new ObjectId(req.body.userId);
+  }
+
+  if (req.body && req.body.adminId) {
+    where["adminId"] = new ObjectId(req.body.adminId);
   }
 
   requestModel.defaultSchema
@@ -66,7 +73,7 @@ deleteAllRequest = async (req, res) => {
 
 module.exports = {
   deleteRequest,
-  isDeleteRequest:requestModel.genericSchema.delete,
+  isDeleteRequest: requestModel.genericSchema.delete,
   deleteAllRequest,
   updateRequest: requestModel.genericSchema.update,
   findById: requestModel.genericSchema.findById,

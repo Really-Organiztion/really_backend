@@ -36,6 +36,10 @@ const requestSchema = new Schema(
       required: true,
       ref: "user",
     },
+    adminId: {
+      type: ObjectId,
+      ref: "admin",
+    },
     isDeleted : {
       type : Boolean,
       default: false
