@@ -43,11 +43,17 @@ deleteRequest = (req, res) => {
     logger.error(error);
   }
 };
-
+isDeleteRequest = (req, res) => {
+  try {
+    const id = req.params.id;
+    requestService.isDeleteRequest(req, res, id);
+  } catch (error) {
+    logger.error(error);
+  }
+};
 deleteAllRequest = (req, res) => {
   try {
-    const userId = req.params.userId;
-    requestService.deleteAllRequest(req, res, userId);
+    requestService.deleteAllRequest(req, res);
   } catch (error) {
     logger.error(error);
   }
@@ -56,6 +62,7 @@ deleteAllRequest = (req, res) => {
 module.exports = {
   getAllData,
   create,
+  isDeleteRequest,
   findById,
   updateRequest,
   deleteRequest,

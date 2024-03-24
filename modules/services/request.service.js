@@ -8,6 +8,11 @@ findAll = (req, res) => {
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
   let where = req.body || {};
+  if (req.body && req.body.isDeleted) {
+    where = { isDeleted: true };
+  } else {
+    where = { isDeleted: false };
+  }
   if (req.body && req.body.userId) {
     where["userId"] = new ObjectId(req.body.userId);
   }
@@ -42,11 +47,15 @@ deleteRequest = async (req, res, id) => {
     });
 };
 
-deleteAllRequest = async (req, res, userId) => {
+deleteAllRequest = async (req, res) => {
+  let where = req.body || {};
+  
+  if (req.body && req.body.userId) {
+    where["userId"] = new ObjectId(req.body.userId);
+  }
+
   requestModel.defaultSchema
-    .deleteMany({
-      userId,
-    })
+    .deleteMany(where)
     .then(function (data) {
       res.status(200).send("Deleted successfully");
     })
@@ -57,6 +66,7 @@ deleteAllRequest = async (req, res, userId) => {
 
 module.exports = {
   deleteRequest,
+  isDeleteRequest:requestModel.genericSchema.delete,
   deleteAllRequest,
   updateRequest: requestModel.genericSchema.update,
   findById: requestModel.genericSchema.findById,

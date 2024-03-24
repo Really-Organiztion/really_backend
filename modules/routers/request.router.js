@@ -12,6 +12,7 @@ requestRouter.put(
   requestController.updateRequest
 );
 requestRouter.delete("/:id", requestController.deleteRequest);
-requestRouter.delete("/deleteAll/:userId", requestController.deleteAllRequest);
+requestRouter.delete("/isDelete/:id", requestController.isDeleteRequest);
+requestRouter.post("/deleteAll", requestController.deleteAllRequest);
 
 module.exports = requestRouter;
