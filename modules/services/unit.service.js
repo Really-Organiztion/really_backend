@@ -7,15 +7,37 @@ findAll = (req, res) => {
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
-  let where = {};
-  if (req.body && req.body.isDeleted) {
-    where = { isDeleted: true };
+  let where = req.body || {};
+  if (req.body) {
+    if (req.body.isDeleted) {
+      where = { isDeleted: true };
+    } else {
+      where = { isDeleted: false };
+    }
+    if (req.body.userId) {
+      where["userId"] = new ObjectId(req.body.userId);
+    }
+    if (req.body.countryId) {
+      where["countryId"] = new ObjectId(req.body.countryId);
+    }
   } else {
     where = { isDeleted: false };
   }
-  if (req.body && req.body.userId) {
-    where["userId"] = new ObjectId(req.body.userId);
+
+  if (where["search"]) {
+    where.$or = [
+      { name: { $regex: where["search"], $options: "i" } },
+      { nameAr: { $regex: where["search"], $options: "i" } },
+      { targetType: { $regex: where["search"], $options: "i" } },
+      { area: { $regex: where["search"], $options: "i" } },
+      { address: { $regex: where["search"], $options: "i" } },
+      { type: { $regex: where["search"], $options: "i" } },
+      { gLocationLink: { $regex: where["search"], $options: "i" } },
+      { additionsServices: { $regex: where["search"], $options: "i" } },
+    ];
+    delete where["search"];
   }
+
   unitModel.defaultSchema
     .find(where)
     .populate("countryId", [`${toFound}`, "code", "numericCode"])

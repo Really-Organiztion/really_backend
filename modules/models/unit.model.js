@@ -66,6 +66,9 @@ const unitSchema = new Schema(
         type: String,
       },
     },
+    additionsTypes: {
+      type: Object,
+    },
     additionsServices: [String],
     servicesId: [ObjectId],
     countryId: {
@@ -99,7 +102,21 @@ const unitSchema = new Schema(
       },
     },
     parentsId: [ObjectId],
+    coordinates: [
+      {
+        latitude: {
+          type: Number,
+        },
+        longitude: {
+          type: Number,
+        },
+      },
+    ],
     isTrusted: {
+      type: Boolean,
+      default: false,
+    },
+    has3DView: {
       type: Boolean,
       default: false,
     },

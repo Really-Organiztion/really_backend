@@ -8,22 +8,21 @@ const userSchema = new Schema(
     firstName: {
       type: String,
       required: true,
-      trim: true,
       minlength: 3,
-      maxlength: 50,
+      maxlength: 30,
     },
     lastName: {
       type: String,
       required: true,
-      trim: true,
       minlength: 3,
-      maxlength: 50,
+      maxlength: 30,
     },
     username: {
       type: String,
+      required: true,
       unique: true,
       minlength: 5,
-      maxlength: 20,
+      maxlength: 30,
     },
     email: {
       type: String,
@@ -46,6 +45,11 @@ const userSchema = new Schema(
     },
     countryId: {
       type: ObjectId,
+      required: true,
+      ref: "country",
+    },
+    nativeCountryId: {
+      type: ObjectId,
       ref: "country",
     },
     phone: {
@@ -64,10 +68,13 @@ const userSchema = new Schema(
     nationalID: {
       type: String,
       trim: true,
-      index: {
-        unique: true,
-        partialFilterExpression: { nationalID: { $type: "string" } },
-      },
+      // index: {
+      //   unique: true,
+      //   partialFilterExpression: {
+      //     nationalID: { $type: "string" },
+      //     nativeCountryId: { $type: "string" },
+      //   },
+      // },
       set: (v) => (v === "" ? null : v),
       length: [14, "National ID must be at least 14 characters"],
     },
@@ -76,11 +83,7 @@ const userSchema = new Schema(
       required: true,
       enum: ["Renter", "Investor", "Owner"],
     },
-    balance: {
-      type: Number,
-      default: 0,
-    },
-    bonus: {
+    conPoints: {
       type: Number,
       default: 0,
     },
@@ -131,6 +134,7 @@ const userSchema = new Schema(
     autoIndex: true,
   }
 );
+ userSchema.index({ nationalID: 1, nativeCountryId: 1 }, { unique: true,sparse:true });
 const genericOperations = require("../genericService");
 // userSchema.virtual("countries", {
 //   ref: "country",

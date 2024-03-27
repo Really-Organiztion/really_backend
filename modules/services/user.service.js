@@ -93,10 +93,10 @@ findAllUsers = async (req, res) => {
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
   let where = req.body || {};
-  if(req.body && req.body.isDeleted) {
-    where['isDeleted'] = true
+  if (req.body && req.body.isDeleted) {
+    where["isDeleted"] = true;
   } else {
-    where['isDeleted'] = false
+    where["isDeleted"] = false;
   }
   if (where["username"]) {
     where["username"] = { $regex: where["username"], $options: "i" };
@@ -581,8 +581,17 @@ generatOptEmail = async (req, res) => {
     });
 };
 updateIdentity = async (req, res, id) => {
+  if (req.body.idType != 'Id' || req.body.idType != 'Passport') {
+    return res.status(400).send("Id Type is required");
+  }
   if (!req.body.imageId) {
-    return res.status(400).send("imageId is required");
+    return res.status(400).send("ImageId is required");
+  }
+  if (!req.body.nationalID) {
+    return res.status(400).send("NationalID is required");
+  }
+  if (!req.body.nativeCountryId) {
+    return res.status(400).send("Native Country Id is required");
   }
   if (!req.body.imageIdBack && req.body.idType == "Id") {
     return res.status(400).send("imageIdBack is required");
@@ -603,7 +612,7 @@ updateIdentity = async (req, res, id) => {
     .then(function (user) {
       let request = {
         details: "I want to update my ID card",
-        code : crypto.randomBytes(6).toString("hex"),
+        code: crypto.randomBytes(6).toString("hex"),
         type: "Identify",
         target: "User",
         userId: user._id,
@@ -611,7 +620,7 @@ updateIdentity = async (req, res, id) => {
       requestModel.defaultSchema
         .create(request)
         .then(function (_request) {
-           webSocket.sendAdminMessage(_request,res);
+          webSocket.sendAdminMessage(_request, res);
         })
         .catch(function (err) {
           res.status(400).send(err);
@@ -717,29 +726,25 @@ createUser = async (req, res) => {
               console.log("Email sent: " + info.response);
             }
           });
-          if(user.nationalID && user.idType){
-
-          let request = {
-            details: "I want to update my ID card",
-            code: crypto.randomBytes(6).toString("hex"),
-            type: "Identify",
-            target: "User",
-            userId: user._id,
-          };
-          requestModel.defaultSchema
-            .create(request)
-            .then(function (_request) {
-              webSocket.sendAdminMessage(_request,res);
-              
-            })
-            .catch(function (err) {
-              res.status(400).send(err);
-            });
+          if (user.nationalID && user.idType) {
+            let request = {
+              details: "I want to update my ID card",
+              code: crypto.randomBytes(6).toString("hex"),
+              type: "Identify",
+              target: "User",
+              userId: user._id,
+            };
+            requestModel.defaultSchema
+              .create(request)
+              .then(function (_request) {
+                webSocket.sendAdminMessage(_request, res);
+              })
+              .catch(function (err) {
+                res.status(400).send(err);
+              });
           } else {
             res.status(200).send(user);
-
           }
-
         })
         .catch(function (err) {
           res.status(400).send(err);
@@ -749,11 +754,26 @@ createUser = async (req, res) => {
       res.status(400).send(err);
     });
 };
+
+findById = (req, res, id) => {
+  const lang = req.query.lang ? req.query.lang : "en";
+  const toFound = lang === "en" ? "name" : "nameAr";
+  userModel.defaultSchema
+    .findById(id, { password: 0 })
+    .populate("countryId", [`${toFound}`, "code", "numericCode"])
+    .then(function (data) {
+      res.status(200).send(data);
+    })
+    .catch(function (err) {
+      res.status(400).send(err);
+    });
+};
+
 module.exports = {
   deleteReturn: userModel.genericSchema.deleteReturn,
   deleteUser: userModel.genericSchema.delete,
   updateUser: userModel.genericSchema.update,
-  findById: userModel.genericSchema.findById,
+  findById,
   createSocialMedia: userModel.genericSchema.create,
   create: createUser,
   findAll: findAllUsers,
