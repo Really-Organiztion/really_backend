@@ -3,7 +3,7 @@ const rateRouter = express.Router();
 const rateController = require("../controllers/rate.controller");
 const roles = require("../../helpers/roles");
 
-rateRouter.get("/", rateController.getAllData);
+rateRouter.post("/all", rateController.getAllData);
 rateRouter.post("/", rateController.create);
 rateRouter.get("/:id", rateController.findById);
 rateRouter.put(

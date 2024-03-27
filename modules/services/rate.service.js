@@ -7,35 +7,34 @@ findAll = (req, res) => {
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
-  let $match = {};
-  if (req.body && req.body.isDeleted) {
-    $match = { isDeleted: true };
+  let where = req.body || {};
+  if (req.body) {
+    if (req.body.isDeleted) {
+      where = { isDeleted: true };
+    } else {
+      where = { isDeleted: false };
+    }
+    if (req.body.userId) {
+      where["userId"] = new ObjectId(req.body.userId);
+    }
+    if (req.body.unitId) {
+      where["unitId"] = new ObjectId(req.body.unitId);
+    }
   } else {
-    $match = { isDeleted: false };
+    where = { isDeleted: false };
   }
   rateModel.defaultSchema
-    .aggregate([
-      {
-        $match,
-      },
-      {
-        $group: {
-          _id: "$_id",
-          name: { $first: `$${toFound}` },
-          numericCode: { $first: `$numericCode` },
-          code: { $first: `$code` },
-          flag: { $first: `$flag` },
-        },
-      },
-    ])
-    .skip((pageNumber - 1) * pageSize)
-    .limit(pageSize)
-    .then(function (data) {
-      res.status(200).send(data);
-    })
-    .catch(function (err) {
-      res.status(400).send(err);
-    });
+  .find(where)
+  .populate("unitId", [`${toFound}`, "type"])
+  .populate("userId", ["username", "phone", "profileImage"])
+  .skip((pageNumber - 1) * pageSize)
+  .limit(pageSize)
+  .then(function (data) {
+    res.status(200).send(data);
+  })
+  .catch(function (err) {
+    res.status(400).send(err);
+  });
 };
 
 updateRate = async (req, res, id) => {
