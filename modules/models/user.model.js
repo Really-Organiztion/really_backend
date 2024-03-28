@@ -45,7 +45,6 @@ const userSchema = new Schema(
     },
     countryId: {
       type: ObjectId,
-      required: true,
       ref: "country",
     },
     nativeCountryId: {
