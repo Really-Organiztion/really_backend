@@ -17,6 +17,9 @@ findAll = (req, res) => {
     if (req.body.userId) {
       where["userId"] = new ObjectId(req.body.userId);
     }
+    if (req.body.unitId) {
+      where["parentsId"] = new ObjectId(req.body.unitId);
+    }
     if (req.body.countryId) {
       where["countryId"] = new ObjectId(req.body.countryId);
     }
