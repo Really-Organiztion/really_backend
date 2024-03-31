@@ -5,16 +5,14 @@ const roles = require("../../helpers/roles");
 
 postRouter.get("/", postController.getAllData);
 postRouter.get("/filterPost", postController.getAllDataFilterPost);
-postRouter.post("/", roles.isAuthenticatedAsAdmin, postController.create);
-postRouter.get("/:id", roles.isAuthenticatedAsAdmin, postController.findById);
+postRouter.post("/", postController.create);
+postRouter.get("/:id", postController.findById);
 postRouter.put(
   "/:id",
-  roles.isAuthenticatedAsAdmin,
   postController.updatePost
 );
 postRouter.delete(
   "/:id",
-  roles.isAuthenticatedAsAdmin,
   postController.deletePost
 );
 
