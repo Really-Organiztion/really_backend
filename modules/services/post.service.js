@@ -60,6 +60,7 @@ findAll = (req, res) => {
         $group: {
           _id: "$_id",
           description: { $first: `$description` },
+          title: { $first: `$title` },
           target: { $first: `$target` },
           userId: { $first: `$userId` },
           unitId: { $first: `$unitId` },

@@ -8,8 +8,12 @@ const postSchema = new Schema({
     type: String,
     required: true,
   },
-  target: {
+  title: {
     type: String,
+    required: true,
+  },
+  target: {
+    type: String, 
     required: true,
     enum : ['Investment', 'Rent']
   },
@@ -28,7 +32,7 @@ const postSchema = new Schema({
     default : false
   }
 });
-postSchema.index({ target: 1, unitId: 1, userId: 1 }, { unique: true });
+postSchema.index({ target: 1, unitId: 1, userId: 1 }, { unique: true, partialFilterExpression: { isDeleted: false} });
 
 const genericOperations = require("../genericService");
 module.exports = {
