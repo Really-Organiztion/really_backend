@@ -25,6 +25,10 @@ const currencySchema = new Schema({
     trim: true,
     unique: true,
   },
+  color: {
+    type: String,
+    required: true,
+  },
   flag: {
     type: String,
   },

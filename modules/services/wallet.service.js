@@ -15,7 +15,7 @@ findAll = (req, res) => {
     .find(where)
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
-    .populate("currencyId", [`${toFound}`, "code","numericCode"])
+    .populate("currencyId", [`${toFound}`, "code","numericCode","color"])
     .populate("userId", ["username", "phone"])
     .then(function (data) {
       res.status(200).send(data);
