@@ -562,7 +562,29 @@ generatOptEmail = async (req, res) => {
             from: process.env.GMAILUSER,
             to: optModel.email,
             subject: "Really Booking Verify Email Code",
-            text: `Your Code is ${optModel.otp}`,
+            text: `* Dear customer,
+
+            Welcome to the world of 🌟Really Booking🌟, where your journey towards unforgettable experiences begins! We are extremely excited that you've decided to join our community, and we promise that being a part of our family is the start of great adventures and lifelong memories.
+            
+            To ensure a safe and comfortable experience within the app, we ask you to confirm your email address. Here is your unique verification code for email verification:
+            
+            🔑 ${optModel.otp} 🔑
+            
+            Please enter this code into the app when prompted to complete your registration process.
+            
+            Confirming your email is an important step that ensures you have full access to all the features and services within Really Booking, enabling you to:
+            
+                Instantly book the best hotels and trips.
+                Take advantage of exclusive offers tailored for our members.
+                Plan your trips with flexibility and ease.
+            
+            We are here to support you every step of the way, so please do not hesitate to get in touch if you need any help or have any questions.
+            
+            Welcome again to the Really Booking family, it's time to start your amazing journey!
+            
+            Best Wishes,
+            
+            The Really Booking Team`,
           };
 
           mailer.transporter.sendMail(mailOptions, function (error, info) {
@@ -581,7 +603,7 @@ generatOptEmail = async (req, res) => {
     });
 };
 updateIdentity = async (req, res, id) => {
-  if (req.body.idType != 'Id' || req.body.idType != 'Passport') {
+  if (req.body.idType != "Id" || req.body.idType != "Passport") {
     return res.status(400).send("Id Type is required");
   }
   if (!req.body.imageId) {
@@ -659,7 +681,29 @@ changeEmail = async (req, res, id) => {
           from: process.env.GMAILUSER,
           to: optModel.email,
           subject: "Really Booking Verify Email Code",
-          text: `Your Code is ${optModel.otp}`,
+          text: `* Dear customer,
+
+            Welcome to the world of 🌟Really Booking🌟, where your journey towards unforgettable experiences begins! We are extremely excited that you've decided to join our community, and we promise that being a part of our family is the start of great adventures and lifelong memories.
+            
+            To ensure a safe and comfortable experience within the app, we ask you to confirm your email address. Here is your unique verification code for email verification:
+            
+            🔑 ${optModel.otp} 🔑
+            
+            Please enter this code into the app when prompted to complete your registration process.
+            
+            Confirming your email is an important step that ensures you have full access to all the features and services within Really Booking, enabling you to:
+            
+                Instantly book the best hotels and trips.
+                Take advantage of exclusive offers tailored for our members.
+                Plan your trips with flexibility and ease.
+            
+            We are here to support you every step of the way, so please do not hesitate to get in touch if you need any help or have any questions.
+            
+            Welcome again to the Really Booking family, it's time to start your amazing journey!
+            
+            Best Wishes,
+            
+            The Really Booking Team`,
         };
 
         mailer.transporter.sendMail(mailOptions, function (error, info) {
@@ -716,7 +760,29 @@ createUser = async (req, res) => {
             from: process.env.GMAILUSER,
             to: optModel.email,
             subject: "Really Booking Verify Email Code",
-            text: `Your Code is ${optModel.otp}`,
+            text: `* Dear customer,
+
+            Welcome to the world of 🌟Really Booking🌟, where your journey towards unforgettable experiences begins! We are extremely excited that you've decided to join our community, and we promise that being a part of our family is the start of great adventures and lifelong memories.
+            
+            To ensure a safe and comfortable experience within the app, we ask you to confirm your email address. Here is your unique verification code for email verification:
+            
+            🔑 ${optModel.otp} 🔑
+            
+            Please enter this code into the app when prompted to complete your registration process.
+            
+            Confirming your email is an important step that ensures you have full access to all the features and services within Really Booking, enabling you to:
+            
+                Instantly book the best hotels and trips.
+                Take advantage of exclusive offers tailored for our members.
+                Plan your trips with flexibility and ease.
+            
+            We are here to support you every step of the way, so please do not hesitate to get in touch if you need any help or have any questions.
+            
+            Welcome again to the Really Booking family, it's time to start your amazing journey!
+            
+            Best Wishes,
+            
+            The Really Booking Team`,
           };
 
           mailer.transporter.sendMail(mailOptions, function (error, info) {
