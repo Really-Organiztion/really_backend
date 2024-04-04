@@ -12,10 +12,11 @@ const postSchema = new Schema({
     type: String,
     required: true,
   },
+
   target: {
-    type: String, 
+    type: String,
     required: true,
-    enum : ['Investment', 'Rent']
+    enum: ["Investment", "Rent"],
   },
   userId: {
     type: ObjectId,
@@ -27,12 +28,19 @@ const postSchema = new Schema({
     required: true,
     ref: "unit",
   },
-  isDeleted : {
-    type : Boolean,
-    default : false
-  }
+  hideUserDetails: {
+    type: Boolean,
+    default: false,
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
-postSchema.index({ target: 1, unitId: 1, userId: 1 }, { unique: true, partialFilterExpression: { isDeleted: false} });
+postSchema.index(
+  { target: 1, unitId: 1, userId: 1 },
+  { unique: true, partialFilterExpression: { isDeleted: false } }
+);
 
 const genericOperations = require("../genericService");
 module.exports = {
