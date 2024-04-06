@@ -23,6 +23,9 @@ findAll = (req, res) => {
   if (req.body && req.body.unitId) {
     $match.unitId = new ObjectId(req.body.unitId);
   }
+  if (req.body && req.body.target) {
+    $match.target = req.body.target;
+  }
   postModel.defaultSchema
     .aggregate([
       {
