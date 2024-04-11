@@ -4,16 +4,15 @@ const commentController = require("../controllers/comment.controller");
 const roles = require("../../helpers/roles");
 
 commentRouter.get("/", commentController.getAllData);
-commentRouter.post("/", roles.isAuthenticatedAsAdmin, commentController.create);
-commentRouter.get("/:id", roles.isAuthenticatedAsAdmin, commentController.findById);
+commentRouter.post("/", commentController.create);
+commentRouter.get("/:id", commentController.findById);
 commentRouter.put(
   "/:id",
-  roles.isAuthenticatedAsAdmin,
   commentController.updateComment
 );
 commentRouter.delete(
   "/:id",
-  roles.isAuthenticatedAsAdmin,
+ 
   commentController.deleteComment
 );
 
