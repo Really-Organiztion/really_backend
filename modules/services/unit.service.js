@@ -29,8 +29,8 @@ findAll = (req, res) => {
 
   if (where["search"]) {
     where.$or = [
-      { name: { $regex: where["search"], $options: "i" } },
-      { nameAr: { $regex: where["search"], $options: "i" } },
+      // { name: { $regex: where["search"], $options: "i" } },
+      // { nameAr: { $regex: where["search"], $options: "i" } },
       { targetType: { $regex: where["search"], $options: "i" } },
       { area: { $regex: where["search"], $options: "i" } },
       { address: { $regex: where["search"], $options: "i" } },
@@ -76,8 +76,8 @@ findAllFilterCb = (req, res) => {
     }
     if (req.body.search) {
       where.$or = [
-        { name: { $regex: req.body.search, $options: "i" } },
-        { nameAr: { $regex: req.body.search, $options: "i" } },
+        // { name: { $regex: req.body.search, $options: "i" } },
+        // { nameAr: { $regex: req.body.search, $options: "i" } },
         { address: { $regex: req.body.search, $options: "i" } },
         { additionsServices: { $regex: req.body.search, $options: "i" } },
       ];

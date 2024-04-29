@@ -13,9 +13,13 @@ const mailer = require("../../helpers/sendMail");
 const crypto = require("crypto");
 
 findUser = async (req, res) => {
+  const lang = req.query.lang ? req.query.lang : "en";
+  const toFound = lang === "en" ? "name" : "nameAr";
   const email = req.body.email;
   const password = req.body.password;
-  let user = await userModel.defaultSchema.findOne({ email });
+  let user = await userModel.defaultSchema
+    .findOne({ email })
+    .populate("countryId", [`${toFound}`, "code", "numericCode"]);
   if (!user) res.status(400).send("Invalid email or password");
   else if (user && !user.emailVerify) {
     res.status(400).send("Mail must be verified before login");

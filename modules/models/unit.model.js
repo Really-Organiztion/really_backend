@@ -10,16 +10,16 @@ const unitSchema = new Schema(
       required: true,
       ref: "user",
     },
-    name: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    nameAr: {
-      type: String,
-      required: true,
-      unique: true,
-    },
+    // name: {
+    //   type: String,
+    //   required: true,
+    //   unique: true,
+    // },
+    // nameAr: {
+    //   type: String,
+    //   required: true,
+    //   unique: true,
+    // },
     targetType: {
       type: String,
       required: true,
