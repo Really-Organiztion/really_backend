@@ -1,7 +1,7 @@
 const fs = require("fs");
 const mkdirp = require("mkdirp").mkdirp;
 const multer = require("multer");
-const validPathesNames = ["user", "unit"];
+const validPathesNames = ["user", "unit","reel"];
 const validFilesTypes = ["image", "file", "video"];
 const path = require("path");
 
