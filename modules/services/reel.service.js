@@ -53,6 +53,12 @@ findAll = (req, res) => {
         },
       },
       {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $group,
       },
     ])
