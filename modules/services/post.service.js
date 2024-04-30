@@ -93,10 +93,84 @@ findAll = (req, res) => {
     });
 };
 
+findAllMap = (req, res) => {
+  const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
+  const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 100000;
+  const lang = req.query.lang ? req.query.lang : "en";
+  const toFound = lang === "en" ? "name" : "nameAr";
+  let $match = {};
+  let match2 = {};
+  if (req.body && req.body.isDeleted) {
+    $match = { isDeleted: true };
+  } else {
+    $match = { isDeleted: false };
+  }
+  if (req.body && req.body.countryId) {
+    match2.countryId = new ObjectId(req.body.countryId);
+  }
+
+  if (req.body && req.body.target) {
+    $match.target = req.body.target;
+  }
+  postModel.defaultSchema
+    .aggregate([
+      {
+        $match,
+      },
+      {
+        $lookup: {
+          from: "units",
+          localField: "unitId",
+          foreignField: "_id",
+          as: "unit",
+        },
+      },
+      {
+        $unwind: {
+          path: "$unit",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          area: { $first: `$unit.area` },
+          unitId: { $first: `$unitId` },
+          coordinates: { $first: `$unit.coordinates` },
+          countryId: { $first: `$unit.countryId` },
+          imagesList: { $first: `$unit.imagesList` }
+        },
+      },
+      {$unwind:"$imagesList"},
+      {
+        $match: match2,
+      },
+      {
+        $group: {
+          _id: "$_id",
+          area: { $first: `$area` },
+          unitId: { $first: `$unitId` },
+          coordinates: { $first: `$coordinates` },
+          image: { $first: `$imagesList` }
+        },
+      },
+    ])
+    .skip((pageNumber - 1) * pageSize)
+    .limit(pageSize)
+    .then(function (data) {
+      res.status(200).send(data);
+    })
+    .catch(function (err) {
+      console.log(err);
+      res.status(400).send(err);
+    });
+};
+
 module.exports = {
   deletePost: postModel.genericSchema.delete,
   updatePost: postModel.genericSchema.update,
   findById: postModel.genericSchema.findById,
   create: postModel.genericSchema.create,
   findAll,
+  findAllMap,
 };

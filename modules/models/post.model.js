@@ -12,7 +12,6 @@ const postSchema = new Schema({
     type: String,
     required: true,
   },
-
   target: {
     type: String,
     required: true,

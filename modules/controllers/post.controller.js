@@ -10,6 +10,15 @@ getAllData = (req, res) => {
   }
 };
 
+getAllDataMap = (req, res) => {
+  try {
+    postService.findAllMap(req, res);
+  } catch (error) {
+    console.log(error);
+    logger.error(error);
+  }
+};
+
 getAllDataFilterPost = async (req, res) => {
   try {
     const unitsIds = await unitService.findAllFilterCb(req, res);
@@ -68,4 +77,5 @@ module.exports = {
   updatePost,
   deletePost,
   getAllData,
+  getAllDataMap,
 };
