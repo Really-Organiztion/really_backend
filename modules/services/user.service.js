@@ -647,6 +647,8 @@ updateIdentity = async (req, res, id) => {
         .create(request)
         .then(function (_request) {
           webSocket.sendAdminMessage(_request, res);
+          res.status(200).send(user);
+
         })
         .catch(function (err) {
           res.status(400).send(err);
@@ -808,6 +810,8 @@ createUser = async (req, res) => {
               .create(request)
               .then(function (_request) {
                 webSocket.sendAdminMessage(_request, res);
+          res.status(200).send(user);
+
               })
               .catch(function (err) {
                 res.status(400).send(err);

@@ -11,7 +11,7 @@ const requestSchema = new Schema(
     },
     type: {
       type: String,
-      enum: ["Identify"],
+      enum: ["Identify",'AddUnit'],
       required: true,
     },
     code: {
@@ -35,6 +35,10 @@ const requestSchema = new Schema(
       type: ObjectId,
       required: true,
       ref: "user",
+    },
+    unitId: {
+      type: ObjectId,
+      ref: "unit",
     },
     adminId: {
       type: ObjectId,

@@ -10,7 +10,6 @@ sendAdminMessage = (msg, res) => {
       client.ws.send(data);
     }
   });
-  res.status(200).send(msg);
 };
 sendMessageByUserID = (msg, id) => {
   clientsList.forEach((client) => {

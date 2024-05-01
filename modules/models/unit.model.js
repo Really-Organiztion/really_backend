@@ -23,7 +23,7 @@ const unitSchema = new Schema(
     targetType: {
       type: String,
       required: true,
-      enum: ["Investment", "Rent"],
+      enum: ["None","Investment", "Rent"],
     },
     area: {
       type: String,
