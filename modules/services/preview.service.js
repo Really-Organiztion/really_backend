@@ -94,7 +94,7 @@ findAll = (req, res) => {
           path: "$subject",
           preserveNullAndEmptyArrays: true,
         },
-      },
+      }, 
       {
         $group: {
           _id: "$_id",

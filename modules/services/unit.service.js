@@ -116,33 +116,52 @@ updateUnitRateCb = (obj, id) => {
 };
 
 create = async (req, res) => {
-  unitModel.defaultSchema.create(req.body).then(function (doc) {
-    let request = {
-      details: "I want to add new unit",
-      code: crypto.randomBytes(6).toString("hex"),
-      type: "AddUnit",
-      target: "Unit",
-      userId: doc.userId,
-      unitId: doc._id,
-    };
-    requestModel.defaultSchema
-      .create(request)
-      .then(function (_request) {
-        webSocket.sendAdminMessage(_request, res);
-        res.status(200).send(doc);
-      })
-      .catch(function (err) {
-        res.status(400).send(err);
-      });
-  }).catch(function (err) {
-    res.status(400).send(err);
-  });
+  unitModel.defaultSchema
+    .create(req.body)
+    .then(function (doc) {
+      let request = {
+        details: "I want to add new unit",
+        code: crypto.randomBytes(6).toString("hex"),
+        type: "AddUnit",
+        target: "Unit",
+        userId: doc.userId,
+        unitId: doc._id,
+      };
+      requestModel.defaultSchema
+        .create(request)
+        .then(function (_request) {
+          webSocket.sendAdminMessage(_request, res);
+          res.status(200).send(doc);
+        })
+        .catch(function (err) {
+          res.status(400).send(err);
+        });
+    })
+    .catch(function (err) {
+      res.status(400).send(err);
+    });
+};
+
+findById = (req, res, id) => {
+  const lang = req.query.lang ? req.query.lang : "en";
+  const toFound = lang === "en" ? "name" : "nameAr";
+  unitModel.defaultSchema
+    .findById(id)
+    .populate("servicesId", [`${toFound}`, "subServicesList"])
+    .populate("countryId", [`${toFound}`, "code", "numericCode"])
+    .populate("userId", ["username", "phone", "profileImage"])
+    .then(function (data) {
+      res.status(200).send(data);
+    })
+    .catch(function (err) {
+      res.status(400).send(err);
+    });
 };
 
 module.exports = {
   deleteUnit: unitModel.genericSchema.delete,
   updateUnit: unitModel.genericSchema.update,
-  findById: unitModel.genericSchema.findById,
+  findById,
   create,
   updateUnitRateCb,
   findAll,

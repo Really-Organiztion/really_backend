@@ -14,7 +14,7 @@ const reportSchema = new Schema({
     ref: "user",
   },
   targetType: {
-    type: ObjectId,
+    type: String,
     required: true,
     enum : ["User","Unit","Comment" , "Post"]
   },
@@ -24,6 +24,7 @@ const reportSchema = new Schema({
   },
 });
 const genericOperations = require("../genericService");
+const { stringify } = require("uuid");
 module.exports = {
   genericSchema: genericOperations(mongoose.model("report", reportSchema)),
   defaultSchema: mongoose.model("report", reportSchema),

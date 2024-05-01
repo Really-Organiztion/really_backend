@@ -15,6 +15,16 @@ const serviceTypeSchema = new Schema({
     required: true,
     unique: true,
   },
+  subServicesList: [
+    {
+      name: {
+        type: String,
+      },
+      nameAr: {
+        type: String,
+      },
+    },
+  ],
   isDeleted : {
     type : Boolean,
     default : false

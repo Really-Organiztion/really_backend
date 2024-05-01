@@ -70,7 +70,7 @@ const unitSchema = new Schema(
       type: Object,
     },
     additionsServices: [String],
-    servicesId: [ObjectId],
+    servicesId: [{ type : ObjectId, ref: 'serviceType' }],
     countryId: {
       type: ObjectId,
       ref: "country",
