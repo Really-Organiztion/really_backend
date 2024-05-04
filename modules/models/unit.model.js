@@ -23,7 +23,7 @@ const unitSchema = new Schema(
     targetType: {
       type: String,
       required: true,
-      enum: ["None","Investment", "Rent"],
+      enum: ["None", "Investment", "Rent"],
     },
     area: {
       type: String,
@@ -70,7 +70,7 @@ const unitSchema = new Schema(
       type: Object,
     },
     additionsServices: [String],
-    servicesId: [{ type : ObjectId, ref: 'serviceType' }],
+    servicesId: [{ type: ObjectId, ref: "serviceType" }],
     countryId: {
       type: ObjectId,
       ref: "country",
@@ -102,16 +102,12 @@ const unitSchema = new Schema(
       },
     },
     parentsId: [ObjectId],
-    coordinates: [
-      {
-        latitude: {
-          type: Number,
-        },
-        longitude: {
-          type: Number,
-        },
+    location: {
+      type: {
+        type: String,
       },
-    ],
+      coordinates: [],
+    },
     isTrusted: {
       type: Boolean,
       default: false,

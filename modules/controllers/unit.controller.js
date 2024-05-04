@@ -9,6 +9,14 @@ getAllData = (req, res) => {
   }
 };
 
+findCoordinatesMatch = (req, res) => {
+  try {
+    unitService.findCoordinatesMatch(req, res);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+
 create = (req, res) => {
   try {
     unitService.create(req, res);
@@ -44,6 +52,7 @@ deleteUnit = (req, res) => {
 
 module.exports = {
   getAllData,
+  findCoordinatesMatch,
   create,
   findById,
   updateUnit,

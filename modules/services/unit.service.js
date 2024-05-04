@@ -142,6 +142,29 @@ create = async (req, res) => {
     });
 };
 
+findCoordinatesMatch = (req, res) => {
+  unitModel.defaultSchema
+  .find({
+    location: {
+      $geoIntersects: {
+        $geometry: {
+          type: "MultiPoint",
+          coordinates: req.body.coordinates[0],
+        },
+      },
+    },
+  })
+  .then(function (unit) {
+    console.log(unit);
+    res.status(200).send(unit);
+  })
+  .catch(function (err) {
+    console.log(err);
+    res.status(400).send(err);
+  });
+};
+
+
 findById = (req, res, id) => {
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
@@ -166,4 +189,5 @@ module.exports = {
   updateUnitRateCb,
   findAll,
   findAllFilterCb,
+  findCoordinatesMatch,
 };
