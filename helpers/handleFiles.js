@@ -1,7 +1,7 @@
 const fs = require("fs");
 const mkdirp = require("mkdirp").mkdirp;
 const multer = require("multer");
-const validPathesNames = ["user", "unit","reel"];
+const validPathesNames = ["user", "unit", "reel"];
 const validFilesTypes = ["image", "file", "video"];
 const path = require("path");
 
@@ -14,7 +14,9 @@ const handleFileUpload = (req, res) => {
   }
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, `attachments/${req.params.pathName}/${req.params.fileType}/`);
+      const path = `attachments/${req.params.pathName}/${req.params.fileType}/`;
+      fs.mkdirSync(path, { recursive: true });
+      cb(null, path);
     },
     filename: function (req, file, cb) {
       const unqieName = Date.now() + "-" + Math.round(Math.random() * 1e9);
