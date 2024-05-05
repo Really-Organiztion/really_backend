@@ -66,6 +66,21 @@ const unitSchema = new Schema(
         type: String,
       },
     },
+    primImage: {
+      url: {
+        type: String,
+      },
+    },
+    ownershipImage: {
+      url: {
+        type: String,
+      },
+    },
+    krokyImage: {
+      url: {
+        type: String,
+      },
+    },
     additionsTypes: {
       type: Object,
     },
