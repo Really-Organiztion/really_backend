@@ -138,7 +138,8 @@ findAllMap = (req, res) => {
           unitId: { $first: `$unitId` },
           coordinates: { $first: `$unit.coordinates` },
           countryId: { $first: `$unit.countryId` },
-          imagesList: { $first: `$unit.imagesList` }
+          primImage: { $first: `$unit.primImage` },
+          // imagesList: { $first: `$unit.imagesList` }
         },
       },
       {$unwind:"$imagesList"},
@@ -151,7 +152,8 @@ findAllMap = (req, res) => {
           area: { $first: `$area` },
           unitId: { $first: `$unitId` },
           coordinates: { $first: `$coordinates` },
-          image: { $first: `$imagesList` }
+          primImage: { $first: `$primImage` },
+          // image: { $first: `$imagesList` }
         },
       },
     ])
