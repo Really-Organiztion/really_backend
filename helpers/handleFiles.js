@@ -46,6 +46,52 @@ const handleFileUpload = (req, res) => {
   });
 };
 
+const handleFilesUpload = (req, res) => {
+  if (!validPathesNames.includes(req.params.pathName)) {
+    return res.status(400).send("The pathName is incorrect");
+  }
+  if (!validFilesTypes.includes(req.params.fileType)) {
+    return res.status(400).send("The fileType is incorrect");
+  }
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      const path = `attachments/${req.params.pathName}/${req.params.fileType}/`;
+      fs.mkdirSync(path, { recursive: true });
+      cb(null, path);
+    },
+    filename: function (req, file, cb) {
+      const unqieName = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      cb(null, unqieName + "-" + file.originalname);
+    },
+  });
+  const upload = multer({ storage: storage });
+  upload.array("file",10)(req, res, function (err) {
+    if (err) {
+      console.log(err);
+      return res.status(400).send(err, "Error uploading file");
+    }
+    if (req.files) {
+      let files = [];
+      req.files.forEach(_files => {
+        files.push({
+          url:
+            "/api/uploadFile/" +
+            req.params.pathName +
+            "/" +
+            req.params.fileType +
+            "/" +
+            _files.filename,
+          type: _files.mimetype,
+          size: _files.size,
+        })
+      });
+      return res.status(200).send(files);
+    } else {
+      return res.status(400).send("Error uploading file");
+    }
+  });
+};
+
 const getFile = async (req, res) => {
   if (!validPathesNames.includes(req.params.pathName)) {
     return res.status(400).send("The pathName is incorrect");
@@ -140,6 +186,7 @@ readFile = async (key) => {
 
 module.exports = {
   handleFileUpload,
+  handleFilesUpload,
   getFile,
   saveFiles,
   readFile,
