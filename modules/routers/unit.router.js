@@ -4,7 +4,7 @@ const unitController = require("../controllers/unit.controller");
 const roles = require("../../helpers/roles");
 
 unitRouter.post("/all", unitController.getAllData);
-unitRouter.post("/coordinatesMatch",roles.isAuthenticatedAsAdmin, unitController.findCoordinatesMatch);
+unitRouter.post("/coordinatesMatch", unitController.findCoordinatesMatch);
 unitRouter.post("/", unitController.create);
 unitRouter.put(
   "/:id",
