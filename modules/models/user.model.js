@@ -53,7 +53,6 @@ const userSchema = new Schema(
     },
     phone: {
       type: String,
-      unique: true,
     },
     verifyIdentityType: {
       type: String,
@@ -76,6 +75,19 @@ const userSchema = new Schema(
       // },
       set: (v) => (v === "" ? null : v),
       length: [14, "National ID must be at least 14 characters"],
+    },
+    nationalID: {
+      type: String,
+      trim: true,
+      // index: {
+      //   unique: true,
+      //   partialFilterExpression: {
+      //     nationalID: { $type: "string" },
+      //     nativeCountryId: { $type: "string" },
+      //   },
+      // },
+      set: (v) => (v === "" ? null : v),
+      uniq: [14, "National ID must be at least 14 characters"],
     },
     role: {
       type: String,
@@ -133,7 +145,9 @@ const userSchema = new Schema(
     autoIndex: true,
   }
 );
+
  userSchema.index({ nationalID: 1, nativeCountryId: 1 }, { unique: true,sparse:true });
+ userSchema.index({ phone: 1, }, { unique: true,sparse:true });
 const genericOperations = require("../genericService");
 // userSchema.virtual("countries", {
 //   ref: "country",
