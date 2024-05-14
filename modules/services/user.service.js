@@ -548,47 +548,53 @@ getOptEmail = async (req, res) => {
     });
 };
 generatOptEmail = async (req, res) => {
-  userOptModel.defaultSchema
-    .findOne({
-      email: req.body.email,
-    })
-    .then(function (_obj) {
-      if (_obj) {
-        res
-          .status(400)
-          .send("You must wait 5 minutes before sending another code");
-      } else {
-        let optModel = {
-          otp: Math.floor(Math.random() * 90000) + 10000,
-          email: req.body.email,
-        };
-        userOptModel.defaultSchema.create(optModel).then(function (models1) {
-          let mailOptions = {
-            from: process.env.GMAILUSER,
-            to: optModel.email,
-            subject: "Really Booking Verify Email Code",
-            text: `
+  let user = await userModel.defaultSchema.findOne({ email: req.body.email });
+  if (user) {
+    userOptModel.defaultSchema
+      .findOne({
+        email: req.body.email,
+      })
+      .then(function (_obj) {
+        if (_obj) {
+          res
+            .status(400)
+            .send("You must wait 5 minutes before sending another code");
+        } else {
+          let optModel = {
+            otp: Math.floor(Math.random() * 90000) + 10000,
+            email: req.body.email,
+          };
+          userOptModel.defaultSchema.create(optModel).then(function (models1) {
+            let mailOptions = {
+              from: process.env.GMAILUSER,
+              to: optModel.email,
+              subject: "Really Booking Verify Email Code",
+              text: `
             ${words.sendEmail1}
 
             🔑 ${optModel.otp} 🔑
             
            ${words.sendEmail2}`,
-          };
+            };
 
-          mailer.transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-              console.log(error);
-            } else {
-              console.log("Email sent: " + info.response);
-            }
+            mailer.transporter.sendMail(mailOptions, function (error, info) {
+              if (error) {
+                console.log(error);
+              } else {
+                console.log("Email sent: " + info.response);
+              }
+            });
+            res.status(200).send("The code has been sent to your email");
           });
-          res.status(200).send("The code has been sent to your email");
-        });
-      }
-    })
-    .catch(function (err1) {
-      res.status(400).send(err1);
-    });
+        }
+      })
+      .catch(function (err1) {
+        res.status(400).send(err1);
+      });
+  } else {
+    res.status(400).send("Email not exist");
+
+  }
 };
 updateIdentity = async (req, res, id) => {
   if (req.body.idType != "Id" || req.body.idType != "Passport") {
