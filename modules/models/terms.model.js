@@ -8,16 +8,13 @@ const termsSchema = new Schema({
   name: {
     type: String,
     required: true,
-    unique: true,
   },
   nameAr: {
     type: String,
     required: true,
-    unique: true,
   },
   type: {
     type: String,
-    enum: ["Register", "AddUnit", "AddPost"],
     required: true,
   },
   
@@ -25,6 +22,11 @@ const termsSchema = new Schema({
     type : Boolean,
     default : false
   }
+},
+{
+  timestamps: true,
+  useCreateIndex: true,
+  autoIndex: true,
 });
 const genericOperations = require("../genericService");
 module.exports = {
