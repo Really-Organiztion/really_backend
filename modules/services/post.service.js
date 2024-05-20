@@ -7,6 +7,8 @@ findAll = (req, res) => {
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
+  const toFoundTitle = lang === "en" ? "title" : "titleAr";
+  const toFoundDescription = lang === "en" ? "description" : "descriptionAr";
   let $match = {};
   if (req.body && req.body.isDeleted) {
     $match = { isDeleted: true };
@@ -62,8 +64,8 @@ findAll = (req, res) => {
       {
         $group: {
           _id: "$_id",
-          description: { $first: `$description` },
-          title: { $first: `$title` },
+          description: { $first: `$${toFoundDescription}` },
+          title: { $first: `$${toFoundTitle}` },
           hideUserDetails: { $first: `$hideUserDetails` },
           target: { $first: `$target` },
           userId: { $first: `$userId` },
@@ -168,6 +170,25 @@ findAllMap = (req, res) => {
     });
 };
 
+
+updatePostCb = (obj, id) => {
+  return new Promise((resolve, reject) => {
+    postModel.defaultSchema
+      .findOneAndUpdate(
+        {
+          _id: id,
+        },
+        obj
+      )
+      .then(function (res) {
+        resolve(res);
+      })
+      .catch(function (err) {
+        reject(null);
+      });
+  });
+};
+
 module.exports = {
   deletePost: postModel.genericSchema.delete,
   updatePost: postModel.genericSchema.update,
@@ -175,4 +196,5 @@ module.exports = {
   create: postModel.genericSchema.create,
   findAll,
   findAllMap,
+  updatePostCb,
 };
