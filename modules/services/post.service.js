@@ -71,7 +71,6 @@ findAll = (req, res) => {
           target: { $first: `$target` },
           userId: { $first: `$userId` },
           unitId: { $first: `$unitId` },
-          name: { $first: `$unit.${toFound}` },
           address: { $first: `$unit.address` },
           type: { $first: `$unit.type` },
           has3DView: { $first: `$unit.has3DView` },
