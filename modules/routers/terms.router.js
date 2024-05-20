@@ -3,9 +3,7 @@ const termsRouter = express.Router();
 const termsController = require("../controllers/terms.controller");
 const roles = require("../../helpers/roles");
 
-termsRouter.post("/all", termsController.getAllData);
 termsRouter.post("/", roles.isAuthenticatedAsAdmin, termsController.create);
-termsRouter.get("/:id", roles.isAuthenticatedAsAdmin, termsController.findById);
 termsRouter.put(
   "/:id",
   roles.isAuthenticatedAsAdmin,

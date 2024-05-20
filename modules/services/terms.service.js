@@ -14,6 +14,10 @@ findAll = (req, res) => {
   } else {
     $match = { isDeleted: false };
   }
+  if (req.body["type"]) {
+    $match["type"] = req.body["type"];
+  
+  }
   if (req.body["search"]) {
     $match.$or = [
       { name: { $regex: req.body["search"], $options: "i" } },
