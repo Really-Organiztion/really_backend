@@ -139,7 +139,7 @@ findAllMap = (req, res) => {
           _id: "$_id",
           area: { $first: `$unit.area` },
           unitId: { $first: `$unitId` },
-          coordinates: { $first: `$unit.coordinates` },
+          coordinates: { $first: `$unit.location.coordinates` },
           countryId: { $first: `$unit.countryId` },
           primImage: { $first: `$unit.primImage` },
           // imagesList: { $first: `$unit.imagesList` }
