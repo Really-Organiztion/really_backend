@@ -66,7 +66,8 @@ findAll = (req, res) => {
           _id: "$_id",
           description: { $first: `$${toFoundDescription}` },
           title: { $first: `$${toFoundTitle}` },
-          hideUserDetails: { $first: `$hideUserDetails` },
+          plansList: { $first: `$plansList` },
+          setting: { $first: `$setting` },
           target: { $first: `$target` },
           userId: { $first: `$userId` },
           unitId: { $first: `$unitId` },
@@ -144,7 +145,7 @@ findAllMap = (req, res) => {
           // imagesList: { $first: `$unit.imagesList` }
         },
       },
-      {$unwind:"$imagesList"},
+      // {$unwind:"$imagesList"},
       {
         $match: match2,
       },

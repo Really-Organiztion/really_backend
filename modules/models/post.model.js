@@ -36,10 +36,7 @@ const postSchema = new Schema(
       required: true,
       ref: "unit",
     },
-    hideUserDetails: {
-      type: Boolean,
-      default: false,
-    },
+ 
     plansList: [
       {
         type: {

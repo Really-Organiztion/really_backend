@@ -593,7 +593,6 @@ generatOptEmail = async (req, res) => {
       });
   } else {
     res.status(400).send("Email not exist");
-
   }
 };
 updateIdentity = async (req, res, id) => {
@@ -779,6 +778,22 @@ createUser = async (req, res) => {
         });
     })
     .catch(function (err) {
+      // if (err.code == '11000') {
+      //   let values = '';
+      //   for (var k in err.keyValue) {
+      //     k =  k.replace("Id", "")
+      //     k =  k[0].toUpperCase() + k.slice(1);
+      //     k = k.replace(/([A-Z])/g, ' $1').trim()
+
+      //     values = values + k + ' , '
+      // }
+      //   res.status(400).send(`${values} Is Duplicated`);
+      //   return;
+      // } else if (err.message) {
+      //   console.log(err.errors);
+      //   res.status(400).send(err.message);
+      //   return;
+      // }
       res.status(400).send(err);
     });
 };
