@@ -17,6 +17,14 @@ findCoordinatesMatch = (req, res) => {
   }
 };
 
+findNearUnits = (req, res) => {
+  try {
+    unitService.findNearUnits(req, res);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+
 create = (req, res) => {
   try {
     unitService.create(req, res);
@@ -53,6 +61,7 @@ deleteUnit = (req, res) => {
 module.exports = {
   getAllData,
   findCoordinatesMatch,
+  findNearUnits,
   create,
   findById,
   updateUnit,

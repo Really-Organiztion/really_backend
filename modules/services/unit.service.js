@@ -171,6 +171,33 @@ findCoordinatesMatch = (req, res) => {
     });
 };
 
+findNearUnits = (req, res) => {
+  const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
+  const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
+  const lang = req.query.lang ? req.query.lang : "en";
+  const toFound = lang === "en" ? "name" : "nameAr";
+  unitModel.defaultSchema
+    .find({
+      location: {
+        $near: {
+          $geometry: { type: "Point", coordinates: req.body.coordinates },
+          $maxDistance: req.body.distance,
+        },
+      },
+    })
+    .populate("countryId", [`${toFound}`, "code", "numericCode"])
+    .populate("userId", ["username", "phone", "profileImage"])
+    .skip((pageNumber - 1) * pageSize)
+    .limit(pageSize)
+    .then(function (unit) {
+      res.status(200).send(unit);
+    })
+    .catch(function (err) {
+      console.log(err);
+      res.status(400).send(err);
+    });
+};
+
 findById = (req, res, id) => {
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
@@ -196,4 +223,5 @@ module.exports = {
   findAll,
   findAllFilterCb,
   findCoordinatesMatch,
+  findNearUnits,
 };
