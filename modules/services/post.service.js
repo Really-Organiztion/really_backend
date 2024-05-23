@@ -67,6 +67,7 @@ findAll = (req, res) => {
           description: { $first: `$${toFoundDescription}` },
           title: { $first: `$${toFoundTitle}` },
           plansList: { $first: `$plansList` },
+          addtionDetails: { $first: `$addtionDetails` },
           setting: { $first: `$setting` },
           target: { $first: `$target` },
           userId: { $first: `$userId` },

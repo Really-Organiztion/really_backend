@@ -36,7 +36,7 @@ const postSchema = new Schema(
       required: true,
       ref: "unit",
     },
- 
+
     plansList: [
       {
         type: {
@@ -92,6 +92,7 @@ const postSchema = new Schema(
         type: Boolean,
       },
     },
+    addtionDetails: {},
     favorites: {
       type: Number,
       default: 0,
