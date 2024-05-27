@@ -8,14 +8,23 @@ findAll = (req, res) => {
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
   let where = req.body || {};
+
   if (!req.body || !req.body.isDeleted) {
     where["isDeleted"] = false;
   }
+
+  if (req.body.userId) {
+    where["userId"] = new ObjectId(req.body.userId);
+  }
+  if (req.body.currencyId) {
+    where["currencyId"] = new ObjectId(req.body.currencyId);
+  }
+
   walletModel.defaultSchema
     .find(where)
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
-    .populate("currencyId", [`${toFound}`, "code","numericCode","color"])
+    .populate("currencyId", [`${toFound}`, "code", "numericCode", "color"])
     .populate("userId", ["username", "phone"])
     .then(function (data) {
       res.status(200).send(data);

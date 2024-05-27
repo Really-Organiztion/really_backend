@@ -3,7 +3,7 @@ const walletRouter = express.Router();
 const walletController = require("../controllers/wallet.controller");
 const roles = require("../../helpers/roles");
 
-walletRouter.get("/", walletController.getAllData);
+walletRouter.post("/all", walletController.getAllData);
 walletRouter.post("/",  walletController.create);
 
 walletRouter.get("/:id",  walletController.findById);
