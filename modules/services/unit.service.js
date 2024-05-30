@@ -46,6 +46,7 @@ findAll = (req, res) => {
 
   unitModel.defaultSchema
     .find(where)
+    .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
     .populate("userId", ["username", "phone", "profileImage"])
     .skip((pageNumber - 1) * pageSize)
@@ -158,6 +159,7 @@ findCoordinatesMatch = (req, res) => {
         },
       },
     })
+    .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
     .populate("userId", ["username", "phone", "profileImage"])
     .skip((pageNumber - 1) * pageSize)
@@ -185,6 +187,7 @@ findNearUnits = (req, res) => {
         },
       },
     })
+    .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
     .populate("userId", ["username", "phone", "profileImage"])
     .skip((pageNumber - 1) * pageSize)

@@ -25,6 +25,7 @@ findAll = (req, res) => {
 
   requestModel.defaultSchema
     .find(where)
+    .sort({ _id: -1 })
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .populate("userId", ["username", "phone"])

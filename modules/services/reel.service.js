@@ -18,7 +18,6 @@ findAll = (req, res) => {
     $match.$or = [
       { caption: { $regex: req.body["search"], $options: "i" } },
       { link: { $regex: req.body["search"], $options: "i" } },
-    
     ];
   }
   if (req.body.userId) {
@@ -36,7 +35,6 @@ findAll = (req, res) => {
     caption: { $first: `$caption` },
     views: { $first: `$views` },
     likes: { $first: `$likes` },
-
   };
 
   reelModel.defaultSchema
@@ -62,6 +60,7 @@ findAll = (req, res) => {
         $group,
       },
     ])
+    .sort({ _id: -1 })
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (data) {

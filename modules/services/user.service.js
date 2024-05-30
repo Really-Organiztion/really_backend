@@ -181,8 +181,8 @@ findAllUsers = async (req, res) => {
 
   let users = await userModel.defaultSchema
     .find(where)
+    .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .select({ password: 0, __v: 0 });
@@ -268,6 +268,7 @@ findUserCourses = async (req, res, id) => {
     const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
     userModel.defaultSchema
       .find({ _id: ObjectId(id) })
+      .sort({ _id: -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .select({ courses: 1, lessons: 1 })
@@ -293,6 +294,7 @@ findUserLessons = async (req, res, id, type) => {
     const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
     userModel.defaultSchema
       .find({ _id: ObjectId(id) })
+      .sort({ _id: -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .select({ lessons: 1 })
@@ -347,6 +349,7 @@ findUserFavorites = async (req, res, id) => {
     const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
     userModel.defaultSchema
       .find({ _id: ObjectId(id) })
+      .sort({ _id: -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .select({ favorites: 1 })
@@ -367,6 +370,7 @@ checkUserCourseInFavorite = async (req, res, userId, courseId) => {
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
   userModel.defaultSchema
     .find({ _id: ObjectId(userId), favorites: { $in: ObjectId(courseId) } })
+    .sort({ _id: -1 })
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .select({ favorites: 1 })

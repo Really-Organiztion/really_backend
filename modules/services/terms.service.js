@@ -42,6 +42,7 @@ findAll = (req, res) => {
         $group,
       },
     ])
+    .sort({ _id: -1 })
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (data) {

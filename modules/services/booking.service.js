@@ -65,6 +65,7 @@ findAll = (req, res) => {
 
   bookingModel.defaultSchema
     .find(where)
+    .sort({ _id: -1 })
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .populate("unitId", ["type"])

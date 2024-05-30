@@ -12,6 +12,7 @@ module.exports = function (Collection) {
       where["isDeleted"] = false;
     }
     Collection.find(where)
+      .sort({ _id: -1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .exec((err, data) => res.send(err || data));

@@ -5,6 +5,7 @@ getNotificationByUserId = (req, res, userId) => {
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
   notificationModel.defaultSchema
     .find({ userId })
+    .sort({ _id: -1 })
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .select({ notification: 1 })

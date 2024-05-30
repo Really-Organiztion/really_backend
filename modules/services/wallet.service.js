@@ -22,6 +22,7 @@ findAll = (req, res) => {
 
   walletModel.defaultSchema
     .find(where)
+    .sort({ _id: -1 })
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .populate("currencyId", [`${toFound}`, "code", "numericCode", "color"])

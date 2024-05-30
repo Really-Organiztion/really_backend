@@ -53,6 +53,7 @@ findAllAdmins = async (req, res) => {
   }
   let admins = await adminModel.defaultSchema
     .find(where)
+    .sort({ _id: -1 })
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .select({ password: 0, __v: 0 });

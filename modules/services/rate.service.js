@@ -25,6 +25,7 @@ findAll = (req, res) => {
   }
   rateModel.defaultSchema
   .find(where)
+  .sort({ _id: -1 })
   .populate("unitId", [`${toFound}`, "type"])
   .populate("userId", ["username", "phone", "profileImage"])
   .skip((pageNumber - 1) * pageSize)
