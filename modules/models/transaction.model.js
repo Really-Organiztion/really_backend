@@ -31,6 +31,18 @@ const transactionSchema = new Schema(
       ],
       required: true,
     },
+    status: {
+      type: String,
+      enum: [
+        "NewTransaction",
+        "Processing",
+        "Ignored",
+        "Canceled",
+        "Completed",
+        "Error",
+      ],
+      required: true,
+    },
     amount: {
       type: Number,
       required: true,

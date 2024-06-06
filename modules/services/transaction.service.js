@@ -33,7 +33,22 @@ findAll = (req, res) => {
       res.status(400).send(err);
     });
 };
-updateTransactionType = async (req, res, id) => {
+updateTransactionStatus = async (req, res, id) => {
+  let set = {};
+
+  if (req.body.type) {
+    set["type"] = { type: req.body.type };
+  } else if (req.body.status) {
+    if (req.body.status == "Processing") {
+      if (req.body?.sessionData?.success) {
+        set["status"] = "Completed";
+      } else {
+        set["status"] = "Error";
+      }
+    } else {
+      set["status"] = req.body.status;
+    }
+  }
   transactionModel.defaultSchema
     .findByIdAndUpdate(id, {
       $set: { type: req.body.type },
@@ -41,18 +56,77 @@ updateTransactionType = async (req, res, id) => {
       setDefaultsOnInsert: true,
     })
     .then(function (data) {
-      res.status(200).send(`New Type is ${req.body.type}`);
+      res.status(200).send(data);
     })
     .catch(function (err) {
       res.status(400).send(err);
     });
 };
 
+create = async (req, res) => {
+  return new Promise((resolve, reject) => {
+    if(req.body){
+      if(req.body.status == 'Processing'){
+        if (req.body?.sessionData?.success) {
+          req.body.status = "Completed";
+        } else {
+          req.body.status = "Error";
+        }
+      }
+    }
+    transactionModel.defaultSchema
+      .create(req.body)
+      .then(function (doc) {
+        resolve(doc);
+      })
+      .catch(function (err) {
+        reject(err);
+        res.status(400).send(err);
+      });
+  });
+};
+
+findOne = (where) => {
+  return new Promise((resolve, reject) => {
+    transactionModel.defaultSchema
+      .findOne(
+        where
+        
+      )
+      .then(function (res) {
+        resolve(res);
+      })
+      .catch(function (err) {
+        reject(null);
+      });
+  });
+};
+
+updateCb = (obj, id) => {
+  return new Promise((resolve, reject) => {
+    transactionModel.defaultSchema
+      .findOneAndUpdate(
+        {
+          _id: id,
+        },
+        obj
+      )
+      .then(function (res) {
+        resolve(res);
+      })
+      .catch(function (err) {
+        reject(null);
+      });
+  });
+};
+
 module.exports = {
   deleteTransaction: transactionModel.genericSchema.delete,
   updateTransaction: transactionModel.genericSchema.update,
-  updateTransactionType,
+  updateTransactionStatus,
   findById: transactionModel.genericSchema.findById,
-  create: transactionModel.genericSchema.create,
+  create,
+  findOne,
+  updateCb,
   findAll,
 };

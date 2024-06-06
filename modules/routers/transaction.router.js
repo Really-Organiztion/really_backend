@@ -12,9 +12,9 @@ transactionRouter.put(
   transactionController.updateTransaction
 );
 transactionRouter.put(
-  "/updateType/:id",
+  "/updateStatus/:id",
   
-  transactionController.updateTransactionType
+  transactionController.updateTransactionStatus
 );
 transactionRouter.delete(
   "/:id",

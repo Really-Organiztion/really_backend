@@ -49,6 +49,40 @@ updateWalletStatus = async (req, res, id) => {
     });
 };
 
+updateCb = (obj, id) => {
+  return new Promise((resolve, reject) => {
+    walletModel.defaultSchema
+      .findOneAndUpdate(
+        {
+          _id: id,
+        },
+        obj
+      )
+      .then(function (res) {
+        resolve(res);
+      })
+      .catch(function (err) {
+        reject(null);
+      });
+  });
+};
+
+findOne = (where) => {
+  return new Promise((resolve, reject) => {
+    walletModel.defaultSchema
+      .findOne(
+        where
+        
+      )
+      .then(function (res) {
+        resolve(res);
+      })
+      .catch(function (err) {
+        reject(null);
+      });
+  });
+};
+
 module.exports = {
   deleteWallet: walletModel.genericSchema.delete,
   updateWallet: walletModel.genericSchema.update,
@@ -56,4 +90,6 @@ module.exports = {
   findById: walletModel.genericSchema.findById,
   create: walletModel.genericSchema.create,
   findAll,
+  findOne,
+  updateCb,
 };
