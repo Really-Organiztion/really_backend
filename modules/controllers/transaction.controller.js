@@ -13,59 +13,76 @@ getAllData = (req, res) => {
 
 create = async (req, res) => {
   try {
-    let transaction = await transactionService.create(req, res);
-    if (!transaction) {
-      res.status(400).send("Can`t add transaction");
-    } else {
-      let where = {};
-      if (transaction.walletId) {
-        where["_id"] = new ObjectId(transaction.walletId);
+    createTransaction(req, (err, obj) => {
+      if (err) {
+        res.status(400).send(err);
       } else {
-        where["userId"] = new ObjectId(transaction.userId);
-        where["currencyId"] = new ObjectId(transaction.currencyId);
+        res.status(200).send(obj);
       }
-      let wallet = await walletService.findOne(where);
-      if (wallet) {
-        if (transaction.type == "Payment") {
-          if (transaction.amount > wallet.activeBalance + wallet.bonus) {
-            transaction.status = "Error";
-            await transactionService.updateCb(transaction, transaction._id);
-
-            res.status(400).send("The wallet balance is insufficient");
-            return;
-          } else {
-            if (wallet.activeBalance >= transaction.amount) {
-              wallet.activeBalance = wallet.activeBalance - transaction.amount;
-            } else {
-              let remain = transaction.amount - wallet.activeBalance;
-              wallet.activeBalance = transaction.amount - remain;
-              wallet.bonus = wallet.bonus - remain;
-            }
-          }
-        } else if (
-          transaction.type == "Receive" &&
-          transaction.status == "Completed"
-        ) {
-          wallet.holdBalance += transaction.amount;
-        } else if (
-          transaction.type == "Bonus" &&
-          transaction.status == "Completed"
-        ) {
-          wallet.bonus += transaction.amount;
-        }
-        let walletUpdated = await walletService.updateCb(wallet, wallet._id);
-        if (walletUpdated) {
-          res.status(200).send(transaction);
-        } else {
-          res.status(400).send("Can`t update Wallet balance");
-        }
-      } else {
-        res.status(400).send("Can`t update Wallet balance");
-      }
-    }
+    });
   } catch (error) {
     logger.error(error);
   }
+};
+
+createTransaction = async (req, callBack) => {
+  callBack = callBack || function () {};
+  let transaction = req.body;
+  // let transaction = await transactionService.create(req);
+  // if (!transaction) {
+  //   callBack("Can`t add transaction",null)
+  //   return
+  // } else {
+  let where = {};
+  if (transaction.walletId) {
+    where["_id"] = new ObjectId(transaction.walletId);
+  } else {
+    where["userId"] = new ObjectId(transaction.userId);
+    where["currencyId"] = new ObjectId(transaction.currencyId);
+  }
+  let wallet = await walletService.findOne(where);
+  if (wallet) {
+    if (transaction.type == "Payment") {
+      if (transaction.amount > wallet.activeBalance + wallet.bonus) {
+        transaction.status = "Error";
+       let _transaction = await transactionService.create({ body: transaction });
+        await transactionService.updateCb(transaction, transaction._id);
+        callBack("The wallet balance is insufficient", null);
+        return;
+      } else {
+        if (wallet.activeBalance >= transaction.amount) {
+          wallet.activeBalance = wallet.activeBalance - transaction.amount;
+        } else {
+          let remain = transaction.amount - wallet.activeBalance;
+          wallet.activeBalance = transaction.amount - remain;
+          wallet.bonus = wallet.bonus - remain;
+        }
+      }
+    } else if (
+      transaction.type == "Receive" &&
+      transaction.status == "Completed"
+    ) {
+      wallet.holdBalance += transaction.amount;
+    } else if (
+      transaction.type == "Bonus" &&
+      transaction.status == "Completed"
+    ) {
+      wallet.bonus += transaction.amount;
+    }
+  let _transaction =  await transactionService.create({ body: transaction });
+    let walletUpdated = await walletService.updateCb(wallet, wallet._id);
+    if (walletUpdated) {
+      callBack(null, _transaction);
+      return;
+    } else {
+      callBack("Can`t update Wallet balance", null);
+      return;
+    }
+  } else {
+    callBack("Wallet Not Found", null);
+    return;
+  }
+  // }
 };
 
 findById = (req, res) => {
@@ -162,5 +179,6 @@ module.exports = {
   findById,
   updateTransactionStatus,
   updateTransaction,
+  createTransaction,
   deleteTransaction,
 };

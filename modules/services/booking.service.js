@@ -68,9 +68,9 @@ findAll = (req, res) => {
     .sort({ _id: -1 })
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
-    .populate("unitId", ["type"])
-    .populate("plan.currencyId", [`${toFound}`, "code", "numericCode", "color"])
-    .populate("userId", ["username", "phone"])
+    // .populate("unitId", ["type"])
+    // .populate("plan.currencyId", [`${toFound}`, "code", "numericCode", "color"])
+    // .populate("userId", ["username", "phone"])
     .then(function (data) {
       let _data = [];
       for (let i = 0; i < data.length; i++) {

@@ -1,4 +1,5 @@
 const bookingService = require("../services/booking.service");
+const transactionController = require("../controllers/transaction.controller");
 const logger = require("../../helpers/logging");
 
 getAllData = (req, res) => {
@@ -9,9 +10,28 @@ getAllData = (req, res) => {
   }
 };
 
-create = (req, res) => {
+create = async (req, res) => {
   try {
-    bookingService.create(req, res);
+    transactionController.createTransaction(
+      { body: req.body.transactionPayment },
+      (errPayment, transactionPayment) => {
+        if (errPayment) {
+          res.status(400).send(errPayment);
+        } else {
+          transactionController.createTransaction(
+            { body: req.body.transactionRecive },
+            (errReceive, transactionReceive) => {
+              if (errReceive) {
+                res.status(400).send(errReceive);
+              } else {
+         
+                bookingService.create( { body: req.body.booking }, res);
+              }
+            }
+          );
+        }
+      }
+    );
   } catch (error) {
     logger.error(error);
   }

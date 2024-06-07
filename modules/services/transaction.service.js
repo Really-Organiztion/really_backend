@@ -24,8 +24,8 @@ findAll = (req, res) => {
     .sort({ _id: -1 })
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
-    .populate("currencyId", [`${toFound}`, "code", "numericCode", "color"])
-    .populate("userId", ["username", "phone"])
+    // .populate("currencyId", [`${toFound}`, "code", "numericCode", "color"])
+    // .populate("userId", ["username", "phone"])
     .then(function (data) {
       res.status(200).send(data);
     })
@@ -63,7 +63,7 @@ updateTransactionStatus = async (req, res, id) => {
     });
 };
 
-create = async (req, res) => {
+create = async (req) => {
   return new Promise((resolve, reject) => {
     if(req.body){
       if(req.body.status == 'Processing'){
@@ -81,7 +81,6 @@ create = async (req, res) => {
       })
       .catch(function (err) {
         reject(err);
-        res.status(400).send(err);
       });
   });
 };
@@ -112,6 +111,7 @@ updateCb = (obj, id) => {
         obj
       )
       .then(function (res) {
+      
         resolve(res);
       })
       .catch(function (err) {

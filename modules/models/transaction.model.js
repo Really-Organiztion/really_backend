@@ -6,7 +6,7 @@ const transactionSchema = new Schema(
   {
     walletId: {
       type: ObjectId,
-      required: true,
+      // required: true,
       ref: "wallet",
     },
     transactionNo: {
