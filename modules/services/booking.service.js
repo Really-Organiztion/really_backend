@@ -1,4 +1,5 @@
 const bookingModel = require("../models/booking.model");
+const webSocket = require("../../helpers/websocket");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -111,11 +112,23 @@ updateBookingStatus = async (req, res, id) => {
     });
 };
 
+create = async (req, res) => {
+  bookingModel.defaultSchema
+    .create(req.body)
+    .then(function (doc) {
+      webSocket.sendBooking(doc);
+      res.status(200).send(doc);
+    })
+    .catch(function (err) {
+      res.status(400).send(err);
+    });
+};
+
 module.exports = {
   deleteBooking: bookingModel.genericSchema.delete,
   updateBooking: bookingModel.genericSchema.update,
   updateBookingStatus,
   findById: bookingModel.genericSchema.findById,
-  create: bookingModel.genericSchema.create,
+  create,
   findAll,
 };

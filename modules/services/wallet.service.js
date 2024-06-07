@@ -67,13 +67,27 @@ updateCb = (obj, id) => {
   });
 };
 
+findById = (req, res, id) => {
+  const lang = req.query.lang ? req.query.lang : "en";
+  const toFound = lang === "en" ? "name" : "nameAr";
+  walletModel.defaultSchema
+    .findById(id)
+    .populate("currencyId", [`${toFound}`, "code", "numericCode", "color"])
+    .populate("userId", ["username", "phone"])
+    .then(function (data) {
+      res.status(200).send(data);
+    })
+    .catch(function (err) {
+      res.status(400).send(err);
+    });
+};
+
 findOne = (where) => {
+
   return new Promise((resolve, reject) => {
     walletModel.defaultSchema
-      .findOne(
-        where
-        
-      )
+      .findOne(where)
+    
       .then(function (res) {
         resolve(res);
       })
@@ -87,7 +101,7 @@ module.exports = {
   deleteWallet: walletModel.genericSchema.delete,
   updateWallet: walletModel.genericSchema.update,
   updateWalletStatus,
-  findById: walletModel.genericSchema.findById,
+  findById,
   create: walletModel.genericSchema.create,
   findAll,
   findOne,

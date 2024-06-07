@@ -4,7 +4,7 @@
 let clientsList = [];
 const crypto = require("crypto");
 sendAdminMessage = (msg, res) => {
- let  data = JSON.stringify(msg);
+  let data = JSON.stringify(msg);
   clientsList.forEach((client) => {
     if (client.role == "admin") {
       client.ws.send(data);
@@ -13,72 +13,90 @@ sendAdminMessage = (msg, res) => {
 };
 sendMessageByUserID = (msg, id) => {
   clientsList.forEach((client) => {
-    if (client.id == id) {
+    if (client.ws.id == id) {
       client.ws.send(msg);
     }
   });
 };
 
-function webs (wss) {
+sendBooking = (msg) => {
+  let data = JSON.stringify(msg);
 
-wss.on("connection", (ws) => {
-  ws.id = crypto.randomBytes(6).toString("hex");
-
-  clientsList.push({
-    ws: ws,
-    role: "-----",
-  });
-  ws.on("message", async (msg) => {
-    msg = JSON.parse(msg);
-    if(typeof msg == "object") {
-    if (msg.role) {
-      clientsList.forEach((client, i) => {
-        if (client.ws.id == ws.id) {
-          clientsList[i].role = msg.role;
-        }
-      });
+  clientsList.forEach((client) => {
+    if (client.type == "Booking") {
+      client.ws.send(data);
     }
-    if (msg.info) {
-      clientsList.forEach((client, i) => {
-        if (client.ws.id == ws.id) {
-          clientsList[i].info = msg.info;
-        }
-      });
-    }
-  }
-
-    // try {
-    //   let result = await notificationController.callbackGetNotificationByUserId(
-    //     msg
-    //   );
-    //   if (result && result.length > 0) ws.send(JSON.stringify(result));
-    //   else ws.send("No Notifications Found");
-    // } catch (error) {
-    //   ws.send("No Notifications Found");
-    // }
   });
-
-  ws.on("close", async (msg) => {
-    clientsList.forEach((client, i) => {
-      if (client.ws.id == ws.id) {
-        clientsList.splice(i, 1);
-      }
-    });
-  });
-
-  ws.on("error", async (msg) => {
-    clientsList.forEach((client, i) => {
-      if (client.ws.id == ws.id) {
-        clientsList.splice(i, 1);
-      }
-    });
-  });
-  ws.send("Connected To Websocket Server");
-});
-
 };
+
+function webs(wss) {
+  wss.on("connection", (ws) => {
+    ws.id = crypto.randomBytes(6).toString("hex");
+
+    clientsList.push({
+      ws: ws,
+      role: "-----",
+      type: "-----",
+    });
+    ws.on("message", async (msg) => {
+      msg = JSON.parse(msg);
+      if (typeof msg == "object") {
+        if (msg.role) {
+          clientsList.forEach((client, i) => {
+            if (client.ws.id == ws.id) {
+              clientsList[i].role = msg.role;
+            }
+          });
+        }
+        if (msg.info) {
+          clientsList.forEach((client, i) => {
+            if (client.ws.id == ws.id) {
+              clientsList[i].info = msg.info;
+            }
+          });
+        }
+
+        if (msg.type) {
+          clientsList.forEach((client, i) => {
+            if (client.ws.id == ws.id) {
+              clientsList[i].type = msg.type;
+            }
+          });
+        }
+      }
+
+      // try {
+      //   let result = await notificationController.callbackGetNotificationByUserId(
+      //     msg
+      //   );
+      //   if (result && result.length > 0) ws.send(JSON.stringify(result));
+      //   else ws.send("No Notifications Found");
+      // } catch (error) {
+      //   ws.send("No Notifications Found");
+      // }
+    });
+
+    ws.on("close", async (msg) => {
+      clientsList.forEach((client, i) => {
+        if (client.ws.id == ws.id) {
+          clientsList.splice(i, 1);
+        }
+      });
+    });
+
+    ws.on("error", async (msg) => {
+      clientsList.forEach((client, i) => {
+        if (client.ws.id == ws.id) {
+          clientsList.splice(i, 1);
+        }
+      });
+    });
+    ws.send("Connected To Websocket Server");
+  });
+}
 module.exports = {
   webs,
   sendAdminMessage,
   sendMessageByUserID,
+  sendBooking,
 };
