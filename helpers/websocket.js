@@ -23,7 +23,10 @@ sendBooking = (msg) => {
   let data = JSON.stringify(msg);
 
   clientsList.forEach((client) => {
-    if (client.type == "Booking") {
+    if (
+      client.type == "Booking" &&
+      msg.unitId.toString() == client.unitId.toString()
+    ) {
       client.ws.send(data);
     }
   });
@@ -60,6 +63,9 @@ function webs(wss) {
           clientsList.forEach((client, i) => {
             if (client.ws.id == ws.id) {
               clientsList[i].type = msg.type;
+              if (msg.unitId) {
+                clientsList[i].unitId = msg.unitId;
+              }
             }
           });
         }
