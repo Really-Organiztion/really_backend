@@ -173,7 +173,6 @@ findAllMap = (req, res) => {
     });
 };
 
-
 updatePostCb = (obj, id) => {
   return new Promise((resolve, reject) => {
     postModel.defaultSchema
@@ -192,10 +191,84 @@ updatePostCb = (obj, id) => {
   });
 };
 
+findById = (req, res, id) => {
+  const lang = req.query.lang ? req.query.lang : "en";
+  const toFound = lang === "en" ? "name" : "nameAr";
+  const toFoundTitle = lang === "en" ? "title" : "titleAr";
+  const toFoundDescription = lang === "en" ? "description" : "descriptionAr";
+  postModel.defaultSchema
+    .aggregate([
+      {
+        $match: {
+          _id: new ObjectId(id),
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "units",
+          localField: "unitId",
+          foreignField: "_id",
+          as: "unit",
+        },
+      },
+      {
+        $unwind: {
+          path: "$unit",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          description: { $first: `$${toFoundDescription}` },
+          title: { $first: `$${toFoundTitle}` },
+          plansList: { $first: `$plansList` },
+          addtionDetails: { $first: `$addtionDetails` },
+          setting: { $first: `$setting` },
+          target: { $first: `$target` },
+          userId: { $first: `$userId` },
+          unitId: { $first: `$unitId` },
+          address: { $first: `$unit.address` },
+          type: { $first: `$unit.type` },
+          has3DView: { $first: `$unit.has3DView` },
+          imagesList: { $first: `$unit.imagesList` },
+          rate: { $first: `$unit.rate` },
+          isTrusted: { $first: `$unit.isTrusted` },
+          isSeparated: { $first: `$unit.isSeparated` },
+          username: { $first: `$user.username` },
+          role: { $first: `$user.role` },
+          // phone: { $first: `$user.phone` },
+          // phonesList: { $first: `$user.phonesList` },
+        },
+      },
+    ])
+    .then(function (data) {
+      console.log(data);
+      res.status(200).send(data[0]);
+    })
+    .catch(function (err) {
+      res.status(400).send(err);
+    });
+};
+
 module.exports = {
   deletePost: postModel.genericSchema.delete,
   updatePost: postModel.genericSchema.update,
-  findById: postModel.genericSchema.findById,
+  findById,
   create: postModel.genericSchema.create,
   findAll,
   findAllMap,
