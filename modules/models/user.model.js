@@ -73,22 +73,22 @@ const userSchema = new Schema(
       //     nativeCountryId: { $type: "string" },
       //   },
       // },
-      set: (v) => (v === "" ? null : v),
-      length: [14, "National ID must be at least 14 characters"],
+      // set: (v) => (v === "" ? null : v),
+      // length: [14, "National ID must be at least 14 characters"],
     },
-    nationalID: {
-      type: String,
-      trim: true,
-      // index: {
-      //   unique: true,
-      //   partialFilterExpression: {
-      //     nationalID: { $type: "string" },
-      //     nativeCountryId: { $type: "string" },
-      //   },
-      // },
-      set: (v) => (v === "" ? null : v),
-      uniq: [14, "National ID must be at least 14 characters"],
-    },
+    // nationalID: {
+    //   type: String,
+    //   trim: true,
+    //   // index: {
+    //   //   unique: true,
+    //   //   partialFilterExpression: {
+    //   //     nationalID: { $type: "string" },
+    //   //     nativeCountryId: { $type: "string" },
+    //   //   },
+    //   // },
+    //   // set: (v) => (v === "" ? null : v),
+    //   // uniq: [14, "National ID must be at least 14 characters"],
+    // },
     role: {
       type: String,
       required: true,

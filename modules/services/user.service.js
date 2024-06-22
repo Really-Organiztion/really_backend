@@ -702,9 +702,9 @@ changeEmail = async (req, res, id) => {
     });
 };
 createUser = async (req, res) => {
-  if (!req.body.idType && req.body.role != "Renter") {
-    return res.status(400).send("idType is required");
-  }
+  // if (!req.body.idType && req.body.role != "Renter") {
+  //   return res.status(400).send("idType is required");
+  // }
   if (!req.body.imageId && req.body.role != "Renter") {
     return res.status(400).send("imageId is required");
   }
