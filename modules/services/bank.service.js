@@ -19,6 +19,10 @@ findAll = (req, res) => {
     $match.$or = [
       { name: { $regex: req.body["search"], $options: "i" } },
       { nameAr: { $regex: req.body["search"], $options: "i" } },
+      { nameAr: { $regex: req.body["search"], $options: "i" } },
+      { nameAr: { $regex: req.body["search"], $options: "i" } },
+      { nameAr: { $regex: req.body["search"], $options: "i" } },
+      { nameAr: { $regex: req.body["search"], $options: "i" } },
     ];
   }
   let $group = {
