@@ -12,6 +12,7 @@ const path = attachmentPath.attachments;
 const mailer = require("../../helpers/sendMail");
 const crypto = require("crypto");
 const words = require("../../helpers/words.json");
+const { log } = require("winston");
 
 findUser = async (req, res) => {
   const lang = req.query.lang ? req.query.lang : "en";
@@ -598,9 +599,9 @@ generatOptEmail = async (req, res) => {
   } else {
     res.status(400).send("Email not exist");
   }
-};
+}; 
 updateIdentity = async (req, res, id) => {
-  if (req.body.idType != "Id" || req.body.idType != "Passport") {
+  if (req.body.idType != "Id" && req.body.idType != "Passport") {
     return res.status(400).send("Id Type is required");
   }
   if (!req.body.imageId) {
