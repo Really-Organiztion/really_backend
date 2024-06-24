@@ -17,7 +17,12 @@ const termsSchema = new Schema({
     type: String,
     required: true,
   },
-  
+  dateTime: {
+    type: Date,
+  },
+  version : {
+    type: Number,
+  },
   isDeleted : {
     type : Boolean,
     default : false

@@ -599,7 +599,7 @@ generatOptEmail = async (req, res) => {
   } else {
     res.status(400).send("Email not exist");
   }
-}; 
+};
 updateIdentity = async (req, res, id) => {
   if (req.body.idType != "Id" && req.body.idType != "Passport") {
     return res.status(400).send("Id Type is required");
@@ -631,7 +631,8 @@ updateIdentity = async (req, res, id) => {
     )
     .then(function (user) {
       let request = {
-        details: "I want to update my ID card",
+        name: "I want to update my ID card",
+        nameAr: "أريد تعديل الهوية",
         code: crypto.randomBytes(6).toString("hex"),
         type: "Identify",
         target: "User",
@@ -759,7 +760,8 @@ createUser = async (req, res) => {
           });
           if (user.nationalID && user.idType) {
             let request = {
-              details: "I want to update my ID card",
+              name: "I want to update my ID card",
+              nameAr: "أريد تعديل الهوية",
               code: crypto.randomBytes(6).toString("hex"),
               type: "Identify",
               target: "User",

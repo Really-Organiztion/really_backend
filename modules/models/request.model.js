@@ -5,7 +5,11 @@ const ObjectId = Schema.ObjectId;
 
 const requestSchema = new Schema(
   {
-    details: {
+    name: {
+      type: String,
+      required: true,
+    },
+    nameAr: {
       type: String,
       required: true,
     },

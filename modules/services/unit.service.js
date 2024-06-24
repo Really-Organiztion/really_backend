@@ -121,7 +121,8 @@ create = async (req, res) => {
     .create(req.body)
     .then(function (doc) {
       let request = {
-        details: "I want to add new unit",
+        name: "I want to add new unit",
+        nameAr: "أريد إضافة وحدة جدبدة",
         code: crypto.randomBytes(6).toString("hex"),
         type: "AddUnit",
         target: "Unit",

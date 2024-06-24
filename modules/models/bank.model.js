@@ -31,6 +31,7 @@ const bankSchema = new Schema(
       required: true,
       ref: "currency",
     },
+    branches: {},
     isDeleted: {
       type: Boolean,
       default: false,

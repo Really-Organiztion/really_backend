@@ -19,8 +19,11 @@ findAll = (req, res) => {
   if (req.body && req.body.adminId) {
     where["adminId"] = new ObjectId(req.body.adminId);
   }
-  if (req.body && req.body.details) {
-    where["details"] = { $regex: req.body["details"], $options: "i" };
+  if (req.body && req.body.name) {
+    where["name"] = { $regex: req.body["name"], $options: "i" };
+  }
+  if (req.body && req.body.nameAr) {
+    where["nameAr"] = { $regex: req.body["nameAr"], $options: "i" };
   }
 
   requestModel.defaultSchema

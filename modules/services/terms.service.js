@@ -16,7 +16,6 @@ findAll = (req, res) => {
   }
   if (req.body["type"]) {
     $match["type"] = req.body["type"];
-  
   }
   if (req.body["search"]) {
     $match.$or = [
@@ -28,6 +27,10 @@ findAll = (req, res) => {
   let $group = {
     _id: "$_id",
     name: { $first: `$${toFound}` },
+    type: { $first: `$type` },
+    dateTime: { $first: `$dateTime` },
+    version: { $first: `$version` },
+    isDeleted: { $first: `$isDeleted` },
     type: { $first: `$type` },
   };
   if (!req.query.lang) {
