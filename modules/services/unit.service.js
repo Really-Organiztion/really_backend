@@ -49,6 +49,8 @@ findAll = (req, res) => {
     .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
     .populate("userId", ["username", "phone", "profileImage"])
+    .populate("linkedBy.userId", ["username", "phone", "profileImage"])
+    .populate("servicesId", [`${toFound}`, "subServicesList"])
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (data) {
@@ -89,6 +91,8 @@ findAllFilterCb = (req, res) => {
 
     unitModel.defaultSchema
       .find(where, { _id: 1 })
+      .populate("linkedBy.userId", ["username", "phone", "profileImage"])
+      .populate("servicesId", [`${toFound}`, "subServicesList"])
       .then(function (data) {
         resolve(data);
       })
@@ -140,6 +144,7 @@ create = async (req, res) => {
         });
     })
     .catch(function (err) {
+      console.log(err);
       res.status(400).send(err);
     });
 };
@@ -163,13 +168,14 @@ findCoordinatesMatch = (req, res) => {
     .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
     .populate("userId", ["username", "phone", "profileImage"])
+    .populate("linkedBy.userId", ["username", "phone", "profileImage"])
+    .populate("servicesId", [`${toFound}`, "subServicesList"])
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (unit) {
       res.status(200).send(unit);
     })
     .catch(function (err) {
-      console.log(err);
       res.status(400).send(err);
     });
 };
@@ -191,13 +197,13 @@ findNearUnits = (req, res) => {
     .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
     .populate("userId", ["username", "phone", "profileImage"])
+    
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (unit) {
       res.status(200).send(unit);
     })
     .catch(function (err) {
-      console.log(err);
       res.status(400).send(err);
     });
 };
@@ -210,8 +216,46 @@ findById = (req, res, id) => {
     .populate("servicesId", [`${toFound}`, "subServicesList"])
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
     .populate("userId", ["username", "phone", "profileImage"])
+    .populate("linkedBy.userId", ["username", "phone", "profileImage"])
+    .populate("servicesId", [`${toFound}`, "subServicesList"])
     .then(function (data) {
       res.status(200).send(data);
+    })
+    .catch(function (err) {
+      res.status(400).send(err);
+    });
+};
+
+updateUnit = async (req, res, id) => {
+  unitModel.defaultSchema
+    .findByIdAndUpdate(id, {
+      $set: { status: req.body },
+      new: true,
+      setDefaultsOnInsert: true,
+    })
+    .then(function (data) {
+      if(req.body.status === 'UnderReview'){
+        let request = {
+          name: "I want to Update unit",
+          nameAr: "أريد تعديل بيانات وحدة",
+          code: crypto.randomBytes(6).toString("hex"),
+          type: "UpdateUnit",
+          target: "Unit",
+          userId: data.userId,
+          unitId: data._id,
+        };
+        requestModel.defaultSchema
+          .create(request)
+          .then(function (_request) {
+            webSocket.sendAdminMessage(_request, res);
+            res.status(200).send(data);
+          })
+          .catch(function (err1) {
+            res.status(400).send(err1);
+          });
+      } else {
+        res.status(200).send(data);
+      }
     })
     .catch(function (err) {
       res.status(400).send(err);

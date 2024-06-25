@@ -10,6 +10,28 @@ const unitSchema = new Schema(
       required: true,
       ref: "user",
     },
+    status: {
+      type: String,
+      required: true,
+      enum: ["Loading","UnderReview", "Accepted", "Refused",  "Published", "Stopped"],
+      default: "UnderReview",
+    },
+    linkedBy : [{
+      userId: {
+        type: ObjectId,
+        required: true,
+        ref: "user",
+      },
+      linkType: {
+        type: String,
+        required: true,
+        enum: ["Owned", "Invested", "Managed"],
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+    }],
     // name: {
     //   type: String,
     //   required: true,
@@ -135,6 +157,7 @@ const unitSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    
     isDeleted: {
       type: Boolean,
       default: false,
@@ -146,8 +169,8 @@ const unitSchema = new Schema(
     autoIndex: true,
   }
 );
-unitSchema.index({location: '2dsphere'})
-unitSchema.index({location: '2d'})
+unitSchema.index({ location: "2dsphere" });
+unitSchema.index({ location: "2d" });
 const genericOperations = require("../genericService");
 module.exports = {
   genericSchema: genericOperations(mongoose.model("unit", unitSchema)),
