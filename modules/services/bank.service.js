@@ -33,7 +33,7 @@ findAll = (req, res) => {
   if (!req.query.lang) {
     $group["nameAr"] = { $first: `$nameAr` };
   }
-  currencyModel.defaultSchema
+  bankModel.defaultSchema
     .aggregate([
       {
         $match,

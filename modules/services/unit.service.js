@@ -26,6 +26,9 @@ findAll = (req, res) => {
     if (req.body.countryId) {
       where["countryId"] = new ObjectId(req.body.countryId);
     }
+    if (req.body.linkedByUserId) {
+      where["linkedBy.userId"] = new ObjectId(req.body.linkedByUserId);
+    }
   } else {
     where = { isDeleted: false };
   }
@@ -50,7 +53,7 @@ findAll = (req, res) => {
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
     .populate("userId", ["username", "phone", "profileImage"])
     .populate("linkedBy.userId", ["username", "phone", "profileImage"])
-    .populate("servicesId", [`${toFound}`, "subServicesList"])
+    // .populate("servicesId", [`${toFound}`, "subServicesList"])
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (data) {
@@ -92,7 +95,7 @@ findAllFilterCb = (req, res) => {
     unitModel.defaultSchema
       .find(where, { _id: 1 })
       .populate("linkedBy.userId", ["username", "phone", "profileImage"])
-      .populate("servicesId", [`${toFound}`, "subServicesList"])
+      // .populate("servicesId", [`${toFound}`, "subServicesList"])
       .then(function (data) {
         resolve(data);
       })
@@ -169,7 +172,7 @@ findCoordinatesMatch = (req, res) => {
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
     .populate("userId", ["username", "phone", "profileImage"])
     .populate("linkedBy.userId", ["username", "phone", "profileImage"])
-    .populate("servicesId", [`${toFound}`, "subServicesList"])
+    // .populate("servicesId", [`${toFound}`, "subServicesList"])
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (unit) {
@@ -213,11 +216,10 @@ findById = (req, res, id) => {
   const toFound = lang === "en" ? "name" : "nameAr";
   unitModel.defaultSchema
     .findById(id)
-    .populate("servicesId", [`${toFound}`, "subServicesList"])
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
     .populate("userId", ["username", "phone", "profileImage"])
     .populate("linkedBy.userId", ["username", "phone", "profileImage"])
-    .populate("servicesId", [`${toFound}`, "subServicesList"])
+    // .populate("servicesId", [`${toFound}`, "subServicesList"])
     .then(function (data) {
       res.status(200).send(data);
     })

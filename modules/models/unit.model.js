@@ -107,7 +107,34 @@ const unitSchema = new Schema(
       type: Object,
     },
     additionsServices: [String],
-    servicesId: [{ type: ObjectId, ref: "serviceType" }],
+    services: [{
+      _id: {
+        type: ObjectId,
+        required: true,
+        ref: "serviceType",
+      },
+      name: {
+        type: String,
+        required: true,
+      },
+      nameAr: {
+        type: String,
+        required: true,
+      },
+      subServicesList: [
+        {
+          _id: {
+            type: ObjectId,
+          },
+          name: {
+            type: String,
+          },
+          nameAr: {
+            type: String,
+          },
+        },
+      ],
+    }],
     countryId: {
       type: ObjectId,
       ref: "country",
