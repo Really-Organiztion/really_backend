@@ -28,6 +28,11 @@ findAll = (req, res) => {
   let $group = {
     _id: "$_id",
     name: { $first: `$${toFound}` },
+    accountNo: { $first: `$accountNo` },
+    iban: { $first: `$iban` },
+    swiftCode: { $first: `$swiftCode` },
+    currencyId: { $first: `$currencyId` },
+    branches: { $first: `$branches` },
    
   };
   if (!req.query.lang) {
