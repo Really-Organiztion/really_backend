@@ -51,8 +51,8 @@ findAll = (req, res) => {
     .find(where)
     .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["username", "phone", "profileImage"])
-    .populate("linkedBy.userId", ["username", "phone", "profileImage"])
+    .populate("userId", ["username", "phone", "profileImage","gender"])
+    .populate("linkedBy.userId", ["username", "phone", "profileImage","gender"])
     // .populate("servicesId", [`${toFound}`, "subServicesList"])
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
@@ -94,7 +94,7 @@ findAllFilterCb = (req, res) => {
 
     unitModel.defaultSchema
       .find(where, { _id: 1 })
-      .populate("linkedBy.userId", ["username", "phone", "profileImage"])
+      .populate("linkedBy.userId", ["username", "phone", "profileImage","gender"])
       // .populate("servicesId", [`${toFound}`, "subServicesList"])
       .then(function (data) {
         resolve(data);
@@ -170,8 +170,8 @@ findCoordinatesMatch = (req, res) => {
     })
     .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["username", "phone", "profileImage"])
-    .populate("linkedBy.userId", ["username", "phone", "profileImage"])
+    .populate("userId", ["username", "phone", "profileImage","gender"])
+    .populate("linkedBy.userId", ["username", "phone", "profileImage","gender"])
     // .populate("servicesId", [`${toFound}`, "subServicesList"])
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
@@ -199,7 +199,7 @@ findNearUnits = (req, res) => {
     })
     .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["username", "phone", "profileImage"])
+    .populate("userId", ["username", "phone", "profileImage","gender"])
     
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
@@ -217,8 +217,8 @@ findById = (req, res, id) => {
   unitModel.defaultSchema
     .findById(id)
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["username", "phone", "profileImage"])
-    .populate("linkedBy.userId", ["username", "phone", "profileImage"])
+    .populate("userId", ["username", "phone", "profileImage","gender"])
+    .populate("linkedBy.userId", ["username", "phone", "profileImage","gender"])
     // .populate("servicesId", [`${toFound}`, "subServicesList"])
     .then(function (data) {
       res.status(200).send(data);
