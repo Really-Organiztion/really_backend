@@ -21,7 +21,8 @@ findAll = (req, res) => {
       {
         $group: {
           _id: "$_id",
-          name: { $first: `$${toFound}` },
+          name: { $first: `$name` },
+          nameAr: { $first: `$nameAr` },
           subServicesList: { $first: `$subServicesList` },
         },
       },

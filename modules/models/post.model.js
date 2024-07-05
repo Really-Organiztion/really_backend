@@ -36,7 +36,11 @@ const postSchema = new Schema(
       required: true,
       ref: "unit",
     },
-
+    status: {
+      type: String,
+      required: true,
+      enum: ["Published", "InReview", "Blocked", "Stopped"],
+    },
     plansList: [
       {
         type: {

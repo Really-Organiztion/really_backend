@@ -30,6 +30,8 @@ findAll = (req, res) => {
     type: { $first: `$type` },
     dateTime: { $first: `$dateTime` },
     version: { $first: `$version` },
+    createdAt: { $first: `$createdAt` },
+    updatedAt: { $first: `$updatedAt` },
     isDeleted: { $first: `$isDeleted` },
     type: { $first: `$type` },
   };

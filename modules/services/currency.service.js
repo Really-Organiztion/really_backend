@@ -28,6 +28,7 @@ findAll = (req, res) => {
     numericCode: { $first: `$numericCode` },
     code: { $first: `$code` },
     flag: { $first: `$flag` },
+    color: { $first: `$color` },
   };
   if (!req.query.lang) {
     $group["nameAr"] = { $first: `$nameAr` };

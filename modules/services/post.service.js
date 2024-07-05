@@ -67,6 +67,7 @@ findAll = (req, res) => {
           description: { $first: `$${toFoundDescription}` },
           title: { $first: `$${toFoundTitle}` },
           plansList: { $first: `$plansList` },
+          status: { $first: `$status` },
           addtionDetails: { $first: `$addtionDetails` },
           setting: { $first: `$setting` },
           target: { $first: `$target` },
@@ -196,6 +197,35 @@ findById = (req, res, id) => {
   const toFound = lang === "en" ? "name" : "nameAr";
   const toFoundTitle = lang === "en" ? "title" : "titleAr";
   const toFoundDescription = lang === "en" ? "description" : "descriptionAr";
+  let $group = {
+    _id: "$_id",
+    description: { $first: `$${toFoundDescription}` },
+    title: { $first: `$${toFoundTitle}` },
+    plansList: { $first: `$plansList` },
+    status: { $first: `$status` },
+    addtionDetails: { $first: `$addtionDetails` },
+    setting: { $first: `$setting` },
+    target: { $first: `$target` },
+    userId: { $first: `$userId` },
+    unitId: { $first: `$unitId` },
+    address: { $first: `$unit.address` },
+    type: { $first: `$unit.type` },
+    has3DView: { $first: `$unit.has3DView` },
+    imagesList: { $first: `$unit.imagesList` },
+    rate: { $first: `$unit.rate` },
+    isTrusted: { $first: `$unit.isTrusted` },
+    isSeparated: { $first: `$unit.isSeparated` },
+    username: { $first: `$user.username` },
+    role: { $first: `$user.role` },
+    // phone: { $first: `$user.phone` },
+    // phonesList: { $first: `$user.phonesList` },
+  };
+
+  if (!req.query.lang) {
+    $group["descriptionAr"] = { $first: `$descriptionAr` };
+    $group["titleAr"] = { $first: `$titleAr` };
+  }
+
   postModel.defaultSchema
     .aggregate([
       {
@@ -232,28 +262,7 @@ findById = (req, res, id) => {
         },
       },
       {
-        $group: {
-          _id: "$_id",
-          description: { $first: `$${toFoundDescription}` },
-          title: { $first: `$${toFoundTitle}` },
-          plansList: { $first: `$plansList` },
-          addtionDetails: { $first: `$addtionDetails` },
-          setting: { $first: `$setting` },
-          target: { $first: `$target` },
-          userId: { $first: `$userId` },
-          unitId: { $first: `$unitId` },
-          address: { $first: `$unit.address` },
-          type: { $first: `$unit.type` },
-          has3DView: { $first: `$unit.has3DView` },
-          imagesList: { $first: `$unit.imagesList` },
-          rate: { $first: `$unit.rate` },
-          isTrusted: { $first: `$unit.isTrusted` },
-          isSeparated: { $first: `$unit.isSeparated` },
-          username: { $first: `$user.username` },
-          role: { $first: `$user.role` },
-          // phone: { $first: `$user.phone` },
-          // phonesList: { $first: `$user.phonesList` },
-        },
+        $group,
       },
     ])
     .then(function (data) {
