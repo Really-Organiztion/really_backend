@@ -30,7 +30,7 @@ app.use("/api/", indexRoutes);
 app.use("/attachments", express.static(path.join(__dirname, "./attachments")));
 app.use(express.static("public"));
 
-const port = process.env.PORT || 40001;
+const port = process.env.PORT || 4000;
 server.listen(port, function () {
   logger.info(`Server is listening on port : ${port}`);
 });
