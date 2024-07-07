@@ -13,6 +13,7 @@ getAllData = (req, res) => {
   }
 };
 
+
 createAdmin = async (req, res, next) => {
   try {
     let admin = await adminService.findAdminById(req.body.adminId);
