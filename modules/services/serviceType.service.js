@@ -13,6 +13,16 @@ findAll = (req, res) => {
   } else {
     $match = { isDeleted: false };
   }
+  if (req.body["search"]) {
+    $match.$or = [
+      { name: { $regex: req.body["search"], $options: "i" } },
+      { nameAr: { $regex: req.body["search"], $options: "i" } },
+      { "subServicesList.name": { $regex: req.body["search"], $options: "i" } },
+      {
+        "subServicesList.nameAr": { $regex: req.body["search"], $options: "i" },
+      },
+    ];
+  }
   serviceTypeModel.defaultSchema
     .aggregate([
       {

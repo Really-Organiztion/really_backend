@@ -6,7 +6,6 @@ const ObjectId = Schema.ObjectId;
 const adminSchema = new Schema({
   adminId: {
     type: ObjectId,
-    required: true,
     ref: "admin",
   },
   username: {
