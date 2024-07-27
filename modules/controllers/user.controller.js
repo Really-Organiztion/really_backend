@@ -1,7 +1,6 @@
 const userService = require("../services/user.service");
 const bcrypt = require("bcryptjs");
 const logger = require("../../helpers/logging");
-const courseController = require("./course.controller");
 const jwt = require("jsonwebtoken");
 const roles = require("../../helpers/roles");
 
@@ -112,97 +111,7 @@ logout = (req, res) => {
   jwt.destroy(roles.getDecodedToken(req.headers));
   res.status(200).send("User logout is susses");
 };
-addPurchaseIntoUser = async (req, res) => {
-  try {
-    const id = req.params.id;
-    try {
-      let result = await courseController.addUserIntoCourse(
-        req.body.courseId,
-        id
-      );
-      if (result) userService.addPurchaseIntoUser(req, res, id, "default");
-    } catch (error) {
-      res.send(error);
-    }
-  } catch (error) {
-    logger.error(error);
-  }
-};
-addPurchaseIntoUserByCode = async (req, res) => {
-  try {
-    const id = req.body.userId;
-    try {
-      let result = await courseController.addUserIntoCourse(
-        req.body.courseId,
-        id
-      );
-      if (result) return userService.addPurchaseIntoUser(req, res, id, "other");
-    } catch (error) {
-      res.send(error);
-    }
-  } catch (error) {
-    logger.error(error);
-  }
-};
-findUserCourses = async (req, res) => {
-  try {
-    const id = req.params.id;
-    let result = await userService.findUserCourses(req, res, id);
-    if (result) {
-      req.body.courses = result[0].courses;
-      req.body.lessons = result[0].lessons;
-      courseController.getUserCourses(req, res);
-    }
-  } catch (error) {
-    logger.error(error);
-  }
-};
-findUserLessons = (req, res) => {
-  try {
-    const id = req.params.id;
-    userService.findUserLessons(req, res, id, "default");
-  } catch (error) {
-    logger.error(error);
-  }
-};
-addFavoriteIntoUser = (req, res) => {
-  try {
-    const id = req.params.id;
-    userService.addFavoriteIntoUser(req, res, id);
-  } catch (error) {
-    logger.error(error);
-  }
-};
-removeUserFavorite = (req, res) => {
-  try {
-    const id = req.params.id;
-    const courseId = req.params.courseId;
-    userService.removeUserFavorite(req, res, id, courseId);
-  } catch (error) {
-    logger.error(error);
-  }
-};
-findUserFavorites = async (req, res) => {
-  try {
-    const id = req.params.id;
-    let result = await userService.findUserFavorites(req, res, id);
-    if (result) {
-      req.body.courses = result;
-      courseController.getUserCourses(req, res);
-    }
-  } catch (error) {
-    logger.error(error);
-  }
-};
-checkUserCourseInFavorite = (req, res) => {
-  try {
-    const userId = req.params.userId;
-    const courseId = req.params.courseId;
-    userService.checkUserCourseInFavorite(req, res, userId, courseId);
-  } catch (error) {
-    logger.error(error);
-  }
-};
+
 changePassword = (req, res) => {
   try {
     const id = req.params.id;
@@ -238,33 +147,7 @@ forgetPassword = (req, res) => {
     logger.error(error);
   }
 };
-updateUserLessonPurchase = (req, res) => {
-  try {
-    return userService.updateUserLessonPurchase(req, res);
-  } catch (error) {
-    logger.error(error);
-  }
-};
-findUserCourseByCourseId = async (req, res) => {
-  try {
-    const userId = req.params.userId;
-    const courseId = req.params.courseId;
-    let course = await courseController.findUserCourseById(req, res, courseId);
-    let userLessons = await userService.findUserLessons(
-      req,
-      res,
-      userId,
-      "other"
-    );
-    let obj = {
-      course: course[0],
-      userLessons: userLessons[0],
-    };
-    res.send(obj);
-  } catch (error) {
-    logger.error(error);
-  }
-};
+
 findUserById = async (id) => {
   try {
     return await userService.findUserById(id);
@@ -272,13 +155,7 @@ findUserById = async (id) => {
     logger.error(error);
   }
 };
-addPromoIntoUser = (req, res) => {
-  try {
-    return userService.addPromoIntoUser(req, res);
-  } catch (error) {
-    logger.error(error);
-  }
-};
+
 
 deleteUser = (req, res) => {
   try {
@@ -310,22 +187,11 @@ module.exports = {
   verifyEmail,
   generatOptEmail,
   getOptEmail,
-  addPurchaseIntoUser,
-  findUserCourses,
-  findUserLessons,
-  addFavoriteIntoUser,
-  findUserFavorites,
   changePassword,
   updateIdentity,
   changeEmail,
   forgetPassword,
-  updateUserLessonPurchase,
-  findUserCourseByCourseId,
-  checkUserCourseInFavorite,
   findUserById,
-  addPurchaseIntoUserByCode,
-  removeUserFavorite,
   socialMediaRegister,
   socialMediaLogin,
-  addPromoIntoUser,
 };

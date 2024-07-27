@@ -1,6 +1,5 @@
 const jwt = require("jwt-simple");
 const adminController = require("../modules/controllers/admin.controller");
-const teacherController = require("../modules/controllers/teacher.controller");
 const userController = require("../modules/controllers/user.controller");
 
 const getToken = (headers) => {
@@ -35,15 +34,6 @@ const getDecodedToken = (headers) => {
   }
 };
 
-const isAuthenticatedAsTeacher = async (req, res, next) => {
-  const decodedData = getDecodedToken(req.headers);
-  if (decodedData) {
-    let result = await teacherController.findTeacherById(decodedData.id);
-    if (result) next();
-    else res.status(400);
-  } else res.status(400);
-};
-
 const isAuthenticatedAsUser = async (req, res, next) => {
   const decodedData = getDecodedToken(req.headers);
   if (decodedData) {
@@ -66,7 +56,6 @@ module.exports = {
   logOut,
   getToken,
   getDecodedToken,
-  isAuthenticatedAsTeacher,
   isAuthenticatedAsAdmin,
   isAuthenticatedAsUser,
 };
