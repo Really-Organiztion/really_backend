@@ -51,8 +51,13 @@ findAll = (req, res) => {
     .find(where)
     .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["username", "phone", "profileImage","gender"])
-    .populate("linkedBy.userId", ["username", "phone", "profileImage","gender"])
+    .populate("userId", ["username", "phone", "profileImage", "gender"])
+    .populate("linkedBy.userId", [
+      "username",
+      "phone",
+      "profileImage",
+      "gender",
+    ])
     // .populate("servicesId", [`${toFound}`, "subServicesList"])
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
@@ -94,7 +99,12 @@ findAllFilterCb = (req, res) => {
 
     unitModel.defaultSchema
       .find(where, { _id: 1 })
-      .populate("linkedBy.userId", ["username", "phone", "profileImage","gender"])
+      .populate("linkedBy.userId", [
+        "username",
+        "phone",
+        "profileImage",
+        "gender",
+      ])
       // .populate("servicesId", [`${toFound}`, "subServicesList"])
       .then(function (data) {
         resolve(data);
@@ -170,8 +180,13 @@ findCoordinatesMatch = (req, res) => {
     })
     .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["username", "phone", "profileImage","gender"])
-    .populate("linkedBy.userId", ["username", "phone", "profileImage","gender"])
+    .populate("userId", ["username", "phone", "profileImage", "gender"])
+    .populate("linkedBy.userId", [
+      "username",
+      "phone",
+      "profileImage",
+      "gender",
+    ])
     // .populate("servicesId", [`${toFound}`, "subServicesList"])
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
@@ -179,6 +194,7 @@ findCoordinatesMatch = (req, res) => {
       res.status(200).send(unit);
     })
     .catch(function (err) {
+      console.log(err);
       res.status(400).send(err);
     });
 };
@@ -199,8 +215,8 @@ findNearUnits = (req, res) => {
     })
     .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["username", "phone", "profileImage","gender"])
-    
+    .populate("userId", ["username", "phone", "profileImage", "gender"])
+
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (unit) {
@@ -217,8 +233,13 @@ findById = (req, res, id) => {
   unitModel.defaultSchema
     .findById(id)
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["username", "phone", "profileImage","gender"])
-    .populate("linkedBy.userId", ["username", "phone", "profileImage","gender"])
+    .populate("userId", ["username", "phone", "profileImage", "gender"])
+    .populate("linkedBy.userId", [
+      "username",
+      "phone",
+      "profileImage",
+      "gender",
+    ])
     // .populate("servicesId", [`${toFound}`, "subServicesList"])
     .then(function (data) {
       res.status(200).send(data);
@@ -235,8 +256,16 @@ updateUnit = async (req, res, id) => {
       new: true,
       setDefaultsOnInsert: true,
     })
+    .populate("countryId", [`${toFound}`, "code", "numericCode"])
+    .populate("userId", ["username", "phone", "profileImage", "gender"])
+    .populate("linkedBy.userId", [
+      "username",
+      "phone",
+      "profileImage",
+      "gender",
+    ])
     .then(function (data) {
-      if(req.body.status === 'UnderReview'){
+      if (req.body.status === "UnderReview") {
         let request = {
           name: "I want to Update unit",
           nameAr: "أريد تعديل بيانات وحدة",
@@ -266,7 +295,7 @@ updateUnit = async (req, res, id) => {
 
 module.exports = {
   deleteUnit: unitModel.genericSchema.delete,
-  updateUnit: unitModel.genericSchema.update,
+  updateUnit,
   findById,
   create,
   updateUnitRateCb,
