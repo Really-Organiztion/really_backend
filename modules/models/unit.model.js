@@ -197,8 +197,7 @@ const unitSchema = new Schema(
   }
 );
 
-// unitSchema.index({ location: "2dsphere" });
-// unitSchema.index({ location: "2d" });
+//  unitSchema.index({ location: "2dsphere" });
 const genericOperations = require("../genericService");
 module.exports = {
   genericSchema: genericOperations(mongoose.model("unit", unitSchema)),

@@ -17,6 +17,9 @@ findAll = (req, res) => {
     } else {
       where = { isDeleted: false };
     }
+    if (req.body.status) {
+      where["status"] = req.body.status
+    }
     if (req.body.userId) {
       where["userId"] = new ObjectId(req.body.userId);
     }
@@ -134,6 +137,10 @@ updateUnitRateCb = (obj, id) => {
 };
 
 create = async (req, res) => {
+  if(req.body.location && req.body.location.coordinates) {
+    req.body.location.coordinates = [req.body.location.coordinates]
+  }
+
   unitModel.defaultSchema
     .create(req.body)
     .then(function (doc) {
@@ -146,6 +153,7 @@ create = async (req, res) => {
         userId: doc.userId,
         unitId: doc._id,
       };
+
       requestModel.defaultSchema
         .create(request)
         .then(function (_request) {
@@ -170,12 +178,12 @@ findCoordinatesMatch = (req, res) => {
   unitModel.defaultSchema
     .find({
       location: {
-        $geoIntersects: {
-          $geometry: {
-            type: "MultiPoint",
-            coordinates: req.body.coordinates,
-          },
-        },
+       $geoIntersects: {
+        $geometry: {
+           type: "Polygon",
+           coordinates: [req.body.coordinates]
+         }
+     }
       },
     })
     .sort({ _id: -1 })
