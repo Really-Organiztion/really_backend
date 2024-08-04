@@ -49,7 +49,7 @@ findAll = (req, res) => {
     ];
     delete where["search"];
   }
-
+  lo
   unitModel.defaultSchema
     .find(where)
     .sort({ _id: -1 })
@@ -258,6 +258,8 @@ findById = (req, res, id) => {
 };
 
 updateUnit = async (req, res, id) => {
+  const lang = req.query.lang ? req.query.lang : "en";
+  const toFound = lang === "en" ? "name" : "nameAr";
   unitModel.defaultSchema
     .findByIdAndUpdate(id, {
       $set: { status: req.body },
