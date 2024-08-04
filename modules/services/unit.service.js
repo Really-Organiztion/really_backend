@@ -65,6 +65,7 @@ findAll = (req, res) => {
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (data) {
+      
       res.status(200).send(data);
     })
     .catch(function (err) {
@@ -261,8 +262,7 @@ updateUnit = async (req, res, id) => {
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
   unitModel.defaultSchema
-    .findByIdAndUpdate(id, {
-      $set: { status: req.body },
+    .findByIdAndUpdate(id, req.body, {
       new: true,
       setDefaultsOnInsert: true,
     })
@@ -295,10 +295,13 @@ updateUnit = async (req, res, id) => {
             res.status(400).send(err1);
           });
       } else {
+        console.log(data);
+        
         res.status(200).send(data);
       }
     })
     .catch(function (err) {
+      console.log(err);
       res.status(400).send(err);
     });
 };
