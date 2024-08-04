@@ -49,7 +49,7 @@ findAll = (req, res) => {
     ];
     delete where["search"];
   }
-  lo
+  
   unitModel.defaultSchema
     .find(where)
     .sort({ _id: -1 })
