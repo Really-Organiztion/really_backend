@@ -9,25 +9,31 @@ findAll = (req, res) => {
   const toFound = lang === "en" ? "name" : "nameAr";
   const toFoundTitle = lang === "en" ? "title" : "titleAr";
   const toFoundDescription = lang === "en" ? "description" : "descriptionAr";
-  let $match = {};
-  if (req.body && req.body.isDeleted) {
-    $match = { isDeleted: true };
-  } else {
+  let $match = req.body || {};
+  if (!req.body.isDeleted) {
     $match = { isDeleted: false };
   }
-  if (req.body && req.body.userId) {
+  if (req.body.userId) {
     $match.userId = new ObjectId(req.body.userId);
   }
-  if (req.body && req.body.unitsIds) {
+  if (req.body.unitsIds) {
     let unitsIds = req.body.unitsIds.map((_obj) => _obj._id);
     $match.unitId = { $in: unitsIds };
   }
-  if (req.body && req.body.unitId) {
+  if (req.body.unitId) {
     $match.unitId = new ObjectId(req.body.unitId);
   }
-  if (req.body && req.body.target) {
-    $match.target = req.body.target;
+
+  if (req.body["search"]) {
+    $match.$or = [
+      { description: { $regex: req.body["search"], $options: "i" } },
+      { descriptionAr: { $regex: req.body["search"], $options: "i" } },
+      { title: { $regex: req.body["search"], $options: "i" } },
+      { titleAr: { $regex: req.body["search"], $options: "i" } },
+    ];
+    delete $match.searsh
   }
+
   postModel.defaultSchema
     .aggregate([
       {
