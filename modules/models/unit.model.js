@@ -13,34 +13,25 @@ const unitSchema = new Schema(
     status: {
       type: String,
       required: true,
-      enum: [
-        "Loading",
-        "UnderReview",
-        "Accepted",
-        "Refused",
-        "Published",
-        "Stopped",
-      ],
+      enum: ["Loading","UnderReview", "Accepted", "Refused",  "Published", "Stopped"],
       default: "UnderReview",
     },
-    linkedBy: [
-      {
-        userId: {
-          type: ObjectId,
-          required: true,
-          ref: "user",
-        },
-        linkType: {
-          type: String,
-          required: true,
-          enum: ["Owned", "Invested", "Managed"],
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now,
-        },
+    linkedBy : [{
+      userId: {
+        type: ObjectId,
+        required: true,
+        ref: "user",
       },
-    ],
+      linkType: {
+        type: String,
+        required: true,
+        enum: ["Owned", "Invested", "Managed"],
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+    }],
     // name: {
     //   type: String,
     //   required: true,
@@ -116,36 +107,34 @@ const unitSchema = new Schema(
       type: Object,
     },
     additionsServices: [String],
-    services: [
-      {
-        _id: {
-          type: ObjectId,
-          required: true,
-          ref: "serviceType",
-        },
-        name: {
-          type: String,
-          required: true,
-        },
-        nameAr: {
-          type: String,
-          required: true,
-        },
-        subServicesList: [
-          {
-            _id: {
-              type: ObjectId,
-            },
-            name: {
-              type: String,
-            },
-            nameAr: {
-              type: String,
-            },
-          },
-        ],
+    services: [{
+      _id: {
+        type: ObjectId,
+        required: true,
+        ref: "serviceType",
       },
-    ],
+      name: {
+        type: String,
+        required: true,
+      },
+      nameAr: {
+        type: String,
+        required: true,
+      },
+      subServicesList: [
+        {
+          _id: {
+            type: ObjectId,
+          },
+          name: {
+            type: String,
+          },
+          nameAr: {
+            type: String,
+          },
+        },
+      ],
+    }],
     countryId: {
       type: ObjectId,
       ref: "country",
@@ -207,7 +196,7 @@ const unitSchema = new Schema(
   }
 );
 
-unitSchema.index({ location: "2d" });
+unitSchema.index({ location: "2dsphere" });
 const genericOperations = require("../genericService");
 module.exports = {
   genericSchema: genericOperations(mongoose.model("unit", unitSchema)),
