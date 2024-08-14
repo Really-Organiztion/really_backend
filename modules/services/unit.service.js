@@ -214,14 +214,17 @@ findNearUnits = (req, res) => {
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
   unitModel.defaultSchema
-    .find({
+    .find(
+      // { location : { $near : req.body.coordinates, $maxDistance: 5510 } }
+      {
       location: {
         $near: {
           $geometry: { type: "Point", coordinates: req.body.coordinates },
           $maxDistance: req.body.distance,
         },
       },
-    })
+    }
+  )
     .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
     .populate("userId", ["username", "phone", "profileImage", "gender"])
@@ -232,6 +235,7 @@ findNearUnits = (req, res) => {
       res.status(200).send(unit);
     })
     .catch(function (err) {
+      console.log(err);
       res.status(400).send(err);
     });
 };

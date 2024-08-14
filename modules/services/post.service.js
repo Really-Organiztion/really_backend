@@ -9,7 +9,8 @@ findAll = (req, res) => {
   const toFound = lang === "en" ? "name" : "nameAr";
   const toFoundTitle = lang === "en" ? "title" : "titleAr";
   const toFoundDescription = lang === "en" ? "description" : "descriptionAr";
-  let $match = req.body || {};
+  let $match = {};
+  let match2 = {};
   if (!req.body.isDeleted) {
     $match = { isDeleted: false };
   }
@@ -24,12 +25,21 @@ findAll = (req, res) => {
     $match.unitId = new ObjectId(req.body.unitId);
   }
 
+  if (req.body.target) {
+    $match.target = { $in: req.body.targetList };
+  }
+
+  if (req.body.status) {
+    $match.status = req.body.status;
+  }
+
   if (req.body["search"]) {
     $match.$or = [
       { description: { $regex: req.body["search"], $options: "i" } },
       { descriptionAr: { $regex: req.body["search"], $options: "i" } },
       { title: { $regex: req.body["search"], $options: "i" } },
       { titleAr: { $regex: req.body["search"], $options: "i" } },
+      { address: { $regex: req.body["search"], $options: "i" } },
     ];
     delete $match.searsh
   }
@@ -88,6 +98,34 @@ findAll = (req, res) => {
           isSeparated: { $first: `$unit.isSeparated` },
           username: { $first: `$user.username` },
           role: { $first: `$user.role` },
+          // phone: { $first: `$user.phone` },
+          // phonesList: { $first: `$user.phonesList` },
+        },
+      },
+      {
+        $match: match2,
+      },
+      {
+        $group: {
+          _id: "$_id",
+          description: { $first: `$${toFoundDescription}` },
+          title: { $first: `$${toFoundTitle}` },
+          plansList: { $first: `$plansList` },
+          status: { $first: `$status` },
+          addtionDetails: { $first: `$addtionDetails` },
+          setting: { $first: `$setting` },
+          target: { $first: `$target` },
+          userId: { $first: `$userId` },
+          unitId: { $first: `$unitId` },
+          address: { $first: `$address` },
+          type: { $first: `$type` },
+          has3DView: { $first: `$has3DView` },
+          imagesList: { $first: `$imagesList` },
+          rate: { $first: `$rate` },
+          isTrusted: { $first: `$isTrusted` },
+          isSeparated: { $first: `$isSeparated` },
+          username: { $first: `$username` },
+          role: { $first: `$role` },
           // phone: { $first: `$user.phone` },
           // phonesList: { $first: `$user.phonesList` },
         },
