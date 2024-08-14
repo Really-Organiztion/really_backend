@@ -10,7 +10,7 @@ findAll = (req, res) => {
   const toFoundTitle = lang === "en" ? "title" : "titleAr";
   const toFoundDescription = lang === "en" ? "description" : "descriptionAr";
   let $match = {};
-  let match2 = {};
+  let $match2 = {};
   if (!req.body.isDeleted) {
     $match = { isDeleted: false };
   }
@@ -29,8 +29,8 @@ findAll = (req, res) => {
     $match.target = { $in: req.body.targetList };
   }
 
-  if (req.body.status) {
-    $match.status = req.body.status;
+  if (req.body.statusList) {
+    $match.status = { $in: req.body.statusList };
   }
 
   if (req.body["search"]) {
@@ -39,9 +39,32 @@ findAll = (req, res) => {
       { descriptionAr: { $regex: req.body["search"], $options: "i" } },
       { title: { $regex: req.body["search"], $options: "i" } },
       { titleAr: { $regex: req.body["search"], $options: "i" } },
-      { address: { $regex: req.body["search"], $options: "i" } },
     ];
-    delete $match.searsh
+  }
+
+  if (req.body.isTrusted) {
+    $match2.isTrusted = req.body.isTrusted;
+  }
+
+  if (req.body.isSeparated) {
+    $match2.isSeparated = req.body.isSeparated;
+  }
+
+  if (req.body.typeList) {
+    $match.type = { $in: req.body.typeList };
+  }
+
+  if (req.body.typePlansList) {
+    $match["plansList.type"] = { $in: req.body.typePlansList };
+  }
+
+  if (req.body.price && req.body.priceTo) {
+    $match["plansList.price"] = {
+      $gte: req.body.price,
+      $lte: req.body.priceTo,
+    };
+  } else if (req.body.price) {
+    $match["plansList.price"] = req.body.price;
   }
 
   postModel.defaultSchema
@@ -103,7 +126,7 @@ findAll = (req, res) => {
         },
       },
       {
-        $match: match2,
+        $match: $match2,
       },
       {
         $group: {
