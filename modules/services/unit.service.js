@@ -18,7 +18,7 @@ findAll = (req, res) => {
       where = { isDeleted: false };
     }
     if (req.body.status) {
-      where["status"] = req.body.status
+      where["status"] = req.body.status;
     }
     if (req.body.userId) {
       where["userId"] = new ObjectId(req.body.userId);
@@ -49,7 +49,7 @@ findAll = (req, res) => {
     ];
     delete where["search"];
   }
-  
+
   unitModel.defaultSchema
     .find(where)
     .sort({ _id: -1 })
@@ -65,7 +65,6 @@ findAll = (req, res) => {
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (data) {
-      
       res.status(200).send(data);
     })
     .catch(function (err) {
@@ -138,8 +137,8 @@ updateUnitRateCb = (obj, id) => {
 };
 
 create = async (req, res) => {
-  if(req.body.location && req.body.location.coordinates) {
-    req.body.location.coordinates = [req.body.location.coordinates]
+  if (req.body.location && req.body.location.coordinates) {
+    req.body.location.coordinates = [req.body.location.coordinates];
   }
 
   unitModel.defaultSchema
@@ -179,12 +178,12 @@ findCoordinatesMatch = (req, res) => {
   unitModel.defaultSchema
     .find({
       location: {
-       $geoIntersects: {
-        $geometry: {
-           type: "Polygon",
-           coordinates: [req.body.coordinates]
-         }
-     }
+        $geoIntersects: {
+          $geometry: {
+            type: "Polygon",
+            coordinates: [req.body.coordinates],
+          },
+        },
       },
     })
     .sort({ _id: -1 })
@@ -208,6 +207,109 @@ findCoordinatesMatch = (req, res) => {
     });
 };
 
+findNearUnitsToPosts = (req, res) => {
+  const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
+  const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
+  const lang = req.query.lang ? req.query.lang : "en";
+  const toFound = lang === "en" ? "name" : "nameAr";
+  const toFoundTitle = lang === "en" ? "title" : "titleAr";
+  const toFoundDescription = lang === "en" ? "description" : "descriptionAr";
+   //   .find(
+    //     {
+    //     location: {
+    //       $near: {
+    //         $geometry: { type: "Point", coordinates: req.body.coordinates },
+    //         $maxDistance: req.body.distance,
+    //       },
+    //     },
+    //   }
+    // )
+  unitModel.defaultSchema
+    .aggregate([
+      {
+        $geoNear: {
+           near: { type: "Point", coordinates: req.body.coordinates },
+           spherical: true,
+           maxDistance: req.body.distance,
+           distanceField: "calcDistance"
+        }
+     },
+      // {
+      //   $match: {
+      //     location: {
+      //       $near: {
+      //         $geometry: { type: "Point", coordinates: req.body.coordinates },
+      //         $maxDistance: req.body.distance,
+      //       },
+      //     },
+      //   },
+      // },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "_id",
+          foreignField: "unitId",
+          as: "post",
+        },
+      },
+      {
+        $unwind: {
+          path: "$post",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          description: { $first: `$post.${toFoundDescription}` },
+          title: { $first: `$post.${toFoundTitle}` },
+          plansList: { $first: `$post.plansList` },
+          status: { $first: `$post.status` },
+          addtionDetails: { $first: `$post.addtionDetails` },
+          setting: { $first: `$post.setting` },
+          target: { $first: `$post.target` },
+          userId: { $first: `$post.userId` },
+          unitId: { $first: `$post.unitId` },
+          address: { $first: `$address` },
+          type: { $first: `$type` },
+          has3DView: { $first: `$has3DView` },
+          imagesList: { $first: `$imagesList` },
+          rate: { $first: `$rate` },
+          isTrusted: { $first: `$isTrusted` },
+          isSeparated: { $first: `$isSeparated` },
+          username: { $first: `$user.username` },
+          role: { $first: `$user.role` },
+          // phone: { $first: `$user.phone` },
+          // phonesList: { $first: `$user.phonesList` },
+        },
+      },
+    ])
+    .sort({ _id: -1 })
+    .skip((pageNumber - 1) * pageSize)
+    .limit(pageSize)
+    .then(function (unit) {
+      
+      res.status(200).send(unit);
+    })
+    .catch(function (err) {
+      res.status(400).send(err);
+    });
+};
+
 findNearUnits = (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
@@ -217,14 +319,14 @@ findNearUnits = (req, res) => {
     .find(
       // { location : { $near : req.body.coordinates, $maxDistance: 5510 } }
       {
-      location: {
-        $near: {
-          $geometry: { type: "Point", coordinates: req.body.coordinates },
-          $maxDistance: req.body.distance,
+        location: {
+          $near: {
+            $geometry: { type: "Point", coordinates: req.body.coordinates },
+            $maxDistance: req.body.distance,
+          },
         },
-      },
-    }
-  )
+      }
+    )
     .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
     .populate("userId", ["username", "phone", "profileImage", "gender"])
@@ -300,7 +402,7 @@ updateUnit = async (req, res, id) => {
           });
       } else {
         console.log(data);
-        
+
         res.status(200).send(data);
       }
     })
@@ -320,4 +422,5 @@ module.exports = {
   findAllFilterCb,
   findCoordinatesMatch,
   findNearUnits,
+  findNearUnitsToPosts,
 };

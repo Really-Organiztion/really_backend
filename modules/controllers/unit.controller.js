@@ -25,6 +25,14 @@ findNearUnits = (req, res) => {
   }
 };
 
+findNearUnitsToPosts = (req, res) => {
+  try {
+    unitService.findNearUnitsToPosts(req, res);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+
 create = (req, res) => {
   try {
     unitService.create(req, res);
@@ -62,6 +70,7 @@ module.exports = {
   getAllData,
   findCoordinatesMatch,
   findNearUnits,
+  findNearUnitsToPosts,
   create,
   findById,
   updateUnit,
