@@ -64,6 +64,7 @@ findAll = (req, res) => {
       {
         $group: {
           _id: "$_id",
+          postId: {$first: `$post._id`},
           description: { $first: `$post.${toFoundDescription}` },
           title: { $first: `$post.${toFoundTitle}` },
           plansList: { $first: `$post.plansList` },

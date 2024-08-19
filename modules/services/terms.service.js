@@ -17,6 +17,9 @@ findAll = (req, res) => {
   if (req.body["type"]) {
     $match["type"] = req.body["type"];
   }
+  if (req.body.typeList) {
+    $match.type = { $in: req.body.typeList };
+  }
   if (req.body["search"]) {
     $match.$or = [
       { name: { $regex: req.body["search"], $options: "i" } },
