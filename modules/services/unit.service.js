@@ -290,6 +290,7 @@ findNearUnitsToPosts = (req, res) => {
           imagesList: { $first: `$imagesList` },
           rate: { $first: `$rate` },
           isTrusted: { $first: `$isTrusted` },
+          primImage: { $first: `$primImage` },
           isSeparated: { $first: `$isSeparated` },
           username: { $first: `$user.username` },
           role: { $first: `$user.role` },
