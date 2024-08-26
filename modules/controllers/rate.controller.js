@@ -18,7 +18,7 @@ create = async (req, res) => {
 
       let obj = { $inc: { [str]: 1, "rate.numOfRates": 1 } };
 
-      let unit = await unitService.updateUnitRateCb(obj, req.body.unitId);
+      let unit = await unitService.updateUnitCb(obj, req.body.unitId);
       if (unit) {
         res.status(200).send(rate);
       } else {
@@ -51,7 +51,7 @@ updateRate = async (req, res) => {
       let str2 = "rate.numOfValue" + rate.value;
       let obj = { $inc: { [str1]: 1, [str2]: -1 } };
 
-      let unit = await unitService.updateUnitRateCb(obj, unitId);
+      let unit = await unitService.updateUnitCb(obj, unitId);
       if (unit) {
         res.status(200).send(rate);
       } else {
@@ -74,7 +74,7 @@ deleteRate = async (req, res) => {
       let str = "rate.numOfValue" + rate.value;
       let obj = { $inc: { [str]: -1, "rate.numOfRates": -1 } };
 
-      let unit = await unitService.updateUnitRateCb(obj, unitId);
+      let unit = await unitService.updateUnitCb(obj, unitId);
       if (unit) {
         res.status(200).send(rate);
       } else {

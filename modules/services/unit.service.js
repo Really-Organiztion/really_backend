@@ -118,7 +118,7 @@ findAllFilterCb = (req, res) => {
   });
 };
 
-updateUnitRateCb = (obj, id) => {
+updateUnitCb = (obj, id) => {
   return new Promise((resolve, reject) => {
     unitModel.defaultSchema
       .findOneAndUpdate(
@@ -303,7 +303,6 @@ findNearUnitsToPosts = (req, res) => {
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (unit) {
-      
       res.status(200).send(unit);
     })
     .catch(function (err) {
@@ -418,7 +417,7 @@ module.exports = {
   updateUnit,
   findById,
   create,
-  updateUnitRateCb,
+  updateUnitCb,
   findAll,
   findAllFilterCb,
   findCoordinatesMatch,

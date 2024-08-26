@@ -242,7 +242,19 @@ findAllMap = (req, res) => {
       res.status(400).send(err);
     });
 };
-
+create = async (req, res) => {
+  return new Promise((resolve, reject) => {
+    postModel.defaultSchema
+      .create(req.body)
+      .then(function (doc) {
+        resolve(doc);
+      })
+      .catch(function (err) {
+        reject(err);
+        res.status(400).send(err);
+      });
+  });
+};
 updatePostCb = (obj, id) => {
   return new Promise((resolve, reject) => {
     postModel.defaultSchema
@@ -348,7 +360,7 @@ module.exports = {
   deletePost: postModel.genericSchema.delete,
   updatePost: postModel.genericSchema.update,
   findById,
-  create: postModel.genericSchema.create,
+  create,
   findAll,
   findAllMap,
   updatePostCb,

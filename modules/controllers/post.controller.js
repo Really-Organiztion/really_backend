@@ -37,9 +37,15 @@ getAllDataFilterPost = async (req, res) => {
   }
 };
 
-create = (req, res) => {
+create = async (req, res) => {
   try {
-    postService.create(req, res);
+    let post = await postService.create(req, res);
+    if (post) {
+      await unitService.updateUnitCb({ status: "Published" }, post.unitId);
+      res.status(200).send(post);
+    } else {
+      res.status(400).send("Can`t add post");
+    }
   } catch (error) {
     logger.error(error);
   }
