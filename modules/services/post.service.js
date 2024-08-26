@@ -348,16 +348,29 @@ findById = (req, res, id) => {
       },
     ])
     .then(function (data) {
-      console.log(data);
       res.status(200).send(data[0]);
     })
     .catch(function (err) {
       res.status(400).send(err);
     });
 };
-
+deletePost = async (req, res, id) => {
+  return new Promise((resolve, reject) => {
+    postModel.defaultSchema
+      .findByIdAndUpdate(id, {
+        isDeleted: true,
+      })
+      .then(function (doc) {
+        resolve(doc);
+      })
+      .catch(function (err) {
+        reject(err);
+        res.status(400).send(err);
+      });
+  });
+};
 module.exports = {
-  deletePost: postModel.genericSchema.delete,
+  deletePost,
   updatePost: postModel.genericSchema.update,
   findById,
   create,

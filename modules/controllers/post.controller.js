@@ -14,7 +14,6 @@ getAllDataMap = (req, res) => {
   try {
     postService.findAllMap(req, res);
   } catch (error) {
-    console.log(error);
     logger.error(error);
   }
 };
@@ -41,7 +40,10 @@ create = async (req, res) => {
   try {
     let post = await postService.create(req, res);
     if (post) {
-      await unitService.updateUnitCb({ status: "Published" }, post.unitId);
+      await unitService.updateUnitCb(
+        { status: "Published" },
+        { _id: post.unitId,status : "Accepted" }
+      );
       res.status(200).send(post);
     } else {
       res.status(400).send("Can`t add post");
@@ -67,10 +69,18 @@ updatePost = (req, res) => {
     logger.error(error);
   }
 };
-deletePost = (req, res) => {
+deletePost = async (req, res) => {
   try {
     const id = req.params.id;
-    postService.deletePost(req, res, id);
+    let post = await postService.deletePost(req, res, id);
+    
+    if (post) {
+      await unitService.updateUnitCb(
+        { status: "Accepted" },
+        { _id: post.unitId, status: "Published" }
+      );
+      res.status(200).send("The post has been deleted");
+    }
   } catch (error) {
     logger.error(error);
   }

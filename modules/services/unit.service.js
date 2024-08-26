@@ -118,16 +118,14 @@ findAllFilterCb = (req, res) => {
   });
 };
 
-updateUnitCb = (obj, id) => {
+updateUnitCb = (obj, where) => {
   return new Promise((resolve, reject) => {
     unitModel.defaultSchema
       .findOneAndUpdate(
-        {
-          _id: id,
-        },
+        where,
         obj
       )
-      .then(function (res) {
+      .then(function (res) {        
         resolve(res);
       })
       .catch(function (err) {
@@ -401,8 +399,6 @@ updateUnit = async (req, res, id) => {
             res.status(400).send(err1);
           });
       } else {
-        console.log(data);
-
         res.status(200).send(data);
       }
     })
