@@ -26,7 +26,7 @@ findAll = (req, res) => {
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .populate("currencyId", [`${toFound}`, "code", "numericCode", "color"])
-    .populate("userId", ["username", "phone"])
+    .populate("userId", ["firstName","lastName","gender","phone", "profileImage"])
     .then(function (data) {
       res.status(200).send(data);
     })
@@ -73,7 +73,7 @@ findById = (req, res, id) => {
   walletModel.defaultSchema
     .findById(id)
     .populate("currencyId", [`${toFound}`, "code", "numericCode", "color"])
-    .populate("userId", ["username", "phone"])
+    .populate("userId", ["firstName","lastName","gender","phone", "profileImage"])
     .then(function (data) {
       res.status(200).send(data);
     })

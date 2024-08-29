@@ -20,7 +20,7 @@ findAll = (req, res) => {
   likeReelModel.defaultSchema
   .find(where)
   .sort({ _id: -1 })
-  .populate("userId", ["username", "profileImage"])
+  .populate("userId", ["firstName","lastName","gender","phone", "profileImage"])
   .skip((pageNumber - 1) * pageSize)
   .limit(pageSize)
   .then(function (data) {

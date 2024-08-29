@@ -4,6 +4,7 @@ const logger = require("../../helpers/logging");
 
 getAllData = (req, res) => {
   try {
+    
     favoritePostService.findAll(req, res);
   } catch (error) {
     logger.error(error);

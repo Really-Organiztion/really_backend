@@ -27,7 +27,7 @@ findAll = (req, res) => {
   .find(where)
   .sort({ _id: -1 })
   .populate("unitId", [`${toFound}`, "type"])
-  .populate("userId", ["username", "phone", "profileImage"])
+  .populate("userId", ["firstName","lastName","gender","phone", "profileImage"])
   .skip((pageNumber - 1) * pageSize)
   .limit(pageSize)
   .then(function (data) {

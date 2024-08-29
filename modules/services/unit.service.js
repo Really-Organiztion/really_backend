@@ -54,13 +54,8 @@ findAll = (req, res) => {
     .find(where)
     .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["username", "phone", "profileImage", "gender"])
-    .populate("linkedBy.userId", [
-      "username",
-      "phone",
-      "profileImage",
-      "gender",
-    ])
+    .populate("userId", ["firstName","lastName","gender","phone", "profileImage"])
+    .populate("linkedBy.userId", ["firstName","lastName","gender","phone", "profileImage"])
     // .populate("servicesId", [`${toFound}`, "subServicesList"])
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
@@ -102,12 +97,8 @@ findAllFilterCb = (req, res) => {
 
     unitModel.defaultSchema
       .find(where, { _id: 1 })
-      .populate("linkedBy.userId", [
-        "username",
-        "phone",
-        "profileImage",
-        "gender",
-      ])
+      .populate("linkedBy.userId", ["firstName","lastName","gender","phone", "profileImage"])
+
       // .populate("servicesId", [`${toFound}`, "subServicesList"])
       .then(function (data) {
         resolve(data);
@@ -121,11 +112,8 @@ findAllFilterCb = (req, res) => {
 updateUnitCb = (obj, where) => {
   return new Promise((resolve, reject) => {
     unitModel.defaultSchema
-      .findOneAndUpdate(
-        where,
-        obj
-      )
-      .then(function (res) {        
+      .findOneAndUpdate(where, obj)
+      .then(function (res) {
         resolve(res);
       })
       .catch(function (err) {
@@ -186,12 +174,19 @@ findCoordinatesMatch = (req, res) => {
     })
     .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["username", "phone", "profileImage", "gender"])
-    .populate("linkedBy.userId", [
-      "username",
+    .populate("userId", [
+      "firstName",
+      "lastName",
+      "gender",
       "phone",
       "profileImage",
+    ])
+    .populate("linkedBy.userId", [
+      "firstName",
+      "lastName",
       "gender",
+      "phone",
+      "profileImage",
     ])
     // .populate("servicesId", [`${toFound}`, "subServicesList"])
     .skip((pageNumber - 1) * pageSize)
@@ -212,26 +207,26 @@ findNearUnitsToPosts = (req, res) => {
   const toFound = lang === "en" ? "name" : "nameAr";
   const toFoundTitle = lang === "en" ? "title" : "titleAr";
   const toFoundDescription = lang === "en" ? "description" : "descriptionAr";
-   //   .find(
-    //     {
-    //     location: {
-    //       $near: {
-    //         $geometry: { type: "Point", coordinates: req.body.coordinates },
-    //         $maxDistance: req.body.distance,
-    //       },
-    //     },
-    //   }
-    // )
+  //   .find(
+  //     {
+  //     location: {
+  //       $near: {
+  //         $geometry: { type: "Point", coordinates: req.body.coordinates },
+  //         $maxDistance: req.body.distance,
+  //       },
+  //     },
+  //   }
+  // )
   unitModel.defaultSchema
     .aggregate([
       {
         $geoNear: {
-           near: { type: "Point", coordinates: req.body.coordinates },
-           spherical: true,
-           maxDistance: req.body.distance,
-           distanceField: "calcDistance"
-        }
-     },
+          near: { type: "Point", coordinates: req.body.coordinates },
+          spherical: true,
+          maxDistance: req.body.distance,
+          distanceField: "calcDistance",
+        },
+      },
       // {
       //   $match: {
       //     location: {
@@ -290,7 +285,11 @@ findNearUnitsToPosts = (req, res) => {
           isTrusted: { $first: `$isTrusted` },
           primImage: { $first: `$primImage` },
           isSeparated: { $first: `$isSeparated` },
-          username: { $first: `$user.username` },
+          firstName: { $first: `$user.firstName` },
+          lastName: { $first: `$user.lastName` },
+          gender: { $first: `$user.gender` },
+          profileImage: { $first: `$user.profileImage` },
+          phone: { $first: `$user.phone` },
           role: { $first: `$user.role` },
           // phone: { $first: `$user.phone` },
           // phonesList: { $first: `$user.phonesList` },
@@ -327,7 +326,7 @@ findNearUnits = (req, res) => {
     )
     .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["username", "phone", "profileImage", "gender"])
+    .populate("userId", ["firstName","lastName","gender","phone", "profileImage"])
 
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
@@ -346,13 +345,8 @@ findById = (req, res, id) => {
   unitModel.defaultSchema
     .findById(id)
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["username", "phone", "profileImage", "gender"])
-    .populate("linkedBy.userId", [
-      "username",
-      "phone",
-      "profileImage",
-      "gender",
-    ])
+    .populate("userId", ["firstName","lastName","gender","phone", "profileImage"])
+    .populate("linkedBy.userId", ["firstName","lastName","gender","phone", "profileImage"])
     // .populate("servicesId", [`${toFound}`, "subServicesList"])
     .then(function (data) {
       res.status(200).send(data);
@@ -371,13 +365,8 @@ updateUnit = async (req, res, id) => {
       setDefaultsOnInsert: true,
     })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["username", "phone", "profileImage", "gender"])
-    .populate("linkedBy.userId", [
-      "username",
-      "phone",
-      "profileImage",
-      "gender",
-    ])
+    .populate("userId", ["firstName","lastName","gender","phone", "profileImage"])
+    .populate("linkedBy.userId", ["firstName","lastName","gender","phone", "profileImage"])
     .then(function (data) {
       if (req.body.status === "UnderReview") {
         let request = {

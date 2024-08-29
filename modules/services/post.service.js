@@ -18,7 +18,7 @@ findAll = (req, res) => {
     $match.userId = new ObjectId(req.body.userId);
   }
   if (req.body.unitsIds) {
-    let unitsIds = req.body.unitsIds.map((_obj) => _obj._id);
+    let unitsIds = req.body.unitsIds.map((_obj) => new ObjectId(_obj));
     $match.unitId = { $in: unitsIds };
   }
   if (req.body.unitId) {
@@ -119,7 +119,11 @@ findAll = (req, res) => {
           rate: { $first: `$unit.rate` },
           isTrusted: { $first: `$unit.isTrusted` },
           isSeparated: { $first: `$unit.isSeparated` },
-          username: { $first: `$user.username` },
+          firstName: { $first: `$user.firstName` },
+          lastName: { $first: `$user.lastName` },
+          gender: { $first: `$user.gender` },
+          profileImage: { $first: `$user.profileImage` },
+          phone: { $first: `$user.phone` },
           role: { $first: `$user.role` },
           primImage: { $first: `$unit.primImage` },
           // phone: { $first: `$user.phone` },
@@ -149,7 +153,11 @@ findAll = (req, res) => {
           isTrusted: { $first: `$isTrusted` },
           primImage: { $first: `$primImage` },
           isSeparated: { $first: `$isSeparated` },
-          username: { $first: `$username` },
+          firstName: { $first: `$firstName` },
+          lastName: { $first: `$lastName` },
+          gender: { $first: `$gender` },
+          profileImage: { $first: `$profileImage` },
+          phone: { $first: `$phone` },
           role: { $first: `$role` },
           // phone: { $first: `$user.phone` },
           // phonesList: { $first: `$user.phonesList` },
@@ -297,7 +305,11 @@ findById = (req, res, id) => {
     isTrusted: { $first: `$unit.isTrusted` },
     primImage: { $first: `$unit.primImage` },
     isSeparated: { $first: `$unit.isSeparated` },
-    username: { $first: `$user.username` },
+    firstName: { $first: `$user.firstName` },
+    lastName: { $first: `$user.lastName` },
+    gender: { $first: `$user.gender` },
+    profileImage: { $first: `$user.profileImage` },
+    phone: { $first: `$user.phone` },
     role: { $first: `$user.role` },
     // phone: { $first: `$user.phone` },
     // phonesList: { $first: `$user.phonesList` },

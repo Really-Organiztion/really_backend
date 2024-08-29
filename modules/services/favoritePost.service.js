@@ -9,15 +9,20 @@ findAll = (req, res) => {
   const toFound = lang === "en" ? "name" : "nameAr";
   const toFoundTitle = lang === "en" ? "title" : "titleAr";
   const toFoundDescription = lang === "en" ? "description" : "descriptionAr";
-  let where = req.body || {};
+  let where = {};
   if (req.body) {
     if (req.body.userId) {
       where["userId"] = new ObjectId(req.body.userId);
     }
-    if (req.body.postId) {
-      where["postId"] = new ObjectId(req.body.postId);
+    if (req.body.postIds) {
+      where["postId"] = { $in:req.body.postIds};
+    }
+    if (req.body.postIds) {
+      let postIds = req.body.postIds.map((_obj) => new ObjectId(_obj));
+      where["postId"] = { $in: postIds };
     }
   }
+  
   favoritePostModel.defaultSchema
     .aggregate([
       {
@@ -131,11 +136,14 @@ findAll = (req, res) => {
           address: { $first: `$unit.address` },
           type: { $first: `$unit.type` },
           has3DView: { $first: `$unit.has3DView` },
-          imagesList: { $first: `$unit.imagesList` },
+          imagesList: { $first: `$unit.imagesList` }, 
           rate: { $first: `$unit.rate` },
           isTrusted: { $first: `$unit.isTrusted` },
           isSeparated: { $first: `$unit.isSeparated` },
-          username: { $first: `$user.username` },
+          firstName: { $first: `$user.firstName` },
+          lastName: { $first: `$user.lastName` },
+          gender: { $first: `$user.gender` },
+          profileImage: { $first: `$user.profileImage` },
           role: { $first: `$user.role` },
           phone: { $first: `$user.phone` },
           phonesList: { $first: `$user.phonesList` },
