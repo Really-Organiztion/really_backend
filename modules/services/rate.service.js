@@ -61,7 +61,7 @@ findAll = (req, res) => {
     });
 };
 
-findAllByComments = (req, res) => {
+findAllWithComments = (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
   const lang = req.query.lang ? req.query.lang : "en";
@@ -179,5 +179,5 @@ module.exports = {
   findById: rateModel.genericSchema.findById,
   createRate,
   findAll,
-  findAllByComments,
+  findAllWithComments,
 };
