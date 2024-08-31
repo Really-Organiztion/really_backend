@@ -83,6 +83,34 @@ findAllWithComments = (req, res) => {
       },
       {
         $lookup: {
+          from: "comments",
+        
+          let: {userId: "$userId", unitId: "$unitId"},
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: [
+                    "$$unitId",
+                    "$unitId"
+                  ]
+                }
+              }
+            },
+            {
+              $project: {
+                userId: 0,
+                unitId: 0,
+                __v: 0,
+              },
+            },
+          ],
+          as: "comment",
+        
+        },
+      },
+      {
+        $lookup: {
           from: "users",
           localField: "userId",
           foreignField: "_id",
@@ -95,24 +123,7 @@ findAllWithComments = (req, res) => {
           preserveNullAndEmptyArrays: true,
         },
       },
-      {
-        $lookup: {
-          from: "comments",
-          localField: "userId",
-          foreignField: "userId",
-          pipeline: [
-            {
-              $project: {
-                userId: 0,
-                unitId: 0,
-                __v: 0,
-              },
-            },
-          ],
-          as: "comment",
-        },
-      },
-
+     
       {
         $group: {
           _id: "$_id",
