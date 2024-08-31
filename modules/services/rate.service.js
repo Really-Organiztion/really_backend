@@ -18,38 +18,39 @@ findAll = (req, res) => {
   }
 
   rateModel.defaultSchema
-  .aggregate([
-    {
-      $match: where,
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "userId",
-        foreignField: "_id",
-        as: "user",
+    .aggregate([
+      {
+        $match: where,
       },
-    },
-    {
-      $unwind: {
-        path: "$user",
-        preserveNullAndEmptyArrays: true,
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
       },
-    },
-    {
-      $group: {
-        _id: "$_id",   
-        userId: { $first: `$user._id` },
-        firstName: { $first: `$user.firstName` },
-        lastName: { $first: `$user.lastName` },
-        gender: { $first: `$user.gender` },
-        profileImage: { $first: `$user.profileImage` },
-        phone: { $first: `$user.phone` },
-        role: { $first: `$user.role` },
-        unitId: { $first: `$unitId` },
+      {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
       },
-    },
-  ])
+      {
+        $group: {
+          _id: "$_id",
+          value: { $first: `$value` },
+          userId: { $first: `$user._id` },
+          firstName: { $first: `$user.firstName` },
+          lastName: { $first: `$user.lastName` },
+          gender: { $first: `$user.gender` },
+          profileImage: { $first: `$user.profileImage` },
+          phone: { $first: `$user.phone` },
+          role: { $first: `$user.role` },
+          unitId: { $first: `$unitId` },
+        },
+      },
+    ])
     .sort({ _id: -1 })
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
@@ -99,13 +100,23 @@ findAllWithComments = (req, res) => {
           from: "comments",
           localField: "userId",
           foreignField: "userId",
+          pipeline: [
+            {
+              $project: {
+                userId: 0,
+                unitId: 0,
+                __v: 0,
+              },
+            },
+          ],
           as: "comment",
         },
       },
-    
+
       {
         $group: {
-          _id: "$_id",   
+          _id: "$_id",
+          value: { $first: `$value` },
           commentList: { $first: `$comment` },
           userId: { $first: `$user._id` },
           firstName: { $first: `$user.firstName` },
