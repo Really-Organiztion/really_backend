@@ -123,9 +123,9 @@ updateUnitCb = (obj, where) => {
 };
 
 create = async (req, res) => {
-  // if (req.body.location && req.body.location.coordinates) {
-  //   req.body.location.coordinates = [req.body.location.coordinates];
-  // }
+  if (req.body.location && req.body.location.coordinates) {
+    req.body.location.coordinates = [req.body.location.coordinates];
+  }
 
   unitModel.defaultSchema
     .create(req.body)
@@ -359,6 +359,9 @@ findById = (req, res, id) => {
 updateUnit = async (req, res, id) => {
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
+  if (req.body.location && req.body.location.coordinates) {
+    req.body.location.coordinates = [req.body.location.coordinates];
+  }
   unitModel.defaultSchema
     .findByIdAndUpdate(id, req.body, {
       new: true,
