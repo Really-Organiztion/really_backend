@@ -10,6 +10,14 @@ getAllData = (req, res) => {
   }
 };
 
+getAllDataByComment = (req, res) => {
+  try {
+    rateService.findAllByComments(req, res);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+
 create = async (req, res) => {
   try {
     let rate = await rateService.createRate(req, res);
@@ -90,6 +98,7 @@ deleteRate = async (req, res) => {
 
 module.exports = {
   getAllData,
+  getAllDataByComment,
   create,
   findById,
   updateRate,

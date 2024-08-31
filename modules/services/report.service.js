@@ -39,6 +39,7 @@ findAll = (req, res) => {
     });
 };
 
+
 module.exports = {
   deleteReport: reportModel.genericSchema.delete,
   updateReport: reportModel.genericSchema.update,
