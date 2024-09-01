@@ -165,13 +165,20 @@ deleteFiles = (req, res) => {
   if (!req.body || !req.body.urlList) {
     return res.status(400).send("Url not found");
   }
+  let data = {
+    deletedCount : 0,
+    notFoundList : [],
+  }
   for (let i = 0; i < req.body.urlList.length; i++) {
     let path = req.body.urlList[i].replace("/api/uploadFile", "attachments");
     if(fs.existsSync(path)){
+      data.deletedCount += 1
       fs.unlinkSync(path);
+    } else {
+      data.notFoundList.push(path)
     }
   }
-  return res.status(200).send("Deleted successfully");
+  return res.status(200).send(data);
 
 };
 
