@@ -5,5 +5,6 @@ const handleFiles = require("../../helpers/handleFiles");
 uploadFileRouter.post("/:pathName/:fileType", handleFiles.handleFileUpload);
 uploadFileRouter.post("/files/:pathName/:fileType", handleFiles.handleFilesUpload);
 uploadFileRouter.get("/:pathName/:fileType/:fileName", handleFiles.getFile);
-uploadFileRouter.delete("/", handleFiles.deleteFile);
+// uploadFileRouter.delete("/", handleFiles.deleteFile);
+uploadFileRouter.delete("/", handleFiles.deleteFiles);
 module.exports = uploadFileRouter;
