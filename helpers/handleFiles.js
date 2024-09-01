@@ -175,7 +175,7 @@ deleteFiles = (req, res) => {
       data.deletedCount += 1
       fs.unlinkSync(path);
     } else {
-      data.notFoundList.push(path)
+      data.notFoundList.push(req.body.urlList[i])
     }
   }
   return res.status(200).send(data);
