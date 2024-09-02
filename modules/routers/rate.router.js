@@ -4,7 +4,6 @@ const rateController = require("../controllers/rate.controller");
 const roles = require("../../helpers/roles");
 
 rateRouter.post("/all", rateController.getAllData);
-rateRouter.post("/allWithComments", rateController.getAllDataWithComments);
 rateRouter.post("/", rateController.create);
 rateRouter.get("/:id", rateController.findById);
 rateRouter.put(

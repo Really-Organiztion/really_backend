@@ -8,6 +8,7 @@ const favoritePostController = require("../controllers/favoritePost.controller")
 const reelController = require("../controllers/reel.controller");
 const commentController = require("../controllers/comment.controller");
 const unitController = require("../controllers/unit.controller");
+const rateController = require("../controllers/rate.controller");
 const roles = require("../../helpers/roles");
 
 publicRouter.post("/post/", postController.getAllData);
@@ -26,5 +27,6 @@ publicRouter.post("/reel/all", reelController.getAllData);
 publicRouter.get("/reel/:id", reelController.findById);
 publicRouter.post("/comment/all", commentController.getAllData);
 publicRouter.get("/unit/:id", unitController.findById);
+publicRouter.post("/rate/allWithComments", rateController.getAllDataWithComments);
 
 module.exports = publicRouter;
