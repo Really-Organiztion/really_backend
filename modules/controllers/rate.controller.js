@@ -51,15 +51,23 @@ findById = (req, res) => {
 updateRate = async (req, res) => {
   try {
     const id = req.params.id;
-    const unitId = req.params.unitId;
+    if(!req.body || !req.body.value) {
+      return res.status(400).send("Must Send Value Rate");
 
+    }
+    let findRate = await rateService.findByIdCb(req, res, id);
+    if (findRate && req.body.value == findRate.value) {
+      return res.status(200).send(findRate);
+    }
     let rate = await rateService.updateRate(req, res, id);
     if (rate) {
-      let str1 = "rate.numOfValue" + req.body.value;
-      let str2 = "rate.numOfValue" + rate.value;
+      let str1 = "rate.numOfValue" + rate.value;
+      let str2 = "rate.numOfValue" + findRate.value;
       let obj = { $inc: { [str1]: 1, [str2]: -1 } };
-
-      let unit = await unitService.updateUnitCb(obj, { _id: unitId });
+      console.log(obj);
+      
+      let unit = await unitService.updateUnitCb(obj, { _id: rate.unitId });
+      
       if (unit) {
         res.status(200).send(rate);
       } else {
@@ -69,6 +77,8 @@ updateRate = async (req, res) => {
       res.status(400).send("Can`t update rate");
     }
   } catch (error) {
+    console.log(error);
+    
     logger.error(error);
   }
 };

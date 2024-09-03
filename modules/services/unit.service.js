@@ -371,16 +371,18 @@ updateUnit = async (req, res, id) => {
     .populate("userId", ["firstName","lastName","gender","phone", "profileImage"])
     .populate("linkedBy.userId", ["firstName","lastName","gender","phone", "profileImage"])
     .then(function (data) {
-      if (req.body.status === "UnderReview") {
+      if (req.body.status === "UnderReview" && data && data.userId) {
+        
         let request = {
           name: "I want to Update unit",
           nameAr: "أريد تعديل بيانات وحدة",
           code: crypto.randomBytes(6).toString("hex"),
           type: "UpdateUnit",
           target: "Unit",
-          userId: data.userId,
+          userId: data.userId._id,
           unitId: data._id,
         };
+        
         requestModel.defaultSchema
           .create(request)
           .then(function (_request) {

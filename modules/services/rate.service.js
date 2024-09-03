@@ -151,10 +151,24 @@ findAllWithComments = (req, res) => {
     });
 };
 
+findByIdCb = async (req, res, id) => {
+  return new Promise((resolve, reject) => {
+    rateModel.defaultSchema
+      .findById(id)
+      .then(function (doc) {
+        resolve(doc);
+      })
+      .catch(function (err) {
+        reject(err);
+        res.status(400).send(err);
+      });
+  });
+};
+
 updateRate = async (req, res, id) => {
   return new Promise((resolve, reject) => {
     rateModel.defaultSchema
-      .findOneAndUpdate({ _id: id }, req.body)
+      .findByIdAndUpdate({ _id: id }, req.body,{ returnOriginal: false },)
       .then(function (doc) {
         resolve(doc);
       })
@@ -199,6 +213,7 @@ module.exports = {
   deleteRate,
   updateRate,
   findById: rateModel.genericSchema.findById,
+  findByIdCb,
   createRate,
   findAll,
   findAllWithComments,

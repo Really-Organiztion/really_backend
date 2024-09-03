@@ -7,7 +7,7 @@ rateRouter.post("/all", rateController.getAllData);
 rateRouter.post("/", rateController.create);
 rateRouter.get("/:id", rateController.findById);
 rateRouter.put(
-  "/:id/:unitId",
+  "/:id",
   rateController.updateRate
 );
 rateRouter.delete(

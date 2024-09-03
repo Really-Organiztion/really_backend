@@ -15,7 +15,7 @@ const requestSchema = new Schema(
     },
     type: {
       type: String,
-      enum: ["Identify",'AddUnit'],
+      enum: ["Identify",'AddUnit' ,'UpdateUnit'],
       required: true,
     },
     code: {
