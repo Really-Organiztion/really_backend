@@ -90,10 +90,16 @@ findAllWithComments = (req, res) => {
             {
               $match: {
                 $expr: {
-                  $eq: [
-                    "$$unitId",
-                    "$unitId"
-                  ]
+                  $and: [
+                    { $eq: ['$isDeleted', false] },
+                    {
+
+                    $eq: [
+                      "$$unitId",
+                      "$unitId"
+                    ]
+                  }
+                ]
                 }
               }
             },
@@ -101,6 +107,7 @@ findAllWithComments = (req, res) => {
               $project: {
                 userId: 0,
                 unitId: 0,
+                isDeleted: 0,
                 __v: 0,
               },
             },

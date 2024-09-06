@@ -27,6 +27,9 @@ publicRouter.post("/reel/all", reelController.getAllData);
 publicRouter.get("/reel/:id", reelController.findById);
 publicRouter.post("/comment/all", commentController.getAllData);
 publicRouter.get("/unit/:id", unitController.findById);
+publicRouter.post("/unit/nearUnitsToPosts", unitController.findNearUnitsToPosts);
+publicRouter.post("/unit/nearUnits", unitController.findNearUnits);
+
 publicRouter.post("/rate/allWithComments", rateController.getAllDataWithComments);
 
 module.exports = publicRouter;
