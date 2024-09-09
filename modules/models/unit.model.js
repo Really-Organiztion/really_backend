@@ -27,6 +27,11 @@ const unitSchema = new Schema(
         required: true,
         enum: ["Owned", "Invested", "Managed"],
       },
+      linkStatus: {
+        type: String,
+        required: true,
+        enum: ["Pending", "Accepted", "Refused"],
+      },
       createdAt: {
         type: Date,
         default: Date.now,

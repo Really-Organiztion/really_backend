@@ -372,7 +372,6 @@ updateUnit = async (req, res, id) => {
     .populate("linkedBy.userId", ["firstName","lastName","gender","phone", "profileImage"])
     .then(function (data) {
       if (req.body.status === "UnderReview" && data && data.userId) {
-        
         let request = {
           name: "I want to Update unit",
           nameAr: "أريد تعديل بيانات وحدة",
