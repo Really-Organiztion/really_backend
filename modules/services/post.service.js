@@ -159,7 +159,7 @@ findAll = (req, res) => {
           phone: { $first: `$user.phone` },
           role: { $first: `$user.role` },
           primImage: { $first: `$unit.primImage` },
-          favoritePost: { $first: `$favoritePost.userId` },
+          favoritePost: { $first: `$favoritePost._id` },
           // phone: { $first: `$user.phone` },
           // phonesList: { $first: `$user.phonesList` },
         },
