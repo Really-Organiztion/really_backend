@@ -181,10 +181,8 @@ findAll = (req, res) => {
           userId: { $first: `$userId` },
           unitId: { $first: `$unitId` },
           address: { $first: `$address` },
+          type: { $first: `$type` },
           favoritePost: { $first: `$favoritePost` },
-          // favoritePost: {
-          //   $cond: { if: { $gte: ["$qty", 250] }, then: 30, else: 20 },
-          // },
           has3DView: { $first: `$has3DView` },
           imagesList: { $first: `$imagesList` },
           rate: { $first: `$rate` },
