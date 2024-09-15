@@ -32,7 +32,9 @@ findAll = (req, res) => {
   if (req.body.statusList) {
     $match.status = { $in: req.body.statusList };
   }
-
+  if (req.body.loginUserId) {
+    req.body.loginUserId = new ObjectId(req.body.loginUserId);
+  }
   if (req.body["search"]) {
     $match.$or = [
       { description: { $regex: req.body["search"], $options: "i" } },
@@ -66,7 +68,6 @@ findAll = (req, res) => {
   } else if (req.body.price) {
     $match["plansList.price"] = req.body.price;
   }
-
   postModel.defaultSchema
     .aggregate([
       {
@@ -101,6 +102,38 @@ findAll = (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "favoriteposts",
+          let: { userId: "req?.body?.loginUserId", postId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $eq: ["$$postId", "$postId"],
+                    },
+                  ],
+                },
+              },
+            },
+            {
+              $project: {
+                unitId: 0,
+                __v: 0,
+              },
+            },
+          ],
+          as: "favoritePost",
+        },
+      },
+      {
+        $unwind: {
+          path: "$favoritePost",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $group: {
           _id: "$_id",
           description: { $first: `$${toFoundDescription}` },
@@ -126,6 +159,7 @@ findAll = (req, res) => {
           phone: { $first: `$user.phone` },
           role: { $first: `$user.role` },
           primImage: { $first: `$unit.primImage` },
+          favoritePost: { $first: `$favoritePost.userId` },
           // phone: { $first: `$user.phone` },
           // phonesList: { $first: `$user.phonesList` },
         },
@@ -133,6 +167,7 @@ findAll = (req, res) => {
       {
         $match: $match2,
       },
+
       {
         $group: {
           _id: "$_id",
@@ -146,7 +181,10 @@ findAll = (req, res) => {
           userId: { $first: `$userId` },
           unitId: { $first: `$unitId` },
           address: { $first: `$address` },
-          type: { $first: `$type` },
+          favoritePost: { $first: `$favoritePost` },
+          // favoritePost: {
+          //   $cond: { if: { $gte: ["$qty", 250] }, then: 30, else: 20 },
+          // },
           has3DView: { $first: `$has3DView` },
           imagesList: { $first: `$imagesList` },
           rate: { $first: `$rate` },
