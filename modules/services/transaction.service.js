@@ -105,13 +105,14 @@ updateCb = (obj, id) => {
   return new Promise((resolve, reject) => {
     transactionModel.defaultSchema
       .findOneAndUpdate(
-        {
-          _id: id,
-        },
-        obj
+        id, obj, {
+          new: true,
+          setDefaultsOnInsert: true,
+        }
       )
       .then(function (res) {
-      
+        console.log(res);
+        
         resolve(res);
       })
       .catch(function (err) {

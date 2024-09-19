@@ -117,7 +117,7 @@ updateTransactionStatus = async (req, res) => {
             transaction.sessionData = req.body.sessionData;
             transaction.status = "Completed";
             wallet.activeBalance += transaction.amount;
-            await transactionService.updateCb(transaction, transaction._id);
+            transaction =  await transactionService.updateCb(transaction, transaction._id);
           } else {
             transaction.status = "Error";
             await transactionService.updateCb(transaction, transaction._id);
@@ -132,6 +132,9 @@ updateTransactionStatus = async (req, res) => {
         } else if (transaction.type == "Active") {
           wallet.holdBalance -= transaction.amount;
           wallet.activeBalance += transaction.amount;
+        } else {
+          transaction =  await transactionService.updateCb(req.body, transaction._id);
+
         }
         let walletUpdated = await walletService.updateCb(wallet, wallet._id);
         if (walletUpdated) {
