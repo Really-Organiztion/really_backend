@@ -110,9 +110,7 @@ updateCb = (obj, id) => {
           setDefaultsOnInsert: true,
         }
       )
-      .then(function (res) {
-        console.log(res);
-        
+      .then(function (res) {        
         resolve(res);
       })
       .catch(function (err) {
