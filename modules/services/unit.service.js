@@ -217,6 +217,17 @@ findNearUnitsToPosts = (req, res) => {
   //     },
   //   }
   // )
+       // {
+      //   $match: {
+      //     location: {
+      //       $near: {
+      //         $geometry: { type: "Point", coordinates: req.body.coordinates },
+      //         $maxDistance: req.body.distance,
+      //       },
+      //     },
+      //   },
+      // },
+
   unitModel.defaultSchema
     .aggregate([
       {
@@ -227,16 +238,7 @@ findNearUnitsToPosts = (req, res) => {
           distanceField: "calcDistance",
         },
       },
-      // {
-      //   $match: {
-      //     location: {
-      //       $near: {
-      //         $geometry: { type: "Point", coordinates: req.body.coordinates },
-      //         $maxDistance: req.body.distance,
-      //       },
-      //     },
-      //   },
-      // },
+ 
       {
         $lookup: {
           from: "posts",
@@ -296,6 +298,11 @@ findNearUnitsToPosts = (req, res) => {
           // phonesList: { $first: `$user.phonesList` },
         },
       },
+      {
+        $match: {
+          postId: { $ne: null }
+        }
+      }
     ])
     .sort({ _id: -1 })
     .skip((pageNumber - 1) * pageSize)
