@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
 findAll = (req, res) => {
+  let sort = { _id: -1 };
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
   const lang = req.query.lang ? req.query.lang : "en";
@@ -24,6 +25,23 @@ findAll = (req, res) => {
 
   if (req.body.postId) {
     where["postId"] = new ObjectId(req.body.postId);
+  }
+
+  if (where["sortByPrice"]) {
+    if (where["sortByPrice"] == "asc") {
+      sort = { "plan.price": 1 };
+    } else if (where["sortByPrice"] == "desc") {
+      sort = { "plan.price": -1 };
+    }
+    delete where["sortByPrice"];
+  }
+  if (where["sortByDates"]) {
+    if (where["sortByDates"] == "asc") {
+      sort = { date: 1 };
+    } else if (where["sortByDates"] == "desc") {
+      sort = { date: -1 };
+    }
+    delete where["sortByDates"];
   }
 
   if (where && where.firstDateTo) {
@@ -66,7 +84,7 @@ findAll = (req, res) => {
 
   bookingModel.defaultSchema
     .find(where)
-    .sort({ _id: -1 })
+    .sort(sort)
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     // .populate("unitId", ["type"])

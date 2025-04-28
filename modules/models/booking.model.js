@@ -52,8 +52,13 @@ const bookingSchema = new Schema(
       currencyCode: {
         type: String,
       },
+      minLimit : {
+        type: Number,
+      },
+      maxLimit : {
+        type: Number,
+      },
     },
-    appointments : [],
     status: {
       type: String,
       enum: ["Selected","UnderReview", "Activated", "Stopped","Canceled","Finished"],

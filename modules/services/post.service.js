@@ -396,6 +396,9 @@ findById = (req, res, id) => {
       },
     ])
     .then(function (data) {
+      if (data.length === 0) {
+        return res.status(400).send("Post not found");
+      }
       res.status(200).send(data[0]);
     })
     .catch(function (err) {
