@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
 findAll = (req, res) => {
+  let sort = { _id: -1 };
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
   const lang = req.query.lang ? req.query.lang : "en";
@@ -68,6 +69,22 @@ findAll = (req, res) => {
   } else if (req.body.price) {
     $match["plansList.price"] = req.body.price;
   }
+  if (where["sortByPrice"]) {
+    if (where["sortByPrice"] == "asc") {
+      sort = { "plan.price": 1 };
+    } else if (where["sortByPrice"] == "desc") {
+      sort = { "plan.price": -1 };
+    }
+    delete where["sortByPrice"];
+  }
+  if (where["sortByDates"]) {
+    if (where["sortByDates"] == "asc") {
+      sort = { createdAt: 1 };
+    } else if (where["sortByDates"] == "desc") {
+      sort = { createdAt: -1 };
+    }
+    delete where["sortByDates"];
+  }
   postModel.defaultSchema
     .aggregate([
       {
@@ -90,8 +107,19 @@ findAll = (req, res) => {
       {
         $lookup: {
           from: "units",
-          localField: "unitId",
-          foreignField: "_id",
+          let: { unitId: "$unitId" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$_id", "$$unitId"],
+                },
+                ...(req.body.unitTypeList
+                  ? { type: { $in: req.body.unitTypeList } }
+                  : {}),
+              },
+            },
+          ],
           as: "unit",
         },
       },
@@ -160,8 +188,6 @@ findAll = (req, res) => {
           role: { $first: `$user.role` },
           primImage: { $first: `$unit.primImage` },
           favoritePost: { $first: `$favoritePost._id` },
-          // phone: { $first: `$user.phone` },
-          // phonesList: { $first: `$user.phonesList` },
         },
       },
       {
@@ -195,12 +221,10 @@ findAll = (req, res) => {
           profileImage: { $first: `$profileImage` },
           phone: { $first: `$phone` },
           role: { $first: `$role` },
-          // phone: { $first: `$user.phone` },
-          // phonesList: { $first: `$user.phonesList` },
         },
       },
     ])
-    .sort({ _id: -1 })
+    .sort(sort)
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (data) {
@@ -210,6 +234,7 @@ findAll = (req, res) => {
       res.status(400).send(err);
     });
 };
+
 
 findAllMap = (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
