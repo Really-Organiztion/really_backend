@@ -78,9 +78,9 @@ findAll = (req, res) => {
   }
   if (req.body["sortByDates"]) {
     if (req.body["sortByDates"] == "asc") {
-      sort = { createdAt: 1 };
+      sort = { createdAt: 1, _id: 1 };
     } else if (req.body["sortByDates"] == "desc") {
-      sort = { createdAt: -1 };
+      sort = { createdAt: -1, _id: -1 };
     }
   }
   postModel.defaultSchema
