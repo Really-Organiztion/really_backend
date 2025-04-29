@@ -13,7 +13,7 @@ const bookingController = require("../controllers/booking.controller");
 const roles = require("../../helpers/roles");
 
 publicRouter.post("/booking/all", bookingController.getAllData);
-publicRouter.post("/post/", postController.getAllData);
+publicRouter.post("/post", postController.getAllData);
 publicRouter.post("/post/map", postController.getAllDataMap);
 publicRouter.post("/post/filterPost", postController.getAllDataFilterPost);
 publicRouter.get("/post/:id", postController.findById);

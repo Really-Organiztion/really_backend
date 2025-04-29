@@ -69,21 +69,19 @@ findAll = (req, res) => {
   } else if (req.body.price) {
     $match["plansList.price"] = req.body.price;
   }
-  if (where["sortByPrice"]) {
-    if (where["sortByPrice"] == "asc") {
+  if (req.body["sortByPrice"]) {
+    if (req.body["sortByPrice"] == "asc") {
       sort = { "plan.price": 1 };
-    } else if (where["sortByPrice"] == "desc") {
+    } else if (req.body["sortByPrice"] == "desc") {
       sort = { "plan.price": -1 };
     }
-    delete where["sortByPrice"];
   }
-  if (where["sortByDates"]) {
-    if (where["sortByDates"] == "asc") {
+  if (req.body["sortByDates"]) {
+    if (req.body["sortByDates"] == "asc") {
       sort = { createdAt: 1 };
-    } else if (where["sortByDates"] == "desc") {
+    } else if (req.body["sortByDates"] == "desc") {
       sort = { createdAt: -1 };
     }
-    delete where["sortByDates"];
   }
   postModel.defaultSchema
     .aggregate([
@@ -228,6 +226,9 @@ findAll = (req, res) => {
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (data) {
+      if (data.length === 0) {
+        return res.status(400).send("Posts not found");
+      }
       res.status(200).send(data);
     })
     .catch(function (err) {
@@ -307,7 +308,6 @@ findAllMap = (req, res) => {
       res.status(200).send(data);
     })
     .catch(function (err) {
-      console.log(err);
       res.status(400).send(err);
     });
 };
