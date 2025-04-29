@@ -71,9 +71,9 @@ findAll = (req, res) => {
   }
   if (req.body["sortByPrice"]) {
     if (req.body["sortByPrice"] == "asc") {
-      sort = { "plan.price": 1 };
+      sort = { "plansList.price": 1 };
     } else if (req.body["sortByPrice"] == "desc") {
-      sort = { "plan.price": -1 };
+      sort = { "plansList.price": -1 };
     }
   }
   if (req.body["sortByDates"]) {
