@@ -37,9 +37,9 @@ findAll = (req, res) => {
   }
   if (where["sortByDates"]) {
     if (where["sortByDates"] == "asc") {
-      sort = { createdAt: 1 };
+      sort = { createdAt: 1, _id: 1 };
     } else if (where["sortByDates"] == "desc") {
-      sort = { createdAt: -1 };
+      sort = { createdAt: -1, _id: -1 };
     }
     delete where["sortByDates"];
   }
