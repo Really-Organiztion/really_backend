@@ -38,19 +38,19 @@ sendBooking = (msg) => {
       msg.unitId?.toString() === client.unitId?.toString(),
     msg
   );
-}
+};
 
 updateClientData = (wsId, updateObj) => {
   const client = clientsMap.get(wsId);
   if (client) Object.assign(client, updateObj);
-}
+};
 removeClientById = (wsId) => {
   clientsMap.delete(wsId);
-}
+};
 
 heartbeat = (ws) => {
   ws.isAlive = true;
-}
+};
 
 function webs(wss) {
   setInterval(() => {
@@ -83,10 +83,14 @@ function webs(wss) {
         if (typeof parsed === "object") {
           const updates = {};
           if (parsed.role) updates.role = parsed.role;
-          if (parsed.type) updates.type = parsed.type;
+          if (parsed.type) {
+            updates.type = parsed.type;
+            // if (parsed.type == "updateBookingReceiptStatus") {
+              
+            // }
+          }
           if (parsed.unitId) updates.unitId = parsed.unitId;
           if (parsed.info) updates.info = parsed.info;
-
           updateClientData(ws.id, updates);
         }
       } catch (err) {

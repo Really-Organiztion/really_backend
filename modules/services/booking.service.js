@@ -129,19 +129,22 @@ updateBookingStatus = async (req, res, id) => {
       res.status(400).send(err);
     });
 };
-updateReceiptStatus = async (req, res, type, id) => {
-  bookingModel.defaultSchema
-    .findByIdAndUpdate(id, {
-      $set: { [type]: req.body.status },
-      new: true,
-      setDefaultsOnInsert: true,
-    })
-    .then(function (data) {
-      res.status(200).send(`New ${type} Status is ${req.body.status}`);
-    })
-    .catch(function (err) {
-      res.status(400).send(err);
-    });
+updateReceiptStatus = async (id, type, status) => {
+  try {
+    const data = await bookingModel.defaultSchema.findByIdAndUpdate(
+      id,
+      { $set: { [type]: status } },
+      { new: true, setDefaultsOnInsert: true }
+    );
+
+    if (!data || !data._id) {
+      return { err: "Booking is not found" };
+    }
+
+    return { result: `New ${type} Status is ${status}` };
+  } catch (err) {
+    return { err: err };
+  }
 };
 
 create = async (req, res) => {
