@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const clientsMap = new Map();
 
 const HEARTBEAT_INTERVAL = 30000;
+const bookingService = require("../modules/services/booking.service");
 
 sendToClients = (filterFn, msg) => {
   const data = typeof msg === "string" ? msg : JSON.stringify(msg);
@@ -37,6 +38,18 @@ sendBooking = (msg) => {
       client.type === "Booking" &&
       msg.unitId?.toString() === client.unitId?.toString(),
     msg
+  );
+};
+
+sendBookingReceiptStatus = (msg) => {
+  sendToClients(
+    (client) =>
+      client.type === "updateBookingReceiptStatus" &&
+      msg.bookId?.toString() === client.bookId?.toString(),
+    {
+      takeoverStatus: msg.takeoverStatus,
+      handoverStatus: msg.handoverStatus,
+    }
   );
 };
 
@@ -85,13 +98,33 @@ function webs(wss) {
           if (parsed.role) updates.role = parsed.role;
           if (parsed.type) {
             updates.type = parsed.type;
-            // if (parsed.type == "updateBookingReceiptStatus") {
-              
-            // }
+            if (parsed.type == "updateBookingReceiptStatus") {
+              updates.takeoverStatus = parsed.takeoverStatus;
+              updates.handoverStatus = parsed.handoverStatus;
+              updates.bookId = parsed.bookId;
+              if (parsed.actionType && parsed.actionStatus) {
+                updates[parsed.actionType] = parsed.actionStatus;
+                console.log("zzzzzzzzzzzzzzzzzzzzzzzz");
+                
+                bookingService.updateReceiptStatusForWS(
+                  parsed.bookId,
+                  parsed.actionType,
+                  parsed.actionStatus
+                );
+              }
+            }
           }
           if (parsed.unitId) updates.unitId = parsed.unitId;
           if (parsed.info) updates.info = parsed.info;
+
           updateClientData(ws.id, updates);
+          if (parsed.type == "updateBookingReceiptStatus") {
+            sendBookingReceiptStatus({
+              bookId: updates.bookId,
+              takeoverStatus: updates.takeoverStatus,
+              handoverStatus: updates.handoverStatus,
+            });
+          }
         }
       } catch (err) {
         console.error("Invalid message received:", err);

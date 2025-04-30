@@ -123,28 +123,46 @@ updateBookingStatus = async (req, res, id) => {
       setDefaultsOnInsert: true,
     })
     .then(function (data) {
+      if (!data || !data._id) {
+        return { err: "Booking is not found" };
+      }
       res.status(200).send(`New Status is ${req.body.status}`);
     })
     .catch(function (err) {
       res.status(400).send(err);
     });
 };
-updateReceiptStatus = async (id, type, status) => {
-  try {
-    const data = await bookingModel.defaultSchema.findByIdAndUpdate(
-      id,
-      { $set: { [type]: status } },
-      { new: true, setDefaultsOnInsert: true }
-    );
 
-    if (!data || !data._id) {
-      return { err: "Booking is not found" };
-    }
+updateReceiptStatus = async (req, res, type , id) => {
+  bookingModel.defaultSchema
+    .findByIdAndUpdate(id, {
+      $set: { [type]: req.body.status },
+      new: true,
+      setDefaultsOnInsert: true,
+    })
+    .then(function (data) {
+      if (!data || !data._id) {
+        return { err: "Booking is not found" };
+      }
+      res.status(200).send(`New ${type} Status is ${req.body.status}`);
+    })
+    .catch(function (err) {
+      res.status(400).send(err);
+    });
+};
 
-    return { result: `New ${type} Status is ${status}` };
-  } catch (err) {
-    return { err: err };
-  }
+updateReceiptStatusForWS = (id, type, status) => {
+  bookingModel.defaultSchema.updateOne(
+    { _id: id },
+    { $set: { [type]: status } },
+    { new: true, setDefaultsOnInsert: true }
+  )
+  .then((res) => {
+    console.log("Update result:", res);
+  })
+  .catch((err) => {
+    console.error("Update error:", err);
+  });
 };
 
 create = async (req, res) => {
@@ -154,6 +172,7 @@ create = async (req, res) => {
       webSocket.sendBooking(doc);
       res.status(200).send(doc);
     })
+    // If an error occurs, return the error
     .catch(function (err) {
       res.status(400).send(err);
     });
@@ -164,6 +183,7 @@ module.exports = {
   updateBooking: bookingModel.genericSchema.update,
   updateBookingStatus,
   updateReceiptStatus,
+  updateReceiptStatusForWS,
   findById: bookingModel.genericSchema.findById,
   create,
   findAll,

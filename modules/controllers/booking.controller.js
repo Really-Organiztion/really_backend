@@ -52,24 +52,34 @@ updateBookingStatus = (req, res) => {
     logger.error(error);
   }
 };
-updateReceiptStatus = async (req, res) => {
+updateReceiptStatus = (req, res) => {
   try {
     const id = req.params.id;
     const type = req.params.type;
-    const status = req.body.status;
-
-    const cb = await bookingService.updateReceiptStatus(id,type,status );
-    
-    if(cb.result) {
-      res.status(200).send(cb.result);
-    } else {
-      res.status(400).send(cb.err);
-      
-    }
+    bookingService.updateReceiptStatus(req, res, type, id);
   } catch (error) {
+    
     logger.error(error);
   }
 };
+// updateReceiptStatus = async (req, res) => {
+//   try {
+//     const id = req.params.id;
+//     const type = req.params.type;
+//     const status = req.body.status;
+
+//     const cb = await bookingService.updateReceiptStatus(id,type,status );
+    
+//     if(cb.result) {
+//       res.status(200).send(cb.result);
+//     } else {
+//       res.status(400).send(cb.err);
+      
+//     }
+//   } catch (error) {
+//     logger.error(error);
+//   }
+// };
 updateBooking = (req, res) => {
   try {
     const id = req.params.id;
