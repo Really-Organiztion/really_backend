@@ -24,8 +24,7 @@ create = async (req, res) => {
               if (errReceive) {
                 res.status(400).send(errReceive);
               } else {
-         
-                bookingService.create( { body: req.body.booking }, res);
+                bookingService.create({ body: req.body.booking }, res);
               }
             }
           );
@@ -53,6 +52,16 @@ updateBookingStatus = (req, res) => {
     logger.error(error);
   }
 };
+updateReceiptStatus = (req, res) => {
+  try {
+    const id = req.params.id;
+    const type = req.params.type;
+
+    bookingService.updateReceiptStatus(req, res,type, id);
+  } catch (error) {
+    logger.error(error);
+  }
+};
 updateBooking = (req, res) => {
   try {
     const id = req.params.id;
@@ -75,6 +84,7 @@ module.exports = {
   create,
   findById,
   updateBookingStatus,
+  updateReceiptStatus,
   updateBooking,
   deleteBooking,
 };

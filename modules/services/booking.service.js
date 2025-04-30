@@ -129,6 +129,20 @@ updateBookingStatus = async (req, res, id) => {
       res.status(400).send(err);
     });
 };
+updateReceiptStatus = async (req, res, type, id) => {
+  bookingModel.defaultSchema
+    .findByIdAndUpdate(id, {
+      $set: { [type]: req.body.status },
+      new: true,
+      setDefaultsOnInsert: true,
+    })
+    .then(function (data) {
+      res.status(200).send(`New ${type} Status is ${req.body.status}`);
+    })
+    .catch(function (err) {
+      res.status(400).send(err);
+    });
+};
 
 create = async (req, res) => {
   bookingModel.defaultSchema
@@ -146,6 +160,7 @@ module.exports = {
   deleteBooking: bookingModel.genericSchema.delete,
   updateBooking: bookingModel.genericSchema.update,
   updateBookingStatus,
+  updateReceiptStatus,
   findById: bookingModel.genericSchema.findById,
   create,
   findAll,

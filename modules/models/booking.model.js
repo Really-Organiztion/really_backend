@@ -2,7 +2,21 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
-
+const ReceiptStatus  = [
+  'waiting',
+  'ready',
+  'onTheWay',
+  'inLocation',
+  'checkIn',
+  'checkUnit',
+  'receipt',
+  'inUnit',
+  'checkUnitBack',
+  'checkOut',
+  'leaving',
+  'finished',
+  'cancelled',
+];
 const bookingSchema = new Schema(
   {
     unitId: {
@@ -76,6 +90,16 @@ const bookingSchema = new Schema(
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    takeoverStatus: {
+      type: String,
+      enum: ReceiptStatus,
+      default: "waiting",
+    },
+    handoverStatus: {
+      type: String,
+      enum: ReceiptStatus,
+      default: "waiting",
     },
   },
   {

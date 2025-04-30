@@ -28,6 +28,9 @@ findUser = async (req, res) => {
   } else if (user && user.isDeleted) {
     res.status(400).send("This user was deleted");
   } else {
+    if (!user.password) {
+      return res.status(400).send("This user was registered with social media");
+    }
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword)
       return res.status(400).send("Invalid email or password");

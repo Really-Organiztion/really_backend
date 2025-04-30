@@ -1,108 +1,219 @@
-// const WebSocket = require("ws");
-// const wss = new WebSocket.Server({ port: 4001 });
-// const notificationController = require("../modules/controllers/notification.controller");
-let clientsList = [];
 const crypto = require("crypto");
-sendAdminMessage = (msg, res) => {
-  let data = JSON.stringify(msg);
-  clientsList.forEach((client) => {
-    if (client.role == "admin") {
-      client.ws.send(data);
+
+const clientsMap = new Map();
+
+const HEARTBEAT_INTERVAL = 30000;
+
+sendToClients = (filterFn, msg) => {
+  const data = typeof msg === "string" ? msg : JSON.stringify(msg);
+  clientsMap.forEach((client) => {
+    if (filterFn(client)) {
+      try {
+        client.ws.send(data);
+      } catch (err) {
+        console.error("Send failed:", err);
+      }
     }
   });
 };
+
+sendAdminMessage = (msg) => {
+  sendToClients((client) => client.role === "admin", msg);
+};
+
 sendMessageByUserID = (msg, id) => {
-  clientsList.forEach((client) => {
-    if (client.ws.id == id) {
-      client.ws.send(msg);
+  const client = clientsMap.get(id);
+  if (client) {
+    try {
+      client.ws.send(typeof msg === "string" ? msg : JSON.stringify(msg));
+    } catch (err) {
+      console.error("Send to user failed:", err);
     }
-  });
+  }
 };
-
 sendBooking = (msg) => {
-  let data = JSON.stringify(msg);
+  sendToClients(
+    (client) =>
+      client.type === "Booking" &&
+      msg.unitId?.toString() === client.unitId?.toString(),
+    msg
+  );
+}
 
-  clientsList.forEach((client) => {
-    if (
-      client.type == "Booking" &&
-      msg.unitId.toString() == client.unitId.toString()
-    ) {
-      client.ws.send(data);
-    }
-  });
-};
+updateClientData = (wsId, updateObj) => {
+  const client = clientsMap.get(wsId);
+  if (client) Object.assign(client, updateObj);
+}
+removeClientById = (wsId) => {
+  clientsMap.delete(wsId);
+}
+
+heartbeat = (ws) => {
+  ws.isAlive = true;
+}
 
 function webs(wss) {
+  setInterval(() => {
+    for (let i = 0; i < wss.clients.length; i++) {
+      if (wss.clients[i].isAlive === false) {
+        console.log("Terminating dead socket:", wss.clients[i].id);
+        removeClientById(wss.clients[i].id);
+        wss.clients[i].terminate();
+      }
+      wss.clients[i].isAlive = false;
+      wss.clients[i].ping();
+    }
+  }, HEARTBEAT_INTERVAL);
+
   wss.on("connection", (ws) => {
     ws.id = crypto.randomBytes(6).toString("hex");
+    ws.isAlive = true;
 
-    clientsList.push({
-      ws: ws,
-      role: "-----",
-      type: "-----",
+    clientsMap.set(ws.id, {
+      ws,
+      role: null,
+      type: null,
     });
+
+    ws.on("pong", () => heartbeat(ws));
+
     ws.on("message", async (msg) => {
-      msg = JSON.parse(msg);
-      if (typeof msg == "object") {
-        if (msg.role) {
-          clientsList.forEach((client, i) => {
-            if (client.ws.id == ws.id) {
-              clientsList[i].role = msg.role;
-            }
-          });
-        }
-        if (msg.info) {
-          clientsList.forEach((client, i) => {
-            if (client.ws.id == ws.id) {
-              clientsList[i].info = msg.info;
-            }
-          });
-        }
+      try {
+        const parsed = JSON.parse(msg);
+        if (typeof parsed === "object") {
+          const updates = {};
+          if (parsed.role) updates.role = parsed.role;
+          if (parsed.type) updates.type = parsed.type;
+          if (parsed.unitId) updates.unitId = parsed.unitId;
+          if (parsed.info) updates.info = parsed.info;
 
-        if (msg.type) {
-          clientsList.forEach((client, i) => {
-            if (client.ws.id == ws.id) {
-              clientsList[i].type = msg.type;
-              if (msg.unitId) {
-                clientsList[i].unitId = msg.unitId;
-              }
-            }
-          });
+          updateClientData(ws.id, updates);
         }
+      } catch (err) {
+        console.error("Invalid message received:", err);
+        ws.send("Error: Invalid message format");
       }
-
-      // try {
-      //   let result = await notificationController.callbackGetNotificationByUserId(
-      //     msg
-      //   );
-      //   if (result && result.length > 0) ws.send(JSON.stringify(result));
-      //   else ws.send("No Notifications Found");
-      // } catch (error) {
-      //   ws.send("No Notifications Found");
-      // }
     });
 
-    ws.on("close", async (msg) => {
-      clientsList.forEach((client, i) => {
-        if (client.ws.id == ws.id) {
-          clientsList.splice(i, 1);
-        }
-      });
-    });
+    ws.on("close", () => removeClientById(ws.id));
+    ws.on("error", () => removeClientById(ws.id));
 
-    ws.on("error", async (msg) => {
-      clientsList.forEach((client, i) => {
-        if (client.ws.id == ws.id) {
-          clientsList.splice(i, 1);
-        }
-      });
-    });
-    ws.send("Connected To Websocket Server");
+    ws.send("Connected To WebSocket Server");
   });
 }
+
 module.exports = {
   webs,
   sendAdminMessage,
   sendMessageByUserID,
   sendBooking,
 };
+
+// // const WebSocket = require("ws");
+// // const wss = new WebSocket.Server({ port: 4001 });
+// // const notificationController = require("../modules/controllers/notification.controller");
+// let clientsList = [];
+// const crypto = require("crypto");
+// sendAdminMessage = (msg, res) => {
+//   let data = JSON.stringify(msg);
+//   clientsList.forEach((client) => {
+//     if (client.role == "admin") {
+//       client.ws.send(data);
+//     }
+//   });
+// };
+// sendMessageByUserID = (msg, id) => {
+//   clientsList.forEach((client) => {
+//     if (client.ws.id == id) {
+//       client.ws.send(msg);
+//     }
+//   });
+// };
+
+// sendBooking = (msg) => {
+//   let data = JSON.stringify(msg);
+
+//   clientsList.forEach((client) => {
+//     if (
+//       client.type == "Booking" &&
+//       msg.unitId.toString() == client.unitId.toString()
+//     ) {
+//       client.ws.send(data);
+//     }
+//   });
+// };
+
+// function webs(wss) {
+//   wss.on("connection", (ws) => {
+//     ws.id = crypto.randomBytes(6).toString("hex");
+
+//     clientsList.push({
+//       ws: ws,
+//       role: "-----",
+//       type: "-----",
+//     });
+//     ws.on("message", async (msg) => {
+//       msg = JSON.parse(msg);
+//       if (typeof msg == "object") {
+//         if (msg.role) {
+//           clientsList.forEach((client, i) => {
+//             if (client.ws.id == ws.id) {
+//               clientsList[i].role = msg.role;
+//             }
+//           });
+//         }
+//         if (msg.info) {
+//           clientsList.forEach((client, i) => {
+//             if (client.ws.id == ws.id) {
+//               clientsList[i].info = msg.info;
+//             }
+//           });
+//         }
+
+//         if (msg.type) {
+//           clientsList.forEach((client, i) => {
+//             if (client.ws.id == ws.id) {
+//               clientsList[i].type = msg.type;
+//               if (msg.unitId) {
+//                 clientsList[i].unitId = msg.unitId;
+//               }
+//             }
+//           });
+//         }
+//       }
+
+//       // try {
+//       //   let result = await notificationController.callbackGetNotificationByUserId(
+//       //     msg
+//       //   );
+//       //   if (result && result.length > 0) ws.send(JSON.stringify(result));
+//       //   else ws.send("No Notifications Found");
+//       // } catch (error) {
+//       //   ws.send("No Notifications Found");
+//       // }
+//     });
+
+//     ws.on("close", async (msg) => {
+//       clientsList.forEach((client, i) => {
+//         if (client.ws.id == ws.id) {
+//           clientsList.splice(i, 1);
+//         }
+//       });
+//     });
+
+//     ws.on("error", async (msg) => {
+//       clientsList.forEach((client, i) => {
+//         if (client.ws.id == ws.id) {
+//           clientsList.splice(i, 1);
+//         }
+//       });
+//     });
+//     ws.send("Connected To Websocket Server");
+//   });
+// }
+// module.exports = {
+//   webs,
+//   sendAdminMessage,
+//   sendMessageByUserID,
+//   sendBooking,
+// };

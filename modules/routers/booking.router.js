@@ -15,6 +15,11 @@ bookingRouter.put(
   
   bookingController.updateBookingStatus
 );
+bookingRouter.put(
+  "/updateReceiptStatus/:type/:id",
+  
+  bookingController.updateReceiptStatus
+);
 bookingRouter.delete(
   "/:id",
   
