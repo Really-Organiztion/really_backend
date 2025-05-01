@@ -34,7 +34,7 @@ createTransaction = async (req, callBack) => {
   //   return
   // } else {
   let where = {};
-  if (transaction.walletId) {
+  if (transaction?.walletId) {
     where["_id"] = new ObjectId(transaction.walletId);
   } else {
     where["userId"] = new ObjectId(transaction.userId);
