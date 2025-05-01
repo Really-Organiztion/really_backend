@@ -104,7 +104,6 @@ function webs(wss) {
               updates.bookId = parsed.bookId;
               if (parsed.actionType && parsed.actionStatus) {
                 updates[parsed.actionType] = parsed.actionStatus;
-                console.log("zzzzzzzzzzzzzzzzzzzzzzzz");
                 
                 bookingService.updateReceiptStatusForWS(
                   parsed.bookId,

@@ -58,7 +58,6 @@ updateReceiptStatus = (req, res) => {
     const type = req.params.type;
     bookingService.updateReceiptStatus(req, res, type, id);
   } catch (error) {
-    
     logger.error(error);
   }
 };

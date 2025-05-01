@@ -124,16 +124,19 @@ updateBookingStatus = async (req, res, id) => {
     })
     .then(function (data) {
       if (!data || !data._id) {
-        return { err: "Booking is not found" };
+      res.status(400).send("Booking is not found");
+      return
+
       }
       res.status(200).send(`New Status is ${req.body.status}`);
+      return
     })
     .catch(function (err) {
       res.status(400).send(err);
     });
 };
 
-updateReceiptStatus = async (req, res, type , id) => {
+updateReceiptStatus = async (req, res, type , id) => {  
   bookingModel.defaultSchema
     .findByIdAndUpdate(id, {
       $set: { [type]: req.body.status },
@@ -142,11 +145,14 @@ updateReceiptStatus = async (req, res, type , id) => {
     })
     .then(function (data) {
       if (!data || !data._id) {
-        return { err: "Booking is not found" };
+      res.status(400).send("Booking is not found");
+      return
       }
       res.status(200).send(`New ${type} Status is ${req.body.status}`);
+      return
     })
     .catch(function (err) {
+      
       res.status(400).send(err);
     });
 };
