@@ -3,19 +3,19 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 const ReceiptStatus  = [
-  'waiting',
-  'ready',
-  'onTheWay',
-  'inLocation',
-  'checkIn',
-  'checkUnit',
-  'receipt',
-  'inUnit',
-  'checkUnitBack',
-  'checkOut',
-  'leaving',
-  'finished',
-  'cancelled',
+  'Waiting',
+  'Ready',
+  'OnTheWay',
+  'InLocation',
+  'CheckIn',
+  'CheckUnit',
+  'Receipt',
+  'InUnit',
+  'CheckUnitBack',
+  'CheckOut',
+  'Leaving',
+  'Finished',
+  'Cancelled',
 ];
 const bookingSchema = new Schema(
   {
