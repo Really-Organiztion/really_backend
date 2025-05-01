@@ -10,6 +10,14 @@ getAllData = (req, res) => {
   }
 };
 
+getAllDataPrivate = (req, res) => {
+  try {
+    bookingService.findAllPrivate(req, res);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+
 create = async (req, res) => {
   try {
     transactionController.createTransaction(
@@ -98,6 +106,7 @@ deleteBooking = (req, res) => {
 
 module.exports = {
   getAllData,
+  getAllDataPrivate,
   create,
   findById,
   updateBookingStatus,

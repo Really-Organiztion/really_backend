@@ -4,6 +4,7 @@ const bookingController = require("../controllers/booking.controller");
 const roles = require("../../helpers/roles");
 
 bookingRouter.post("/",  bookingController.create);
+bookingRouter.post("/all",  bookingController.getAllDataPrivate);
 
 bookingRouter.get("/:id",  bookingController.findById);
 bookingRouter.put(
