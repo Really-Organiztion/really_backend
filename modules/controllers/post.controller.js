@@ -29,7 +29,7 @@ getAllDataFilterPost = async (req, res) => {
       }
       postService.findAll(req, res);
     } else {
-      res.status(400).send("Posts not found");
+      res.status(200).send([]);
     }
   } catch (error) {
     logger.error(error);

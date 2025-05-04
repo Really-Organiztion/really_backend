@@ -226,10 +226,8 @@ findAll = (req, res) => {
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (data) {
-      if (data.length === 0) {
-        return res.status(400).send("Posts not found");
-      }
-      res.status(200).send(data);
+   
+      res.status(200).send(data || []);
     })
     .catch(function (err) {
       res.status(400).send(err);
@@ -305,7 +303,7 @@ findAllMap = (req, res) => {
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (data) {
-      res.status(200).send(data);
+      res.status(200).send(data || []);
     })
     .catch(function (err) {
       res.status(400).send(err);

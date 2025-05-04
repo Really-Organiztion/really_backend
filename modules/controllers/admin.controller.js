@@ -93,7 +93,7 @@ updateRoleAdmin = async (req, res) => {
           .send("The user does not have permission to update role");
       }
     } else {
-      return res.status(403).send("User not found");
+      return res.status(400).send("User not found");
     }
   } catch (error) {
     logger.error(error);
@@ -114,7 +114,7 @@ deleteAdmin = async (req, res) => {
           .send("The user does not have permission to delete");
       }
     } else {
-      return res.status(403).send("User not found");
+      return res.status(400).send("User not found");
     }
   } catch (error) {
     logger.error(error);
