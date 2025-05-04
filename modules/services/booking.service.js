@@ -87,7 +87,7 @@ findAll = (req, res) => {
     .find(where)
     .sort(sort)
     .skip((pageNumber - 1) * pageSize)
-    .select({ status: 1, firstDate: 1, lastDate: 1, plan: 1 })
+    .select({ status: 1, firstDate: 1, lastDate: 1, 'plan.type': 1 })
     .limit(pageSize)
     // .populate("unitId", ["type"])
     // .populate("plan.currencyId", [`${toFound}`, "code", "numericCode", "color"])
