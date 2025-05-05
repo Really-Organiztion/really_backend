@@ -10,10 +10,12 @@ const commentController = require("../controllers/comment.controller");
 const unitController = require("../controllers/unit.controller");
 const rateController = require("../controllers/rate.controller");
 const bookingController = require("../controllers/booking.controller");
+const countryController = require("../controllers/country.controller");
 const roles = require("../../helpers/roles");
 
 publicRouter.post("/booking/all", bookingController.getAllData);
 publicRouter.post("/post", postController.getAllData);
+publicRouter.get("/getTimeZone", countryController.getTimeZone);
 publicRouter.post("/post/map", postController.getAllDataMap);
 publicRouter.post("/post/filterPost", postController.getAllDataFilterPost);
 publicRouter.get("/post/:id", postController.findById);

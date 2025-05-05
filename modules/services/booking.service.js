@@ -255,7 +255,6 @@ updateReceiptStatus = async (req, res, type, id) => {
 };
 
 updateReceiptStatusForWS = (id, type, status) => {
-  console.log("updateReceiptStatusForWS", id, type, status);
   bookingModel.defaultSchema
     .updateOne(
       { _id: id },
@@ -271,7 +270,7 @@ updateReceiptStatusForWS = (id, type, status) => {
 };
 
 create = async (req, res) => {
-  req.body.code = `${req.body.plan.type}-${req.body.plan.price}$-${Math.random()
+  req.body.code = `${req.body.plan.type}-${req.body.plan.price}-${Math.random()
     .toString(36)
     .substring(2, 8)
     .toUpperCase()}`;

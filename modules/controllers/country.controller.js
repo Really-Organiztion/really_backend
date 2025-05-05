@@ -11,9 +11,7 @@ getAllData = (req, res) => {
 
 create = (req, res) => {
   try {
-  
-        countryService.create(req, res);
-   
+    countryService.create(req, res);
   } catch (error) {
     logger.error(error);
   }
@@ -53,6 +51,46 @@ deleteReturn = (req, res) => {
   }
 };
 
+getTimeZone = (req, res) => {
+  const timeZone = req.query.timeZone;
+
+  if (!timeZone) {
+    return res.status(400).json({ error: "timeZone is required" });
+  }
+
+  try {
+    const now = new Date();
+
+    // التنسيق للوقت بناءً على المنطقة الزمنية المطلوبة
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false, // عشان تكون 24 ساعة
+    });
+
+    // تحويل التوقيت المحلي للمنطقة المطلوبة
+    const localTime = formatter.format(now);
+
+    // الحصول على ISO UTC
+    const isoUTC = now.toISOString();
+
+    res.json({
+      timeZone,
+      isoUTC,
+      isoCurrent: isoUTC.replace("Z", ""), // لإزالة الـ Z في النهاية
+      readable: localTime,
+    });
+  } catch (error) {
+    res.status(400).json({ error: "Invalid timeZone format" });
+  }
+};
+
+
 module.exports = {
   getAllData,
   create,
@@ -60,4 +98,5 @@ module.exports = {
   updateCountry,
   deleteCountry,
   deleteReturn,
+  getTimeZone,
 };
