@@ -2,23 +2,24 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
-const ReceiptStatus  = [
-  'Waiting',
-  'Ready',
-  'OnTheWay',
-  'InLocation',
-  'CheckIn',
-  'CheckUnit',
-  'Receipt',
-  'InUnit',
-  'CheckUnitBack',
-  'CheckOut',
-  'Leaving',
-  'Finished',
-  'Cancelled',
+const ReceiptStatus = [
+  "Waiting",
+  "Ready",
+  "OnTheWay",
+  "InLocation",
+  "CheckIn",
+  "CheckUnit",
+  "Receipt",
+  "InUnit",
+  "CheckUnitBack",
+  "CheckOut",
+  "Leaving",
+  "Finished",
+  "Cancelled",
 ];
 const bookingSchema = new Schema(
   {
+    code: { type: String, unique: true },
     unitId: {
       type: ObjectId,
       required: true,
@@ -66,16 +67,23 @@ const bookingSchema = new Schema(
       currencyCode: {
         type: String,
       },
-      minLimit : {
+      minLimit: {
         type: Number,
       },
-      maxLimit : {
+      maxLimit: {
         type: Number,
       },
     },
     status: {
       type: String,
-      enum: ["Selected","UnderReview", "Activated", "Stopped","Canceled","Finished"],
+      enum: [
+        "Selected",
+        "UnderReview",
+        "Activated",
+        "Stopped",
+        "Canceled",
+        "Finished",
+      ],
       default: "Selected",
     },
     firstDate: {

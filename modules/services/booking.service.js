@@ -20,6 +20,9 @@ findAll = (req, res) => {
     where["userId"] = new ObjectId(req.body.userId);
   }
 
+  if (req.body.code) {
+    where["code"] = new RegExp(req.body.code, "i");
+  }
   if (req.body.unitId) {
     where["unitId"] = new ObjectId(req.body.unitId);
   }
@@ -87,7 +90,7 @@ findAll = (req, res) => {
     .find(where)
     .sort(sort)
     .skip((pageNumber - 1) * pageSize)
-    .select({ status: 1, firstDate: 1, lastDate: 1, 'plan.type': 1 })
+    .select({ status: 1, firstDate: 1, lastDate: 1, "plan.type": 1, code: 1 })
     .limit(pageSize)
     // .populate("unitId", ["type"])
     // .populate("plan.currencyId", [`${toFound}`, "code", "numericCode", "color"])
@@ -142,6 +145,9 @@ findAllPrivate = async (req, res) => {
       if (where[field]) match[field] = new ObjectId(where[field]);
     });
 
+    if (req.body.code) {
+      match["code"] = new RegExp(req.body.code, "i");
+    }
     const handleDate = (field) => {
       if (where[`${field}To`] || where[field]) {
         const from = new Date(where[field]);
@@ -208,7 +214,6 @@ findAllPrivate = async (req, res) => {
   }
 };
 
-
 updateBookingStatus = async (req, res, id) => {
   bookingModel.defaultSchema
     .findByIdAndUpdate(id, {
@@ -250,6 +255,7 @@ updateReceiptStatus = async (req, res, type, id) => {
 };
 
 updateReceiptStatusForWS = (id, type, status) => {
+  console.log("updateReceiptStatusForWS", id, type, status);
   bookingModel.defaultSchema
     .updateOne(
       { _id: id },
@@ -265,6 +271,10 @@ updateReceiptStatusForWS = (id, type, status) => {
 };
 
 create = async (req, res) => {
+  req.body.code = `${req.body.plan.type}-${req.body.plan.price}$-${Math.random()
+    .toString(36)
+    .substring(2, 8)
+    .toUpperCase()}`;
   bookingModel.defaultSchema
     .create(req.body)
     .then(function (doc) {
