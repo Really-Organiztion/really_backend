@@ -1,5 +1,6 @@
 const bookingModel = require("../models/booking.model");
 const webSocket = require("../../helpers/websocket");
+const customMethods = require("../../helpers/custom-methods");
 const mongoose = require("mongoose");
 const { ObjectId } = require("mongoose").Types;
 const unitModel = require("../models/unit.model");
@@ -90,7 +91,7 @@ findAll = (req, res) => {
     .find(where)
     .sort(sort)
     .skip((pageNumber - 1) * pageSize)
-    .select({ status: 1, firstDate: 1, lastDate: 1, "plan.type": 1, code: 1 })
+    .select({ status: 1, firstDate: 1, lastDate: 1, "plan.type": 1 })
     .limit(pageSize)
     // .populate("unitId", ["type"])
     // .populate("plan.currencyId", [`${toFound}`, "code", "numericCode", "color"])
@@ -270,6 +271,8 @@ updateReceiptStatusForWS = (id, type, status) => {
 };
 
 create = async (req, res) => {
+  req.body.firstDate = customMethods.stripTimezone(req.body.firstDate);
+  req.body.lastDate = customMethods.stripTimezone(req.body.lastDate);
   req.body.code = `${req.body.plan.type}-${req.body.plan.price}-${Math.random()
     .toString(36)
     .substring(2, 8)
@@ -280,7 +283,26 @@ create = async (req, res) => {
       webSocket.sendBooking(doc);
       res.status(200).send(doc);
     })
-    // If an error occurs, return the error
+    .catch(function (err) {
+      res.status(400).send(err);
+    });
+};
+
+updateBooking = (req, res, id) => {
+  if (req.body.firstDate) {
+    req.body.firstDate = customMethods.stripTimezone(req.body.firstDate);
+  }
+  if (req.body.lastDate) {
+    req.body.lastDate = customMethods.stripTimezone(req.body.lastDate);
+  }
+  bookingModel.defaultSchema
+    .findByIdAndUpdate(id, req.body, {
+      new: true,
+      setDefaultsOnInsert: true,
+    })
+    .then(function (data) {
+      res.status(200).send(data);
+    })
     .catch(function (err) {
       res.status(400).send(err);
     });
@@ -288,7 +310,7 @@ create = async (req, res) => {
 
 module.exports = {
   deleteBooking: bookingModel.genericSchema.delete,
-  updateBooking: bookingModel.genericSchema.update,
+  updateBooking,
   updateBookingStatus,
   updateReceiptStatus,
   updateReceiptStatusForWS,

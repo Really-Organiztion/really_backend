@@ -61,34 +61,38 @@ getTimeZone = (req, res) => {
   try {
     const now = new Date();
 
-    // التنسيق للوقت بناءً على المنطقة الزمنية المطلوبة
-    const formatter = new Intl.DateTimeFormat("en-US", {
+    const formatter = new Intl.DateTimeFormat('en-GB', {
       timeZone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false, // عشان تكون 24 ساعة
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
     });
 
-    // تحويل التوقيت المحلي للمنطقة المطلوبة
-    const localTime = formatter.format(now);
+    const parts = formatter.formatToParts(now).reduce((acc, part) => {
+      if (part.type !== 'literal') {
+        acc[part.type] = part.value;
+      }
+      return acc;
+    }, {});
 
-    // الحصول على ISO UTC
-    const isoUTC = now.toISOString();
+    const isoCurrent = `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}`;
 
     res.json({
       timeZone,
-      isoUTC,
-      isoCurrent: isoUTC.replace("Z", ""), // لإزالة الـ Z في النهاية
-      readable: localTime,
+      isoUTC: now.toISOString(),
+      isoCurrent,
     });
   } catch (error) {
     res.status(400).json({ error: "Invalid timeZone format" });
   }
 };
+
+
+
 
 
 module.exports = {
