@@ -149,20 +149,58 @@ findAllPrivate = async (req, res) => {
     if (req.body.code) {
       match["code"] = new RegExp(req.body.code, "i");
     }
-    const handleDate = (field) => {
-      if (where[`${field}To`] || where[field]) {
-        const from = new Date(where[field]);
-        const to = new Date(where[`${field}To`] || where[field]);
-        to.setDate(to.getDate() + 1);
-        match[field] = { $gte: from, $lt: to };
-      }
-      delete where[field];
-      delete where[`${field}To`];
-    };
+    // const handleDate = (field) => {
+    //   if (where[`${field}To`] || where[field]) {
+    //     const from = new Date(where[field]);
+    //     const to = new Date(where[`${field}To`] || where[field]);
+    //     to.setDate(to.getDate() + 1);
+    //     match[field] = { $gte: from, $lt: to };
+    //   }
+    //   delete where[field];
+    //   delete where[`${field}To`];
+    // };
 
-    handleDate("firstDate");
-    handleDate("lastDate");
+    // handleDate("firstDate");
+    // handleDate("lastDate");
+    if (where && where.firstDateTo) {
+      let d1 = new Date(where.firstDate);
+      let d2 = new Date(where.firstDateTo);
+      d2.setDate(d2.getDate() + 1);
+      match.firstDate = {
+        $gte: d1,
+        $lt: d2,
+      };
+    
+    } else if (where.firstDate) {
+      let d1 = new Date(where.firstDate);
+      let d2 = new Date(where.firstDate);
+      d2.setDate(d2.getDate() + 1);
+      match.firstDate = {
+        $gte: d1,
+        $lt: d2,
+      };
 
+    }
+  
+    if (where && where.lastDateTo) {
+      let d1 = new Date(where.lastDate);
+      let d2 = new Date(where.lastDateTo);
+      d2.setDate(d2.getDate() + 1);
+      match.lastDate = {
+        $gte: d1,
+        $lt: d2,
+      };
+
+    } else if (where.lastDate) {
+      let d1 = new Date(where.lastDate);
+      let d2 = new Date(where.lastDate);
+      d2.setDate(d2.getDate() + 1);
+      match.lastDate = {
+        $gte: d1,
+        $lt: d2,
+      };
+    }
+ 
     let sort = { createdAt: -1 };
     if (where.sortByPrice) {
       sort = { "plan.price": where.sortByPrice === "asc" ? 1 : -1 };
@@ -170,7 +208,10 @@ findAllPrivate = async (req, res) => {
       const direction = where.sortByDates === "asc" ? 1 : -1;
       sort = { createdAt: direction, _id: direction };
     }
-
+    console.log(where ,"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+    console.log(match);
+    
+    
     const pipeline = [
       { $match: match },
 
@@ -195,7 +236,6 @@ findAllPrivate = async (req, res) => {
       { $skip: (pageNumber - 1) * pageSize },
       { $limit: pageSize },
 
-      // 🟡 لإضافة populate لاحقًا
       // {
       //   $lookup: {
       //     from: "units",
