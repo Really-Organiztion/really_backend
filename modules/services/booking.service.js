@@ -64,7 +64,7 @@ findAll = (req, res) => {
     d2.setDate(d2.getDate() + 1);
     where.firstDate = {
       $gte: d1,
-      $lt: d2,
+      // $lt: d2,
     };
   }
 
@@ -83,7 +83,7 @@ findAll = (req, res) => {
     d2.setDate(d2.getDate() + 1);
     where.lastDate = {
       $gte: d1,
-      $lt: d2,
+      // $lt: d2,
     };
   }
 
@@ -177,7 +177,7 @@ findAllPrivate = async (req, res) => {
       d2.setDate(d2.getDate() + 1);
       match.firstDate = {
         $gte: d1,
-        $lt: d2,
+        // $lt: d2,
       };
 
     }
@@ -197,7 +197,7 @@ findAllPrivate = async (req, res) => {
       d2.setDate(d2.getDate() + 1);
       match.lastDate = {
         $gte: d1,
-        $lt: d2,
+        // $lt: d2,
       };
     }
  
@@ -208,8 +208,6 @@ findAllPrivate = async (req, res) => {
       const direction = where.sortByDates === "asc" ? 1 : -1;
       sort = { createdAt: direction, _id: direction };
     }
-    console.log(where ,"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
-    console.log(match);
     
     
     const pipeline = [
