@@ -3,6 +3,40 @@ const walletService = require("../services/wallet.service");
 const logger = require("../../helpers/logging");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
+thawaniSession = async (req, res) => {
+  try {
+    let transaction = await transactionService.findOne({
+      transactionNo: body.transactionNo,
+      userId: new ObjectId(body.userId),
+    });
+    if (!transaction) {
+      res
+        .status(400)
+        .json({ message: "Transaction is not found", error: err.message });
+      return;
+    }
+    let wallet = await walletService.findOne({
+      _id: new ObjectId(transaction.walletId),
+    });
+    if (!wallet) {
+      res
+        .status(400)
+        .json({ message: "Wallet is not found", error: err.message });
+      return;
+    }
+    if(wallet.userId.toString() != transaction.userId.toString()){
+      res
+        .status(400)
+        .json({ message: "Wallet is not found", error: err.message });
+      return;
+    };
+
+    transactionService.thawaniSession(transaction, res);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+
 getAllData = (req, res) => {
   try {
     transactionService.findAll(req, res);
@@ -45,7 +79,9 @@ createTransaction = async (req, callBack) => {
     if (transaction.type == "Payment") {
       if (transaction.amount > wallet.activeBalance + wallet.bonus) {
         transaction.status = "Error";
-       let _transaction = await transactionService.create({ body: transaction });
+        let _transaction = await transactionService.create({
+          body: transaction,
+        });
         await transactionService.updateCb(transaction, transaction._id);
         callBack("The wallet balance is insufficient", null);
         return;
@@ -69,7 +105,7 @@ createTransaction = async (req, callBack) => {
     ) {
       wallet.bonus += transaction.amount;
     }
-  let _transaction =  await transactionService.create({ body: transaction });
+    let _transaction = await transactionService.create({ body: transaction });
     let walletUpdated = await walletService.updateCb(wallet, wallet._id);
     if (walletUpdated) {
       callBack(null, _transaction);
@@ -117,7 +153,10 @@ updateTransactionStatus = async (req, res) => {
             transaction.sessionData = req.body.sessionData;
             transaction.status = "Completed";
             wallet.activeBalance += transaction.amount;
-            transaction =  await transactionService.updateCb(transaction, transaction._id);
+            transaction = await transactionService.updateCb(
+              transaction,
+              transaction._id
+            );
           } else {
             transaction.status = "Error";
             await transactionService.updateCb(transaction, transaction._id);
@@ -133,8 +172,10 @@ updateTransactionStatus = async (req, res) => {
           wallet.holdBalance -= transaction.amount;
           wallet.activeBalance += transaction.amount;
         } else {
-          transaction =  await transactionService.updateCb(req.body, transaction._id);
-
+          transaction = await transactionService.updateCb(
+            req.body,
+            transaction._id
+          );
         }
         let walletUpdated = await walletService.updateCb(wallet, wallet._id);
         if (walletUpdated) {
@@ -178,6 +219,7 @@ deleteTransaction = (req, res) => {
 
 module.exports = {
   getAllData,
+  thawaniSession,
   create,
   findById,
   updateTransactionStatus,

@@ -63,10 +63,33 @@ updateTransactionStatus = async (req, res, id) => {
     });
 };
 
+thawaniSession = async (transaction, res) => {
+  try {
+    let body = req.body;
+    
+    const response = await axios.get(
+      `https://uatcheckout.thawani.om/api/v1/checkout/session/${transaction.sessionData.sessionId}`,
+      {
+        headers: {
+          Accept: "application/json",
+          "thawani-api-key": "rRQ26GcsZzoEhbrP2HZvLYDbn9C9et",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error("Error fetching Thawani session:", error.message);
+    res
+      .status(400)
+      .json({ message: "Failed to fetch session", error: error.message });
+  }
+};
+
 create = async (req) => {
   return new Promise((resolve, reject) => {
-    if(req.body){
-      if(req.body.status == 'Processing'){
+    if (req.body) {
+      if (req.body.status == "Processing") {
         if (req.body?.sessionData?.success) {
           req.body.status = "Completed";
         } else {
@@ -88,10 +111,7 @@ create = async (req) => {
 findOne = (where) => {
   return new Promise((resolve, reject) => {
     transactionModel.defaultSchema
-      .findOne(
-        where
-        
-      )
+      .findOne(where)
       .then(function (res) {
         resolve(res);
       })
@@ -104,13 +124,11 @@ findOne = (where) => {
 updateCb = (obj, id) => {
   return new Promise((resolve, reject) => {
     transactionModel.defaultSchema
-      .findOneAndUpdate(
-        id, obj, {
-          new: true,
-          setDefaultsOnInsert: true,
-        }
-      )
-      .then(function (res) {        
+      .findOneAndUpdate(id, obj, {
+        new: true,
+        setDefaultsOnInsert: true,
+      })
+      .then(function (res) {
         resolve(res);
       })
       .catch(function (err) {
@@ -128,4 +146,5 @@ module.exports = {
   findOne,
   updateCb,
   findAll,
+  thawaniSession,
 };

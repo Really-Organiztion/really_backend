@@ -4,6 +4,7 @@ const transactionController = require("../controllers/transaction.controller");
 const roles = require("../../helpers/roles");
 
 transactionRouter.post("/all", transactionController.getAllData);
+transactionRouter.post("/thawani-session", transactionController.thawaniSession);
 transactionRouter.post("/",  transactionController.create);
 
 transactionRouter.get("/:id",  transactionController.findById);
