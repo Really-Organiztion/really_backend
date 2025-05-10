@@ -62,28 +62,29 @@ updateTransactionStatus = async (req, res, id) => {
       res.status(400).send(err);
     });
 };
+thawaniSession = async (transaction) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const thawaniResponse = await axios.get(
+        `https://uatcheckout.thawani.om/api/v1/checkout/session/${transaction.sessionData.sessionId}`,
+        {
+          headers: {
+            Accept: "application/json",
+            "thawani-api-key": "rRQ26GcsZzoEhbrP2HZvLYDbn9C9et",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if(thawaniResponse?.data) {
 
-thawaniSession = async (transaction, res) => {
-  try {
-    let body = req.body;
-    
-    const response = await axios.get(
-      `https://uatcheckout.thawani.om/api/v1/checkout/session/${transaction.sessionData.sessionId}`,
-      {
-        headers: {
-          Accept: "application/json",
-          "thawani-api-key": "rRQ26GcsZzoEhbrP2HZvLYDbn9C9et",
-          "Content-Type": "application/json",
-        },
+        resolve({ doc : thawaniResponse.data , done: true});
+      } else {
+        reject({error : "not found" , done: false});
       }
-    );
-    res.status(200).json(response.data);
-  } catch (error) {
-    console.error("Error fetching Thawani session:", error.message);
-    res
-      .status(400)
-      .json({ message: "Failed to fetch session", error: error.message });
-  }
+    } catch (error) {
+      reject({error : "not found" , done: false});
+    }
+  });
 };
 
 create = async (req) => {

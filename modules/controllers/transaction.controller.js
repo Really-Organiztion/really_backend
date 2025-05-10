@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 thawaniSession = async (req, res) => {
   try {
+    let body = req.body;
     let transaction = await transactionService.findOne({
       transactionNo: body.transactionNo,
       userId: new ObjectId(body.userId),
@@ -24,14 +25,37 @@ thawaniSession = async (req, res) => {
         .json({ message: "Wallet is not found", error: err.message });
       return;
     }
-    if(wallet.userId.toString() != transaction.userId.toString()){
+    if (wallet.userId.toString() != transaction.userId.toString()) {
       res
         .status(400)
         .json({ message: "Wallet is not found", error: err.message });
       return;
-    };
+    }
 
-    transactionService.thawaniSession(transaction, res);
+    let sawanyResponse = await transactionService.thawaniSession(
+      transaction,
+      res
+    );
+    if (sawanyResponse.done) {
+      if (thawaniResponse.doc.success) {
+        if (
+          body.status == "canceled" &&
+          thawaniResponse.doc?.data?.payment_status == "unpaid"
+        ) {
+          transactionService.deleteTransaction(req, res, transaction._id);
+
+        } else if (
+          body.status == "success" &&
+          thawaniResponse.doc?.data.payment_status == "paid"
+        ) {
+          wallet.activeBalance += transaction.amount;
+          walletService.updateWallet({body : wallet}, res, wallet._id);
+        }
+      }
+      res.status(200).send(sawanyResponse.doc);
+    } else {
+      res.status(400).send(sawanyResponse);
+    }
   } catch (error) {
     logger.error(error);
   }
