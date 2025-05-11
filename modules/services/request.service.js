@@ -31,7 +31,13 @@ findAll = (req, res) => {
     .sort({ _id: -1 })
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
-    .populate("userId", ["firstName","lastName","gender","phone", "profileImage"])
+    .populate("userId", [
+      "firstName",
+      "lastName",
+      "gender",
+      "phone",
+      "profileImage",
+    ])
     .populate("adminId", ["username", "role"])
     .then(function (data) {
       res.status(200).send(data);

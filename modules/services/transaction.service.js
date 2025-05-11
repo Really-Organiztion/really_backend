@@ -75,14 +75,13 @@ thawaniSession = async (transaction) => {
           },
         }
       );
-      if(thawaniResponse?.data) {
-
-        resolve({ doc : thawaniResponse.data , done: true});
+      if (thawaniResponse?.data) {
+        resolve({ doc: thawaniResponse.data, done: true });
       } else {
-        reject({error : "not found" , done: false});
+        reject({ error: "not found", done: false });
       }
     } catch (error) {
-      reject({error : "not found" , done: false});
+      reject({ error: "not found", done: false });
     }
   });
 };
@@ -122,6 +121,21 @@ findOne = (where) => {
   });
 };
 
+deleteCb = (id) => {
+  return new Promise((resolve, reject) => {
+    transactionModel.defaultSchema
+      .deleteOne({
+        _id: id,
+      })
+      .then(function (res) {
+        resolve(res);
+      })
+      .catch(function (err) {
+        reject(null);
+      });
+  });
+};
+
 updateCb = (obj, id) => {
   return new Promise((resolve, reject) => {
     transactionModel.defaultSchema
@@ -139,6 +153,7 @@ updateCb = (obj, id) => {
 };
 
 module.exports = {
+  deleteCb,
   deleteTransaction: transactionModel.genericSchema.delete,
   updateTransaction: transactionModel.genericSchema.update,
   updateTransactionStatus,

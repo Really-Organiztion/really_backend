@@ -42,14 +42,14 @@ thawaniSession = async (req, res) => {
           body.status == "canceled" &&
           thawaniResponse.doc?.data?.payment_status == "unpaid"
         ) {
-          transactionService.deleteTransaction(req, res, transaction._id);
+          transactionService.deleteCb(transaction._id);
 
         } else if (
           body.status == "success" &&
           thawaniResponse.doc?.data.payment_status == "paid"
         ) {
           wallet.activeBalance += transaction.amount;
-          walletService.updateWallet({body : wallet}, res, wallet._id);
+          walletService.updateCb(wallet, wallet._id);
         }
       }
       res.status(200).send(sawanyResponse.doc);
