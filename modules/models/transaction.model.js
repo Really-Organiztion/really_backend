@@ -10,7 +10,7 @@ const transactionSchema = new Schema(
       ref: "wallet",
     },
     transactionNo: {
-      type: Number,
+      type: String,
       required: true,
     },
     transactionBy: {

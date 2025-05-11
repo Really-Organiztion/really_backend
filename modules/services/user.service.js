@@ -19,13 +19,16 @@ findUser = async (req, res) => {
   const toFound = lang === "en" ? "name" : "nameAr";
   const email = req.body.email;
   const password = req.body.password;
+  if (!email) return res.status(400).send("Email is required");
+  else if (!password) return res.status(400).send("Password is required");
   let user = await userModel.defaultSchema
     .findOne({ email })
     .populate("countryId", [`${toFound}`, "code", "numericCode"]);
   if (!user) res.status(400).send("Invalid email or password");
-  else if (user && !user.emailVerify) {
-    res.status(400).send("Mail must be verified before login");
-  } else if (user && user.isDeleted) {
+  // else if (user && !user.emailVerify) {
+  //   res.status(400).send("Mail must be verified before login");
+  // }
+  else if (user && user.isDeleted) {
     res.status(400).send("This user was deleted");
   } else {
     if (!user.password) {
@@ -563,6 +566,7 @@ generatOptEmail = async (req, res) => {
         email: req.body.email,
       })
       .then(function (_obj) {
+        
         if (_obj) {
           res
             .status(400)
@@ -584,8 +588,8 @@ generatOptEmail = async (req, res) => {
             
            ${words.sendEmail2}`,
             };
-
-            mailer.transporter.sendMail(mailOptions, function (error, info) {
+            
+            mailer.transporter.sendMail(mailOptions, function (error, info) {              
               if (error) {
                 console.log(error);
               } else {
