@@ -14,6 +14,7 @@ thawaniSession = async (req, res) => {
       res.status(400).json({ error: "Transaction is not found" });
       return;
     }
+    
     let wallet = await walletService.findOne({
       _id: new ObjectId(transaction.walletId),
     });
@@ -25,18 +26,19 @@ thawaniSession = async (req, res) => {
       res.status(400).json({ error: "Wallet is not found" });
       return;
     }
-
+    
     if (!transaction?.sessionData?.sessionId) {
       res.status(400).json({ error: "Transaction session is not found" });
       return;
     }
-
+    
     let thawaniResponse = await transactionService.thawaniSession(
       transaction,
       res
     );
+    
     if (thawaniResponse.done) {
-      if (thawaniResponse.doc.success) {
+      if (thawaniResponse.doc.done) {
         if (
           body.status == "canceled" &&
           thawaniResponse.doc?.data?.payment_status == "unpaid"
@@ -55,6 +57,7 @@ thawaniSession = async (req, res) => {
       res.status(400).send(thawaniResponse);
     }
   } catch (error) {
+    
     logger.error(error);
   }
 };

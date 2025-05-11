@@ -1,7 +1,7 @@
 const transactionModel = require("../models/transaction.model");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
-
+const axios = require('axios');
 findAll = (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
@@ -63,6 +63,7 @@ updateTransactionStatus = async (req, res, id) => {
     });
 };
 thawaniSession = async (transaction) => {
+  
   return new Promise(async (resolve, reject) => {
     try {
       const thawaniResponse = await axios.get(
@@ -75,13 +76,15 @@ thawaniSession = async (transaction) => {
           },
         }
       );
+      console.log(thawaniResponse);
+      
       if (thawaniResponse?.data) {
         resolve({ doc: thawaniResponse.data, done: true });
       } else {
-        reject({ error: "not found", done: false });
+        resolve({ error: "Transacion not found in thawani", done: false });
       }
     } catch (error) {
-      reject({ error: "not found", done: false });
+      resolve({ error: "Transacion not found in thawani", done: false });
     }
   });
 };
