@@ -11,39 +11,37 @@ thawaniSession = async (req, res) => {
       userId: new ObjectId(body.userId),
     });
     if (!transaction) {
-      res
-        .status(400)
-        .json({ message: "Transaction is not found", error: err.message });
+      res.status(400).json({ error: "Transaction is not found" });
       return;
     }
     let wallet = await walletService.findOne({
       _id: new ObjectId(transaction.walletId),
     });
     if (!wallet) {
-      res
-        .status(400)
-        .json({ message: "Wallet is not found", error: err.message });
+      res.status(400).json({ error: "Wallet is not found" });
       return;
     }
     if (wallet.userId.toString() != transaction.userId.toString()) {
-      res
-        .status(400)
-        .json({ message: "Wallet is not found", error: err.message });
+      res.status(400).json({ error: "Wallet is not found" });
       return;
     }
 
-    let sawanyResponse = await transactionService.thawaniSession(
+    if (!transaction?.sessionData?.sessionId) {
+      res.status(400).json({ error: "Transaction session is not found" });
+      return;
+    }
+
+    let thawaniResponse = await transactionService.thawaniSession(
       transaction,
       res
     );
-    if (sawanyResponse.done) {
+    if (thawaniResponse.done) {
       if (thawaniResponse.doc.success) {
         if (
           body.status == "canceled" &&
           thawaniResponse.doc?.data?.payment_status == "unpaid"
         ) {
           transactionService.deleteCb(transaction._id);
-
         } else if (
           body.status == "success" &&
           thawaniResponse.doc?.data.payment_status == "paid"
@@ -52,9 +50,9 @@ thawaniSession = async (req, res) => {
           walletService.updateCb(wallet, wallet._id);
         }
       }
-      res.status(200).send(sawanyResponse.doc);
+      res.status(200).send(thawaniResponse.doc);
     } else {
-      res.status(400).send(sawanyResponse);
+      res.status(400).send(thawaniResponse);
     }
   } catch (error) {
     logger.error(error);
