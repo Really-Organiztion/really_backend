@@ -67,7 +67,7 @@ thawaniSession = async (transaction) => {
   return new Promise(async (resolve, reject) => {
     try {
       const thawaniResponse = await axios.get(
-        `https://uatcheckout.thawani.om/api/v1/checkout/session/${transaction.sessionData.sessionId}`,
+        `https://uatcheckout.thawani.om/api/v1/checkout/session/${transaction.sessionData.session_id}`,
         {
           headers: {
             Accept: "application/json",
@@ -76,7 +76,6 @@ thawaniSession = async (transaction) => {
           },
         }
       );
-      console.log(thawaniResponse);
       
       if (thawaniResponse?.data) {
         resolve({ doc: thawaniResponse.data, done: true });
