@@ -59,7 +59,7 @@ thawaniSession = async (req, res) => {
           transactionService.updateCb(transaction, transaction._id);
         }
       }
-      res.status(200).send(thawaniResponse.doc);
+      res.status(200).send(transaction);
     } else {
       res.status(400).send(thawaniResponse);
     }
