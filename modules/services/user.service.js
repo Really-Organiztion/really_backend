@@ -8,12 +8,12 @@ const jwt = require("jsonwebtoken");
 const handleFiles = require("../../helpers/handleFiles");
 const webSocket = require("../../helpers/websocket");
 const attachmentPath = require("../../helpers/attachmentPath.json");
-const path = attachmentPath.attachments;
+// const path = attachmentPath.attachments;
 const mailer = require("../../helpers/sendMail");
 const crypto = require("crypto");
 const words = require("../../helpers/words.json");
 const { log } = require("winston");
-
+const path = require("path");
 findUser = async (req, res) => {
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
@@ -566,7 +566,6 @@ generatOptEmail = async (req, res) => {
         email: req.body.email,
       })
       .then(function (_obj) {
-        
         if (_obj) {
           res
             .status(400)
@@ -581,15 +580,39 @@ generatOptEmail = async (req, res) => {
               from: process.env.GMAILUSER,
               to: optModel.email,
               subject: "Really Booking Verify Email Code",
-              text: `
-            ${words.sendEmail1}
-
-            🔑 ${optModel.otp} 🔑
-            
-           ${words.sendEmail2}`,
+              html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Email Verification</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <div style="max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+            <div style="text-align: center;">
+              <img src="cid:logoImage" alt="Really Booking Logo" style="width: 120px; margin-bottom: 20px;">
+            </div>
+            <h2 style="text-align: center;">Verify Your Email</h2>
+            <p>Hello,</p>
+            <p>Your Really Booking verification code is:</p>
+            <h1 style="text-align: center; color: #007BFF;">${optModel.otp}</h1>
+            <p>Enter this code in the app to confirm your email and unlock all features.</p>
+            <p>If you didn’t request this, you can safely ignore this email.</p>
+            <p>Thanks,<br>The Really Booking Team</p>
+          </div>
+        </body>
+        </html>
+      `,
+              attachments: [
+                {
+                  filename: "logo.png",
+                  path: path.join(__dirname, "../../helpers/logo.png"),
+                  cid: "logoImage",
+                },
+              ],
             };
-            
-            mailer.transporter.sendMail(mailOptions, function (error, info) {              
+
+            mailer.transporter.sendMail(mailOptions, function (error, info) {
               if (error) {
                 console.log(error);
               } else {
@@ -688,13 +711,36 @@ changeEmail = async (req, res, id) => {
           from: process.env.GMAILUSER,
           to: optModel.email,
           subject: "Really Booking Verify Email Code",
-          text: `          
-            ${words.sendEmail1}
-
-            🔑 ${optModel.otp} 🔑
-
-            ${words.sendEmail2}
-            `,
+          html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Email Verification</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <div style="max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+            <div style="text-align: center;">
+              <img src="cid:logoImage" alt="Really Booking Logo" style="width: 120px; margin-bottom: 20px;">
+            </div>
+            <h2 style="text-align: center;">Verify Your Email</h2>
+            <p>Hello,</p>
+            <p>Your Really Booking verification code is:</p>
+            <h1 style="text-align: center; color: #007BFF;">${optModel.otp}</h1>
+            <p>Enter this code in the app to confirm your email and unlock all features.</p>
+            <p>If you didn’t request this, you can safely ignore this email.</p>
+            <p>Thanks,<br>The Really Booking Team</p>
+          </div>
+        </body>
+        </html>
+      `,
+          attachments: [
+            {
+              filename: "logo.png",
+              path: path.join(__dirname, "../../helpers/logo.png"),
+              cid: "logoImage",
+            },
+          ],
         };
 
         mailer.transporter.sendMail(mailOptions, function (error, info) {
@@ -751,11 +797,36 @@ createUser = async (req, res) => {
             from: process.env.GMAILUSER,
             to: optModel.email,
             subject: "Really Booking Verify Email Code",
-            text: `${words.sendEmail1}
-
-                  🔑 ${optModel.otp} 🔑
-
-                  ${words.sendEmail2}`,
+            html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Email Verification</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <div style="max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+            <div style="text-align: center;">
+              <img src="cid:logoImage" alt="Really Booking Logo" style="width: 120px; margin-bottom: 20px;">
+            </div>
+            <h2 style="text-align: center;">Verify Your Email</h2>
+            <p>Hello,</p>
+            <p>Your Really Booking verification code is:</p>
+            <h1 style="text-align: center; color: #007BFF;">${optModel.otp}</h1>
+            <p>Enter this code in the app to confirm your email and unlock all features.</p>
+            <p>If you didn’t request this, you can safely ignore this email.</p>
+            <p>Thanks,<br>The Really Booking Team</p>
+          </div>
+        </body>
+        </html>
+      `,
+            attachments: [
+              {
+                filename: "logo.png",
+                path: path.join(__dirname, "../../helpers/logo.png"),
+                cid: "logoImage",
+              },
+            ],
           };
 
           mailer.transporter.sendMail(mailOptions, function (error, info) {
