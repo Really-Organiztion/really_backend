@@ -27,7 +27,7 @@ thawaniSession = async (req, res) => {
       return;
     }
 
-    if (!transaction?.sessionData?.sessionId) {
+    if (!transaction?.sessionData?.session_id) {
       res.status(400).json({ error: "Transaction session is not found" });
       return;
     }
@@ -179,7 +179,7 @@ updateTransactionStatus = async (req, res) => {
         if (transaction.type == "Deposit" && req.body.status == "Processing") {
           if (
             req.body.sessionData &&
-            req.body.sessionData.paymentStatus == "paid"
+            req.body.sessionData.payment_status == "paid"
           ) {
             transaction.sessionData = req.body.sessionData;
             transaction.status = "Completed";
