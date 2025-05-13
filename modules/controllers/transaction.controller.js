@@ -36,29 +36,43 @@ thawaniSession = async (req, res) => {
       transaction,
       res
     );
+    console.log(thawaniResponse.doc);
 
     if (thawaniResponse.done) {
-      if (thawaniResponse.doc.done) {
-        if (
-          body.status == "canceled" &&
-          thawaniResponse.doc?.data?.payment_status == "unpaid"
-        ) {
-          transactionService.deleteCb(transaction._id);
-        } else if (
-          body.status == "success" &&
-          thawaniResponse.doc?.data.payment_status == "paid"
-        ) {
-          if (transaction.status != "Completed") {
-            wallet.activeBalance += transaction.amount;
-            walletService.updateCb(wallet, wallet._id);
-          }
-          if (thawaniResponse.doc?.data) {
-            transaction.sessionData = thawaniResponse.doc.data;
-          }
-          transaction.status = "Completed";
-          transactionService.updateCb(transaction, transaction._id);
+      console.log(thawaniResponse.doc?.data?.payment_status == "cancelled");
+
+      if (
+        (body.status == "cancel" &&
+          thawaniResponse.doc?.data?.payment_status == "unpaid") ||
+        thawaniResponse.doc?.data?.payment_status == "cancelled"
+      ) {
+        transactionService.deleteCb(transaction._id);
+        transaction.status = "Canceled";
+      } else if (
+        body.status == "success" &&
+        thawaniResponse.doc?.data.payment_status == "paid"
+      ) {
+        if (transaction.status != "Completed") {
+          wallet.activeBalance += transaction.amount;
+          walletService.updateCb(wallet, wallet._id);
+        } else {
+          res.status(400).send({ error: "Transaction is already completed" });
+          return;
         }
+
+        transaction.status = "Completed";
+        transactionService.updateCb(transaction, transaction._id);
+      } else if (
+        body.status == "success" &&
+        thawaniResponse.doc?.data.payment_status != "paid"
+      ) {
+        res.status(400).send(thawaniResponse);
+        return;
       }
+      if (thawaniResponse.doc?.data) {
+        transaction.sessionData = thawaniResponse.doc.data;
+      }
+
       res.status(200).send(transaction);
     } else {
       res.status(400).send(thawaniResponse);
