@@ -38,6 +38,7 @@ thawaniSession = async (req, res) => {
     );
 
     if (thawaniResponse.done) {
+      transaction.sessionData = thawaniResponse.doc.data;
 
       if (
         (body.status == "cancel" &&
@@ -53,9 +54,6 @@ thawaniSession = async (req, res) => {
         if (transaction.status != "Completed") {
           wallet.activeBalance += transaction.amount;
           walletService.updateCb(wallet, wallet._id);
-        } else {
-          res.status(400).send({ error: "Transaction is already completed" });
-          return;
         }
 
         transaction.status = "Completed";
@@ -66,9 +64,6 @@ thawaniSession = async (req, res) => {
       ) {
         res.status(400).send(thawaniResponse);
         return;
-      }
-      if (thawaniResponse.doc?.data) {
-        transaction.sessionData = thawaniResponse.doc.data;
       }
 
       res.status(200).send(transaction);
