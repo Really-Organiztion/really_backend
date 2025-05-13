@@ -36,10 +36,8 @@ thawaniSession = async (req, res) => {
       transaction,
       res
     );
-    console.log(thawaniResponse.doc);
 
     if (thawaniResponse.done) {
-      console.log(thawaniResponse.doc?.data?.payment_status == "cancelled");
 
       if (
         (body.status == "cancel" &&
