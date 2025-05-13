@@ -590,7 +590,7 @@ generatOptEmail = async (req, res) => {
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
           <div style="max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
             <div style="text-align: center;">
-              <img src="cid:logoImage" alt="Really Booking Logo" style="width: 120px; margin-bottom: 20px;">
+              <img src="" alt="Really Booking Logo" style="width: 120px; margin-bottom: 20px;">
             </div>
             <h2 style="text-align: center;">Verify Your Email</h2>
             <p>Hello,</p>
@@ -603,13 +603,6 @@ generatOptEmail = async (req, res) => {
         </body>
         </html>
       `,
-              attachments: [
-                {
-                  filename: "logo.png",
-                  path: path.join(__dirname, "../../helpers/logo.png"),
-                  cid: "logoImage",
-                },
-              ],
             };
 
             mailer.transporter.sendMail(mailOptions, function (error, info) {
@@ -721,7 +714,7 @@ changeEmail = async (req, res, id) => {
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
           <div style="max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
             <div style="text-align: center;">
-              <img src="cid:logoImage" alt="Really Booking Logo" style="width: 120px; margin-bottom: 20px;">
+              <img src="" alt="Really Booking Logo" style="width: 120px; margin-bottom: 20px;">
             </div>
             <h2 style="text-align: center;">Verify Your Email</h2>
             <p>Hello,</p>
@@ -734,13 +727,6 @@ changeEmail = async (req, res, id) => {
         </body>
         </html>
       `,
-          attachments: [
-            {
-              filename: "logo.png",
-              path: path.join(__dirname, "../../helpers/logo.png"),
-              cid: "logoImage",
-            },
-          ],
         };
 
         mailer.transporter.sendMail(mailOptions, function (error, info) {
@@ -807,7 +793,7 @@ createUser = async (req, res) => {
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
           <div style="max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
             <div style="text-align: center;">
-              <img src="cid:logoImage" alt="Really Booking Logo" style="width: 120px; margin-bottom: 20px;">
+              <img src="" alt="Really Booking Logo" style="width: 120px; margin-bottom: 20px;">
             </div>
             <h2 style="text-align: center;">Verify Your Email</h2>
             <p>Hello,</p>
@@ -820,13 +806,6 @@ createUser = async (req, res) => {
         </body>
         </html>
       `,
-            attachments: [
-              {
-                filename: "logo.png",
-                path: path.join(__dirname, "../../helpers/logo.png"),
-                cid: "logoImage",
-              },
-            ],
           };
 
           mailer.transporter.sendMail(mailOptions, function (error, info) {
