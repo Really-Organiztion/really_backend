@@ -63,7 +63,7 @@ updateTransactionStatus = async (req, res, id) => {
     });
 };
 thawaniSession = async (transaction) => {
-  
+
   return new Promise(async (resolve, reject) => {
     try {
       const thawaniResponse = await axios.get(

@@ -23,7 +23,7 @@ thawaniSession = async (req, res) => {
       return;
     }
     if (wallet.userId.toString() != transaction.userId.toString()) {
-      res.status(400).json({ error: "Wallet is not found" });
+      res.status(400).json({ error: "The user does not own this wallet" });
       return;
     }
 
