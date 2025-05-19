@@ -6,10 +6,8 @@ findAll = (req, res) => {
   let sort = { createdAt: -1 };
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
-  const lang = req.query.lang ? req.query.lang : "en";
-  const toFound = lang === "en" ? "name" : "nameAr";
-  const toFoundTitle = lang === "en" ? "title" : "titleAr";
-  const toFoundDescription = lang === "en" ? "description" : "descriptionAr";
+  const lang = req.query.lang ? req.query.lang : "En";
+
   let $match = {};
   let $match2 = {};
   if (!req.body.isDeleted) {
@@ -38,10 +36,13 @@ findAll = (req, res) => {
   }
   if (req.body["search"]) {
     $match.$or = [
-      { description: { $regex: req.body["search"], $options: "i" } },
-      { descriptionAr: { $regex: req.body["search"], $options: "i" } },
-      { title: { $regex: req.body["search"], $options: "i" } },
-      { titleAr: { $regex: req.body["search"], $options: "i" } },
+      {
+        "descriptionLangList.name": {
+          $regex: req.body["search"],
+          $options: "i",
+        },
+      },
+      { "titleLangList.name": { $regex: req.body["search"], $options: "i" } },
     ];
   }
 
@@ -160,10 +161,48 @@ findAll = (req, res) => {
         },
       },
       {
+        $addFields: {
+          toFoundDescription: {
+            $ifNull: [
+              {
+                $arrayElemAt: [
+                  {
+                    $filter: {
+                      input: "$descriptionLangList",
+                      as: "item",
+                      cond: { $eq: ["$$item.language", lang] },
+                    },
+                  },
+                  0,
+                ],
+              },
+              { name: "N/A" },
+            ],
+          },
+          toFoundTitle: {
+            $ifNull: [
+              {
+                $arrayElemAt: [
+                  {
+                    $filter: {
+                      input: "$titleLangList",
+                      as: "item",
+                      cond: { $eq: ["$$item.language", lang] },
+                    },
+                  },
+                  0,
+                ],
+              },
+              { name: "N/A" },
+            ],
+          },
+        },
+      },
+      {
         $group: {
           _id: "$_id",
-          description: { $first: `$${toFoundDescription}` },
-          title: { $first: `$${toFoundTitle}` },
+          description: { $first: "$toFoundDescription.name" },
+          title: { $first: "$toFoundTitle.name" },
           plansList: { $first: `$plansList` },
           status: { $first: `$status` },
           addtionDetails: { $first: `$addtionDetails` },
@@ -176,6 +215,7 @@ findAll = (req, res) => {
           has3DView: { $first: `$unit.has3DView` },
           imagesList: { $first: `$unit.imagesList` },
           rate: { $first: `$unit.rate` },
+          additionsTypes: { $first: `$unit.additionsTypes` },
           isTrusted: { $first: `$unit.isTrusted` },
           isSeparated: { $first: `$unit.isSeparated` },
           firstName: { $first: `$user.firstName` },
@@ -195,8 +235,8 @@ findAll = (req, res) => {
       {
         $group: {
           _id: "$_id",
-          description: { $first: `$${toFoundDescription}` },
-          title: { $first: `$${toFoundTitle}` },
+          description: { $first: "$description" },
+          title: { $first: "$title" },
           plansList: { $first: `$plansList` },
           status: { $first: `$status` },
           addtionDetails: { $first: `$addtionDetails` },
@@ -226,14 +266,12 @@ findAll = (req, res) => {
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .then(function (data) {
-   
       res.status(200).send(data || []);
     })
     .catch(function (err) {
       res.status(400).send(err);
     });
 };
-
 
 findAllMap = (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
@@ -341,43 +379,7 @@ updatePostCb = (obj, id) => {
 };
 
 findById = (req, res, id) => {
-  const lang = req.query.lang ? req.query.lang : "en";
-  const toFound = lang === "en" ? "name" : "nameAr";
-  const toFoundTitle = lang === "en" ? "title" : "titleAr";
-  const toFoundDescription = lang === "en" ? "description" : "descriptionAr";
-  let $group = {
-    _id: "$_id",
-    description: { $first: `$${toFoundDescription}` },
-    title: { $first: `$${toFoundTitle}` },
-    plansList: { $first: `$plansList` },
-    status: { $first: `$status` },
-    addtionDetails: { $first: `$addtionDetails` },
-    setting: { $first: `$setting` },
-    target: { $first: `$target` },
-    userId: { $first: `$userId` },
-    unitId: { $first: `$unitId` },
-    address: { $first: `$unit.address` },
-    type: { $first: `$unit.type` },
-    has3DView: { $first: `$unit.has3DView` },
-    imagesList: { $first: `$unit.imagesList` },
-    rate: { $first: `$unit.rate` },
-    isTrusted: { $first: `$unit.isTrusted` },
-    primImage: { $first: `$unit.primImage` },
-    isSeparated: { $first: `$unit.isSeparated` },
-    firstName: { $first: `$user.firstName` },
-    lastName: { $first: `$user.lastName` },
-    gender: { $first: `$user.gender` },
-    profileImage: { $first: `$user.profileImage` },
-    phone: { $first: `$user.phone` },
-    role: { $first: `$user.role` },
-    // phone: { $first: `$user.phone` },
-    // phonesList: { $first: `$user.phonesList` },
-  };
-
-  if (!req.query.lang) {
-    $group["descriptionAr"] = { $first: `$descriptionAr` };
-    $group["titleAr"] = { $first: `$titleAr` };
-  }
+  const lang = req.query.lang ? req.query.lang : "En";
 
   postModel.defaultSchema
     .aggregate([
@@ -415,7 +417,61 @@ findById = (req, res, id) => {
         },
       },
       {
-        $group,
+        $addFields: {
+          titleLang: {
+            $arrayElemAt: [
+              {
+                $filter: {
+                  input: "$titleLangList",
+                  as: "item",
+                  cond: { $eq: ["$$item.language", lang] },
+                },
+              },
+              0,
+            ],
+          },
+          descriptionLang: {
+            $arrayElemAt: [
+              {
+                $filter: {
+                  input: "$descriptionLangList",
+                  as: "item",
+                  cond: { $eq: ["$$item.language", lang] },
+                },
+              },
+              0,
+            ],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          plansList: { $first: "$plansList" },
+          status: { $first: "$status" },
+          addtionDetails: { $first: "$addtionDetails" },
+          setting: { $first: "$setting" },
+          target: { $first: "$target" },
+          userId: { $first: "$userId" },
+          unitId: { $first: "$unitId" },
+          address: { $first: "$unit.address" },
+          type: { $first: "$unit.type" },
+          has3DView: { $first: "$unit.has3DView" },
+          imagesList: { $first: "$unit.imagesList" },
+          rate: { $first: "$unit.rate" },
+          isTrusted: { $first: "$unit.isTrusted" },
+          primImage: { $first: "$unit.primImage" },
+          isSeparated: { $first: "$unit.isSeparated" },
+          additionsTypes: { $first: "$unit.additionsTypes" },
+          firstName: { $first: "$user.firstName" },
+          lastName: { $first: "$user.lastName" },
+          gender: { $first: "$user.gender" },
+          profileImage: { $first: "$user.profileImage" },
+          phone: { $first: "$user.phone" },
+          role: { $first: "$user.role" },
+          title: { $first: "$titleLang.name" },
+          description: { $first: "$descriptionLang.name" },
+        },
       },
     ])
     .then(function (data) {
@@ -428,6 +484,7 @@ findById = (req, res, id) => {
       res.status(400).send(err);
     });
 };
+
 deletePost = async (req, res, id) => {
   return new Promise((resolve, reject) => {
     postModel.defaultSchema

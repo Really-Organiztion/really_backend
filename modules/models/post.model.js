@@ -4,22 +4,9 @@ const ObjectId = Schema.ObjectId;
 
 const postSchema = new Schema(
   {
-    description: {
-      type: String,
-      required: true,
-    },
-    descriptionAr: {
-      type: String,
-      required: true,
-    },
-    title: {
-      type: String,
-      required: true,
-    },
-    titleAr: {
-      type: String,
-      required: true,
-    },
+    descriptionLangList : [{language : {type : String}, name : {type : String}}],
+    titleLangList : [{language : {type : String}, name : {type : String}}],
+   
     target: {
       type: String,
       required: true,
