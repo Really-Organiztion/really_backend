@@ -275,7 +275,6 @@ findNearUnitsToPosts = (req, res) => {
           title: { $first: `$post.${toFoundTitle}` },
           plansList: { $first: `$post.plansList` },
           status: { $first: `$post.status` },
-          addtionDetails: { $first: `$post.addtionDetails` },
           setting: { $first: `$post.setting` },
           target: { $first: `$post.target` },
           userId: { $first: `$post.userId` },

@@ -82,7 +82,6 @@ const postSchema = new Schema(
         type: Boolean,
       },
     },
-    addtionDetails: {},
     favorites: {
       type: Number,
       default: 0,
