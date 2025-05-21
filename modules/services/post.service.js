@@ -225,6 +225,7 @@ findAll = (req, res) => {
           role: { $first: `$user.role` },
           primImage: { $first: `$unit.primImage` },
           favoritePost: { $first: `$favoritePost._id` },
+          updatedAt: { $first: `$updatedAt` },
         },
       },
       {
@@ -258,6 +259,7 @@ findAll = (req, res) => {
           profileImage: { $first: `$profileImage` },
           phone: { $first: `$phone` },
           role: { $first: `$role` },
+          updatedAt: { $first: `$updatedAt` },
         },
       },
     ])
@@ -469,6 +471,7 @@ findById = (req, res, id) => {
           role: { $first: "$user.role" },
           title: { $first: "$titleLang.name" },
           description: { $first: "$descriptionLang.name" },
+          updatedAt: { $first: "$updatedAt" },
         },
       },
     ])

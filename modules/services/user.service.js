@@ -478,7 +478,7 @@ verifyEmail = async (req, res) => {
         userModel.defaultSchema
           .findOneAndUpdate(
             { email: req.body.email },
-            { $set: { emailVerify: true } },
+            { $set: { emailVerify: true ,status: 'Active' } },
             {
               new: true,
               setDefaultsOnInsert: true,
