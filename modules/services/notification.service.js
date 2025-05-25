@@ -31,10 +31,24 @@ createMany = async (notifications, res) => {
     const data = await notificationModel.defaultSchema.insertMany(
       notifications
     );
-    res.status(200).send({nessage : "Add Success"});
+    res.status(200).send({ nessage: "Add Success" });
   } catch (err) {
     res.status(400).send(err);
   }
+};
+
+seen = (res, id) => {
+  notificationModel.defaultSchema
+    .updateOne({ _id: id }, { $set: { seen: true } })
+    .then((data) => res.status(200).send({message: "Update seen Success"}))
+    .catch((err) => res.status(400).send(err));
+};
+
+deleteUserNotifications = (req, res, userId) => {
+  notificationModel.defaultSchema
+    .deleteMany({ userId })
+    .then((data) => res.status(200).send(data))
+    .catch((err) => res.status(400).send(err));
 };
 
 module.exports = {
@@ -43,7 +57,9 @@ module.exports = {
   findById: notificationModel.genericSchema.findById,
   create: notificationModel.genericSchema.create,
   findAll: notificationModel.genericSchema.findAll,
+  deleteUserNotifications,
   getNotificationByUserId,
+  seen,
   createMany,
   callbackGetNotificationByUserId,
 };

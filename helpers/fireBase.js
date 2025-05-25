@@ -1,11 +1,10 @@
 const FCM = require("fcm-node");
-const sendFcm = (obj, callback) => {
+const sendFcm = (obj) => {
   try {
     let fcm = new FCM(process.env.FCMSERVERKAY);
     let message = {
     
       priority: "high",
-      // collapse_key: "type_a",
       notification: {
         title: obj.title,
         body: obj.message,
@@ -46,13 +45,19 @@ const sendFcm = (obj, callback) => {
 
     fcm.send(message, (err, response) => {
       if (err) {
-        callback({ err });
+        console.log(err,"vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
+        
+        // callback({ err });
       } else {
-        callback({ response: JSON.parse(response) });
+        console.log(response,"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
+
+        // callback({ response: JSON.parse(response) });
       }
     });
   } catch (err) {
-    callback({ err });
+    console.log(err,"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    
+    // callback({ err });
   }
 };
 module.exports = {

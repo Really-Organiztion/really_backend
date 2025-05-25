@@ -19,6 +19,7 @@ create = (req, res) => {
   }
 };
 
+
 send = async (req, res) => {
   try {
     let notificationList = [];
@@ -79,6 +80,15 @@ findById = (req, res) => {
     logger.error(error);
   }
 };
+seen = (req, res) => {
+  try {
+    const id = req.params.id;
+    notificationService.seen(res, id);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+
 updateNotification = (req, res) => {
   try {
     const id = req.params.id;
@@ -95,6 +105,16 @@ deleteNotification = (req, res) => {
     logger.error(error);
   }
 };
+deleteUserNotifications = (req, res) => {
+  try {
+    const id = req.params.id;
+
+    notificationService.deleteUserNotifications(req, res , id);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+
 getNotificationByUserId = (req, res) => {
   try {
     const id = req.params.id;
@@ -116,7 +136,9 @@ module.exports = {
   create,
   findById,
   updateNotification,
+  seen,
   deleteNotification,
+  deleteUserNotifications,
   getNotificationByUserId,
   callbackGetNotificationByUserId,
 };
