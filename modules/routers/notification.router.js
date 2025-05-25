@@ -4,6 +4,7 @@ const notificationController = require("../controllers/notification.controller")
 const roles = require("../../helpers/roles");
 
 notificationRouter.get("/", notificationController.getAllData);
+notificationRouter.post("/send", notificationController.send);
 notificationRouter.post("/", notificationController.create);
 notificationRouter.get(
   "/user/:id",

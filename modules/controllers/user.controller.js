@@ -4,6 +4,14 @@ const logger = require("../../helpers/logging");
 const jwt = require("jsonwebtoken");
 const roles = require("../../helpers/roles");
 
+getAllIdAndDeviceToken = (req, res) => {
+  try {
+    userService.getAllIdAndDeviceToken(req, res);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+
 getAllData = (req, res) => {
   try {
     userService.findAll(req, res);

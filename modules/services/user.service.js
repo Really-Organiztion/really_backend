@@ -99,6 +99,18 @@ socialMediaLogin = async (req, res) => {
       res.status(400).send(err1);
     });
 };
+
+getAllIdAndDeviceToken = async (where) => {
+  try {
+    const data = await userModel.defaultSchema
+      .find(where)
+      .select({ _id: 1, deviceToken: 1 });
+    return data;
+  } catch (err) {
+    throw err;
+  }
+};
+
 findAllUsers = async (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
@@ -478,7 +490,7 @@ verifyEmail = async (req, res) => {
         userModel.defaultSchema
           .findOneAndUpdate(
             { email: req.body.email },
-            { $set: { emailVerify: true ,status: 'Active' } },
+            { $set: { emailVerify: true, status: "Active" } },
             {
               new: true,
               setDefaultsOnInsert: true,
@@ -885,6 +897,7 @@ module.exports = {
   create: createUser,
   findAll: findAllUsers,
   verifyEmail,
+  getAllIdAndDeviceToken,
   generatOptEmail,
   getOptEmail,
   forgetPassword,

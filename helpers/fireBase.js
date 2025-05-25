@@ -1,20 +1,17 @@
 const FCM = require("fcm-node");
-const sendFcm = (ibj, callback) => {
+const sendFcm = (obj, callback) => {
   try {
-    // let obj = req.body;
     let fcm = new FCM(process.env.FCMSERVERKAY);
     let message = {
-      to: obj.deviceToken,
+    
       priority: "high",
-      collapse_key: "type_a",
+      // collapse_key: "type_a",
       notification: {
         title: obj.title,
-        body: obj.msgBody,
+        body: obj.message,
         sound: "default",
-        click_action: "FCM_PLUGIN_ACTIVITY",
-        vibrate: [500, 1000, 500, 1000],
-        // icon: "fcm_push_icon",
-        // delivery_receipt_requested: true,
+        badge: "1",
+        click_action: "FLUTTER_NOTIFICATION_CLICK",
       },
       android: {
         priority: "high",
@@ -30,21 +27,32 @@ const sendFcm = (ibj, callback) => {
 
       data: {
         click_action: "FLUTTER_NOTIFICATION_CLICK",
-        id: obj.id,
+        // id: obj.id,
         type: obj.type,
       },
     };
+
+    if (obj.topic) {
+      message.to = `/topics/${obj.topic}`;
+    } else if (obj.deviceTokenList) {
+      message.registration_ids = obj.deviceTokenList;
+    } else if (obj.deviceToken) {
+      message.to = obj.deviceToken;
+    } else {
+      return callback({
+        err: "No target specified (topic or deviceTokens/deviceToken)",
+      });
+    }
+
     fcm.send(message, (err, response) => {
       if (err) {
         callback({ err });
       } else {
-        // return res.status(200).send(JSON.parse(response));
         callback({ response: JSON.parse(response) });
       }
     });
   } catch (err) {
     callback({ err });
-    // return callback({ err });
   }
 };
 module.exports = {

@@ -26,6 +26,17 @@ callbackGetNotificationByUserId = (userId) => {
   });
 };
 
+createMany = async (notifications, res) => {
+  try {
+    const data = await notificationModel.defaultSchema.insertMany(
+      notifications
+    );
+    res.status(200).send({nessage : "Add Success"});
+  } catch (err) {
+    res.status(400).send(err);
+  }
+};
+
 module.exports = {
   deleteNotification: notificationModel.genericSchema.delete,
   updateNotification: notificationModel.genericSchema.update,
@@ -33,5 +44,6 @@ module.exports = {
   create: notificationModel.genericSchema.create,
   findAll: notificationModel.genericSchema.findAll,
   getNotificationByUserId,
+  createMany,
   callbackGetNotificationByUserId,
 };
