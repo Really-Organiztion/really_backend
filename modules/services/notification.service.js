@@ -26,14 +26,12 @@ callbackGetNotificationByUserId = (userId) => {
   });
 };
 
-createMany = async (notifications, res) => {
+createMany = async (notifications) => {
   try {
-    const data = await notificationModel.defaultSchema.insertMany(
-      notifications
-    );
-    res.status(200).send({ nessage: "Add Success" });
+    const data = await notificationModel.defaultSchema.insertMany(notifications);
+    return data; 
   } catch (err) {
-    res.status(400).send(err);
+    throw err;
   }
 };
 

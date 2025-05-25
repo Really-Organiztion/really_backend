@@ -19,36 +19,36 @@ create = (req, res) => {
   }
 };
 
-
-send = async (req, res) => {
+const send = async (req, res) => {
   try {
     let notificationList = [];
     let deviceTokenList = [];
-    if (req.body.action != "Send") {
-      if (req.body.type == "Private") {
+
+    if (req.body.action !== "Send") {
+      if (req.body.type === "Private") {
         notificationList = [{ ...req.body }];
-      } else if (
-        req.body.type == "Renter" ||
-        req.body.type == "Investor" ||
-        req.body.type == "Owner"
-      ) {
-        let userList = await userService.getAllIdAndDeviceToken({
+      } else if (["Renter", "Investor", "Owner"].includes(req.body.type)) {
+        const userList = await userService.getAllIdAndDeviceToken({
           role: req.body.type,
           status: "Active",
           isDeleted: false,
         });
-        notificationList = userList.map((_u) => ({ ...req.body, userId: _u._id }));
-        
+        notificationList = userList.map((_u) => ({
+          ...req.body,
+          userId: _u._id,
+        }));
         deviceTokenList = userList.map((_u) => _u.deviceToken);
-      } else if (req.body.type == "Public") {
-        let userList = await userService.getAllIdAndDeviceToken({
+      } else if (req.body.type === "Public") {
+        const userList = await userService.getAllIdAndDeviceToken({
           status: "Active",
           isDeleted: false,
         });
-        notificationList = userList.map((_u) => ({ ...req.body, userId: _u._id }));
+        notificationList = userList.map((_u) => ({
+          ...req.body,
+          userId: _u._id,
+        }));
         deviceTokenList = userList.map((_u) => _u.deviceToken);
-
-      } else if (req.body.type == "Custom") {
+      } else if (req.body.type === "Custom") {
         if (req.body.userIdList) {
           notificationList = req.body.userIdList.map((_u) => ({
             ...req.body,
@@ -56,19 +56,24 @@ send = async (req, res) => {
           }));
         }
       }
-      fireBase.sendFcm({ ...req.body,deviceTokenList });
 
-      notificationService.createMany(notificationList, res);
+      fireBase.sendFcm({ ...req.body, deviceTokenList });
+
+      notificationService.createMany(notificationList);
     }
-    if (req.body.action != "Save") {
-      if (req.body.deviceTokenList.length > 0) {
+
+    if (req.body.action !== "Save") {
+      if (deviceTokenList.length > 0) {
         req.body.deviceTokenList = deviceTokenList;
       }
+
       fireBase.sendFcm(req.body);
-      res.status(200).send("Success");
     }
+
+    return res.status(200).send({ message: "Success" });
   } catch (error) {
     logger.error(error);
+    return res.status(500).send({ error: "Internal Server Error" });
   }
 };
 
@@ -109,7 +114,7 @@ deleteUserNotifications = (req, res) => {
   try {
     const id = req.params.id;
 
-    notificationService.deleteUserNotifications(req, res , id);
+    notificationService.deleteUserNotifications(req, res, id);
   } catch (error) {
     logger.error(error);
   }
