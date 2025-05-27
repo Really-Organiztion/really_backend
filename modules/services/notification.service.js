@@ -1,8 +1,6 @@
 const notificationModel = require("../models/notification.model");
 
 getNotificationByUserId = (req, res, userId) => {
-  console.log(userId);
-
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
   notificationModel.defaultSchema
@@ -11,9 +9,7 @@ getNotificationByUserId = (req, res, userId) => {
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .sort({ date: -1 })
-    .then((data) => {
-      res.status(200).send(data);
-    })
+    .then((data) => res.status(200).send(data))
     .catch((err) => res.status(400).send(err));
 };
 
@@ -23,9 +19,7 @@ callbackGetNotificationByUserId = (userId) => {
       .find({ userId })
       .select({ notification: 1 })
       .sort({ date: -1 })
-      .then((data) => {
-        resolve(data);
-      })
+      .then((data) => resolve(data))
       .catch((err) => reject(err));
   });
 };
