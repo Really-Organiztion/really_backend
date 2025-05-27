@@ -1,6 +1,8 @@
 const notificationModel = require("../models/notification.model");
 
 getNotificationByUserId = (req, res, userId) => {
+  console.log(userId);
+
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
   notificationModel.defaultSchema
@@ -8,9 +10,11 @@ getNotificationByUserId = (req, res, userId) => {
     .sort({ _id: -1 })
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
-    .select({ notification: 1 })
     .sort({ date: -1 })
-    .exec((err, data) => res.json(err || data));
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => res.status(400).send(err));
 };
 
 callbackGetNotificationByUserId = (userId) => {
@@ -19,17 +23,19 @@ callbackGetNotificationByUserId = (userId) => {
       .find({ userId })
       .select({ notification: 1 })
       .sort({ date: -1 })
-      .exec((err, data) => {
-        if (err) reject(err);
-        else resolve(data);
-      });
+      .then((data) => {
+        resolve(data);
+      })
+      .catch((err) => reject(err));
   });
 };
 
 createMany = async (notifications) => {
   try {
-    const data = await notificationModel.defaultSchema.insertMany(notifications);
-    return data; 
+    const data = await notificationModel.defaultSchema.insertMany(
+      notifications
+    );
+    return data;
   } catch (err) {
     throw err;
   }
@@ -38,7 +44,7 @@ createMany = async (notifications) => {
 seen = (res, id) => {
   notificationModel.defaultSchema
     .updateOne({ _id: id }, { $set: { seen: true } })
-    .then((data) => res.status(200).send({message: "Update seen Success"}))
+    .then((data) => res.status(200).send({ message: "Update seen Success" }))
     .catch((err) => res.status(400).send(err));
 };
 
