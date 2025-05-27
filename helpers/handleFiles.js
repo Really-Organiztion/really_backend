@@ -67,7 +67,6 @@ const handleFilesUpload = (req, res) => {
   const upload = multer({ storage: storage });
   upload.array("file", 50)(req, res, function (err) {
     if (err) {
-      console.log(err);
       return res.status(400).send(err, "Error uploading file");
     }
     if (req.files) {

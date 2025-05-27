@@ -866,7 +866,6 @@ createUser = async (req, res) => {
       //   res.status(400).send(`${values} Is Duplicated`);
       //   return;
       // } else if (err.message) {
-      //   console.log(err.errors);
       //   res.status(400).send(err.message);
       //   return;
       // }

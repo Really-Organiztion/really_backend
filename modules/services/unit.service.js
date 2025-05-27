@@ -151,7 +151,6 @@ create = async (req, res) => {
         });
     })
     .catch(function (err) {
-      console.log(err);
       res.status(400).send(err);
     });
 };
@@ -195,7 +194,6 @@ findCoordinatesMatch = (req, res) => {
       res.status(200).send(unit);
     })
     .catch(function (err) {
-      console.log(err);
       res.status(400).send(err);
     });
 };
@@ -341,7 +339,6 @@ findNearUnits = (req, res) => {
       res.status(200).send(unit);
     })
     .catch(function (err) {
-      console.log(err);
       res.status(400).send(err);
     });
 };
@@ -403,7 +400,6 @@ updateUnit = async (req, res, id) => {
       }
     })
     .catch(function (err) {
-      console.log(err);
       res.status(400).send(err);
     });
 };

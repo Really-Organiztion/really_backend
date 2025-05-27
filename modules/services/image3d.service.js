@@ -47,7 +47,6 @@ deleteImage3d = async (req, res, id) => {
       _id: id,
     })
     .then(function (data) {
-      console.log(data);
       handleFiles.deleteFileCb(data.url, (cb) => {
         if (cb.done) {
           res.status(200).send(cb.msg);

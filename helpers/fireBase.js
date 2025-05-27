@@ -35,7 +35,6 @@ const sendFcm = async (obj) => {
       };
 
       const response = await messaging.send(message);
-      console.log("FCM response:", response);
       return response;
     } else if (
       obj.deviceTokenList &&
@@ -67,7 +66,6 @@ const sendFcm = async (obj) => {
       }));
 
       const response = await messaging.sendEach(messages);
-      console.log("FCM response:", response);
 
       response.responses.forEach((resp, idx) => {
         if (!resp.success) {
@@ -102,7 +100,6 @@ const sendFcm = async (obj) => {
       };
 
       const response = await messaging.send(message);
-      console.log("FCM response:", response);
       return response;
     } else {
       console.error(

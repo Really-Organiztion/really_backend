@@ -22,7 +22,6 @@ authenticate = async (req, res) => {
       }
     })
     .catch((error) => {
-      console.log(error);
       res.send({
         message: "Authentication failed.",
         error,
@@ -55,7 +54,6 @@ registerOrder = async (req, res, token, merchantId) => {
       );
     })
     .catch((error) => {
-      console.log(error);
       res.send({
         message: "Order registration failed.",
         error: JSON.stringify(error),
@@ -101,7 +99,6 @@ generatePaymentKeyWithOrderRegister = async (
       res.send({ paymentKey: response.data.token });
     })
     .catch((error) => {
-      console.log(error);
       res.send({
         message: "Payment key generation failed.",
         error: JSON.stringify(error),

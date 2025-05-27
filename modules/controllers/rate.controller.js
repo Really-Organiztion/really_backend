@@ -64,7 +64,6 @@ updateRate = async (req, res) => {
       let str1 = "rate.numOfValue" + rate.value;
       let str2 = "rate.numOfValue" + findRate.value;
       let obj = { $inc: { [str1]: 1, [str2]: -1 } };
-      console.log(obj);
       
       let unit = await unitService.updateUnitCb(obj, { _id: rate.unitId });
       
@@ -77,7 +76,6 @@ updateRate = async (req, res) => {
       res.status(400).send("Can`t update rate");
     }
   } catch (error) {
-    console.log(error);
     
     logger.error(error);
   }
