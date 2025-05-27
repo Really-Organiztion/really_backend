@@ -4,9 +4,11 @@ const ObjectId = Schema.ObjectId;
 
 const postSchema = new Schema(
   {
-    descriptionLangList : [{language : {type : String}, name : {type : String}}],
-    titleLangList : [{language : {type : String}, name : {type : String}}],
-   
+    descriptionLangList: [
+      { language: { type: String }, name: { type: String } },
+    ],
+    titleLangList: [{ language: { type: String }, name: { type: String } }],
+
     target: {
       type: String,
       required: true,
@@ -53,12 +55,35 @@ const postSchema = new Schema(
         insPrice: {
           type: Number,
         },
+        discount: {
+          type: Number,
+        },
+        minLimit: {
+          type: Number,
+        },
+        maxLimit: {
+          type: Number,
+        },
         currencyId: {
           type: ObjectId,
           ref: "currency",
         },
         currencyCode: {
           type: String,
+        },
+        pricingRole: [
+          {
+            price: {
+              type: Number,
+            },
+            from: {
+              type: Number,
+            },
+          },
+        ],
+        paymentPartly: {
+          type: [Number],
+          default: [],
         },
       },
     ],

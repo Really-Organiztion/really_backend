@@ -48,6 +48,8 @@ const walletSchema = new Schema(
     autoIndex: true,
   }
 );
+walletSchema.index({ currencyId: 1, userId: 1 }, { unique: true });
+
 const genericOperations = require("../genericService");
 module.exports = {
   genericSchema: genericOperations(mongoose.model("wallet", walletSchema)),

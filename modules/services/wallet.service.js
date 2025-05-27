@@ -26,7 +26,13 @@ findAll = (req, res) => {
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
     .populate("currencyId", [`${toFound}`, "code", "numericCode", "color"])
-    .populate("userId", ["firstName","lastName","gender","phone", "profileImage"])
+    .populate("userId", [
+      "firstName",
+      "lastName",
+      "gender",
+      "phone",
+      "profileImage",
+    ])
     .then(function (data) {
       res.status(200).send(data);
     })
@@ -73,7 +79,13 @@ findById = (req, res, id) => {
   walletModel.defaultSchema
     .findById(id)
     .populate("currencyId", [`${toFound}`, "code", "numericCode", "color"])
-    .populate("userId", ["firstName","lastName","gender","phone", "profileImage"])
+    .populate("userId", [
+      "firstName",
+      "lastName",
+      "gender",
+      "phone",
+      "profileImage",
+    ])
     .then(function (data) {
       res.status(200).send(data);
     })
@@ -83,11 +95,10 @@ findById = (req, res, id) => {
 };
 
 findOne = (where) => {
-
   return new Promise((resolve, reject) => {
     walletModel.defaultSchema
       .findOne(where)
-    
+
       .then(function (res) {
         resolve(res);
       })
@@ -97,12 +108,38 @@ findOne = (where) => {
   });
 };
 
+create = (req, res) => {
+  const lang = req.query.lang ? req.query.lang : "en";
+  const toFound = lang === "en" ? "name" : "nameAr";
+
+  walletModel.defaultSchema
+    .create(req.body)
+    .then(function (_obj) {
+      return walletModel.defaultSchema
+        .findById(_obj._id)
+        .populate("currencyId", [`${toFound}`, "code", "numericCode", "color"])
+        .populate("userId", [
+          "firstName",
+          "lastName",
+          "gender",
+          "phone",
+          "profileImage",
+        ]);
+    })
+    .then(function (populatedObj) {
+      res.status(200).send(populatedObj);
+    })
+    .catch(function (err) {
+      res.status(400).send(err);
+    });
+};
+
 module.exports = {
   deleteWallet: walletModel.genericSchema.delete,
   updateWallet: walletModel.genericSchema.update,
   updateWalletStatus,
   findById,
-  create: walletModel.genericSchema.create,
+  create,
   findAll,
   findOne,
   updateCb,

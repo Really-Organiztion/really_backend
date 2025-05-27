@@ -262,6 +262,40 @@ findAll = (req, res) => {
           updatedAt: { $first: `$updatedAt` },
         },
       },
+      {
+      $addFields: {
+        plansList: {
+          $map: {
+            input: "$plansList",
+            as: "plan",
+            in: {
+              $mergeObjects: [
+                "$$plan",
+                {
+                  pricingRole: {
+                    $cond: {
+                      if: {
+                        $and: [
+                          { $isArray: "$$plan.pricingRole" },
+                          { $gt: [{ $size: "$$plan.pricingRole" }, 0] }
+                        ]
+                      },
+                      then: {
+                        $sortArray: {
+                          input: "$$plan.pricingRole",
+                          sortBy: { from: 1 }
+                        }
+                      },
+                      else: "$$plan.pricingRole"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
     ])
     .sort(sort)
     .skip((pageNumber - 1) * pageSize)
@@ -474,6 +508,40 @@ findById = (req, res, id) => {
           updatedAt: { $first: "$updatedAt" },
         },
       },
+      {
+      $addFields: {
+        plansList: {
+          $map: {
+            input: "$plansList",
+            as: "plan",
+            in: {
+              $mergeObjects: [
+                "$$plan",
+                {
+                  pricingRole: {
+                    $cond: {
+                      if: {
+                        $and: [
+                          { $isArray: "$$plan.pricingRole" },
+                          { $gt: [{ $size: "$$plan.pricingRole" }, 0] }
+                        ]
+                      },
+                      then: {
+                        $sortArray: {
+                          input: "$$plan.pricingRole",
+                          sortBy: { from: 1 }
+                        }
+                      },
+                      else: "$$plan.pricingRole"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
     ])
     .then(function (data) {
       if (data.length === 0) {
