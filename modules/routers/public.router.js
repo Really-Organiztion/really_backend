@@ -18,7 +18,7 @@ publicRouter.post("/post", postController.getAllData);
 publicRouter.get("/getTimeZone", countryController.getTimeZone);
 publicRouter.post("/post/map", postController.getAllDataMap);
 publicRouter.post("/post/filterPost", postController.getAllDataFilterPost);
-publicRouter.get("/post/:id", postController.findById);
+publicRouter.post("/post/:id", postController.findById);
 publicRouter.post("/image3d/all", image3dController.getAllData);
 publicRouter.get("/image3d/:id", image3dController.findById);
 publicRouter.post("/likeReel/all", likeReelController.getAllData);

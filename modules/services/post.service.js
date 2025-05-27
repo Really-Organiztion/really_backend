@@ -34,6 +34,8 @@ findAll = (req, res) => {
   if (req.body.loginUserId) {
     req.body.loginUserId = new ObjectId(req.body.loginUserId);
   }
+  if (req.body.isLangList) {
+  }
   if (req.body["search"]) {
     $match.$or = [
       {
@@ -83,6 +85,72 @@ findAll = (req, res) => {
     } else if (req.body["sortByDates"] == "desc") {
       sort = { createdAt: -1, _id: -1 };
     }
+  }
+  let group1 = {
+    $group: {
+      _id: "$_id",
+      description: { $first: "$toFoundDescription.name" },
+      title: { $first: "$toFoundTitle.name" },
+      plansList: { $first: `$plansList` },
+      status: { $first: `$status` },
+      setting: { $first: `$setting` },
+      target: { $first: `$target` },
+      userId: { $first: `$userId` },
+      unitId: { $first: `$unitId` },
+      address: { $first: `$unit.address` },
+      type: { $first: `$unit.type` },
+      has3DView: { $first: `$unit.has3DView` },
+      imagesList: { $first: `$unit.imagesList` },
+      rate: { $first: `$unit.rate` },
+      additionsTypes: { $first: `$unit.additionsTypes` },
+      isTrusted: { $first: `$unit.isTrusted` },
+      isSeparated: { $first: `$unit.isSeparated` },
+      firstName: { $first: `$user.firstName` },
+      lastName: { $first: `$user.lastName` },
+      gender: { $first: `$user.gender` },
+      profileImage: { $first: `$user.profileImage` },
+      phone: { $first: `$user.phone` },
+      role: { $first: `$user.role` },
+      primImage: { $first: `$unit.primImage` },
+      favoritePost: { $first: `$favoritePost._id` },
+      updatedAt: { $first: `$updatedAt` },
+    },
+  };
+  let group2 = {
+    $group: {
+      _id: "$_id",
+      description: { $first: "$description" },
+      title: { $first: "$title" },
+      plansList: { $first: `$plansList` },
+      status: { $first: `$status` },
+      setting: { $first: `$setting` },
+      target: { $first: `$target` },
+      userId: { $first: `$userId` },
+      unitId: { $first: `$unitId` },
+      address: { $first: `$address` },
+      additionsTypes: { $first: `$additionsTypes` },
+      type: { $first: `$type` },
+      favoritePost: { $first: `$favoritePost` },
+      has3DView: { $first: `$has3DView` },
+      imagesList: { $first: `$imagesList` },
+      rate: { $first: `$rate` },
+      isTrusted: { $first: `$isTrusted` },
+      primImage: { $first: `$primImage` },
+      isSeparated: { $first: `$isSeparated` },
+      firstName: { $first: `$firstName` },
+      lastName: { $first: `$lastName` },
+      gender: { $first: `$gender` },
+      profileImage: { $first: `$profileImage` },
+      phone: { $first: `$phone` },
+      role: { $first: `$role` },
+      updatedAt: { $first: `$updatedAt` },
+    },
+  };
+  if (req.body.isLangList) {
+    group1.$group.descriptionLangList = { $first: "$descriptionLangList" };
+    group1.$group.titleLangList = { $first: "$titleLangList" };
+    group2.$group.descriptionLangList = { $first: "$descriptionLangList" };
+    group2.$group.titleLangList = { $first: "$titleLangList" };
   }
   postModel.defaultSchema
     .aggregate([
@@ -198,104 +266,46 @@ findAll = (req, res) => {
           },
         },
       },
-      {
-        $group: {
-          _id: "$_id",
-          description: { $first: "$toFoundDescription.name" },
-          title: { $first: "$toFoundTitle.name" },
-          plansList: { $first: `$plansList` },
-          status: { $first: `$status` },
-          setting: { $first: `$setting` },
-          target: { $first: `$target` },
-          userId: { $first: `$userId` },
-          unitId: { $first: `$unitId` },
-          address: { $first: `$unit.address` },
-          type: { $first: `$unit.type` },
-          has3DView: { $first: `$unit.has3DView` },
-          imagesList: { $first: `$unit.imagesList` },
-          rate: { $first: `$unit.rate` },
-          additionsTypes: { $first: `$unit.additionsTypes` },
-          isTrusted: { $first: `$unit.isTrusted` },
-          isSeparated: { $first: `$unit.isSeparated` },
-          firstName: { $first: `$user.firstName` },
-          lastName: { $first: `$user.lastName` },
-          gender: { $first: `$user.gender` },
-          profileImage: { $first: `$user.profileImage` },
-          phone: { $first: `$user.phone` },
-          role: { $first: `$user.role` },
-          primImage: { $first: `$unit.primImage` },
-          favoritePost: { $first: `$favoritePost._id` },
-          updatedAt: { $first: `$updatedAt` },
-        },
-      },
+      group1,
       {
         $match: $match2,
       },
 
+      group2,
       {
-        $group: {
-          _id: "$_id",
-          description: { $first: "$description" },
-          title: { $first: "$title" },
-          plansList: { $first: `$plansList` },
-          status: { $first: `$status` },
-          setting: { $first: `$setting` },
-          target: { $first: `$target` },
-          userId: { $first: `$userId` },
-          unitId: { $first: `$unitId` },
-          address: { $first: `$address` },
-          additionsTypes: { $first: `$additionsTypes` },
-          type: { $first: `$type` },
-          favoritePost: { $first: `$favoritePost` },
-          has3DView: { $first: `$has3DView` },
-          imagesList: { $first: `$imagesList` },
-          rate: { $first: `$rate` },
-          isTrusted: { $first: `$isTrusted` },
-          primImage: { $first: `$primImage` },
-          isSeparated: { $first: `$isSeparated` },
-          firstName: { $first: `$firstName` },
-          lastName: { $first: `$lastName` },
-          gender: { $first: `$gender` },
-          profileImage: { $first: `$profileImage` },
-          phone: { $first: `$phone` },
-          role: { $first: `$role` },
-          updatedAt: { $first: `$updatedAt` },
+        $addFields: {
+          plansList: {
+            $map: {
+              input: "$plansList",
+              as: "plan",
+              in: {
+                $mergeObjects: [
+                  "$$plan",
+                  {
+                    pricingRole: {
+                      $cond: {
+                        if: {
+                          $and: [
+                            { $isArray: "$$plan.pricingRole" },
+                            { $gt: [{ $size: "$$plan.pricingRole" }, 0] },
+                          ],
+                        },
+                        then: {
+                          $sortArray: {
+                            input: "$$plan.pricingRole",
+                            sortBy: { from: 1 },
+                          },
+                        },
+                        else: "$$plan.pricingRole",
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
         },
       },
-      {
-      $addFields: {
-        plansList: {
-          $map: {
-            input: "$plansList",
-            as: "plan",
-            in: {
-              $mergeObjects: [
-                "$$plan",
-                {
-                  pricingRole: {
-                    $cond: {
-                      if: {
-                        $and: [
-                          { $isArray: "$$plan.pricingRole" },
-                          { $gt: [{ $size: "$$plan.pricingRole" }, 0] }
-                        ]
-                      },
-                      then: {
-                        $sortArray: {
-                          input: "$$plan.pricingRole",
-                          sortBy: { from: 1 }
-                        }
-                      },
-                      else: "$$plan.pricingRole"
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      }
-    }
     ])
     .sort(sort)
     .skip((pageNumber - 1) * pageSize)
@@ -415,7 +425,39 @@ updatePostCb = (obj, id) => {
 
 findById = (req, res, id) => {
   const lang = req.query.lang ? req.query.lang : "En";
-
+  let group1 = {
+    $group: {
+      _id: "$_id",
+      plansList: { $first: "$plansList" },
+      status: { $first: "$status" },
+      setting: { $first: "$setting" },
+      target: { $first: "$target" },
+      userId: { $first: "$userId" },
+      unitId: { $first: "$unitId" },
+      address: { $first: "$unit.address" },
+      type: { $first: "$unit.type" },
+      has3DView: { $first: "$unit.has3DView" },
+      imagesList: { $first: "$unit.imagesList" },
+      rate: { $first: "$unit.rate" },
+      isTrusted: { $first: "$unit.isTrusted" },
+      primImage: { $first: "$unit.primImage" },
+      isSeparated: { $first: "$unit.isSeparated" },
+      additionsTypes: { $first: "$unit.additionsTypes" },
+      firstName: { $first: "$user.firstName" },
+      lastName: { $first: "$user.lastName" },
+      gender: { $first: "$user.gender" },
+      profileImage: { $first: "$user.profileImage" },
+      phone: { $first: "$user.phone" },
+      role: { $first: "$user.role" },
+      title: { $first: "$titleLang.name" },
+      description: { $first: "$descriptionLang.name" },
+      updatedAt: { $first: "$updatedAt" },
+    },
+  };
+  if (req.body.isLangList) {
+    group1.$group.descriptionLangList = { $first: "$descriptionLangList" };
+    group1.$group.titleLangList = { $first: "$titleLangList" };
+  }
   postModel.defaultSchema
     .aggregate([
       {
@@ -479,69 +521,41 @@ findById = (req, res, id) => {
           },
         },
       },
+      group1,
       {
-        $group: {
-          _id: "$_id",
-          plansList: { $first: "$plansList" },
-          status: { $first: "$status" },
-          setting: { $first: "$setting" },
-          target: { $first: "$target" },
-          userId: { $first: "$userId" },
-          unitId: { $first: "$unitId" },
-          address: { $first: "$unit.address" },
-          type: { $first: "$unit.type" },
-          has3DView: { $first: "$unit.has3DView" },
-          imagesList: { $first: "$unit.imagesList" },
-          rate: { $first: "$unit.rate" },
-          isTrusted: { $first: "$unit.isTrusted" },
-          primImage: { $first: "$unit.primImage" },
-          isSeparated: { $first: "$unit.isSeparated" },
-          additionsTypes: { $first: "$unit.additionsTypes" },
-          firstName: { $first: "$user.firstName" },
-          lastName: { $first: "$user.lastName" },
-          gender: { $first: "$user.gender" },
-          profileImage: { $first: "$user.profileImage" },
-          phone: { $first: "$user.phone" },
-          role: { $first: "$user.role" },
-          title: { $first: "$titleLang.name" },
-          description: { $first: "$descriptionLang.name" },
-          updatedAt: { $first: "$updatedAt" },
+        $addFields: {
+          plansList: {
+            $map: {
+              input: "$plansList",
+              as: "plan",
+              in: {
+                $mergeObjects: [
+                  "$$plan",
+                  {
+                    pricingRole: {
+                      $cond: {
+                        if: {
+                          $and: [
+                            { $isArray: "$$plan.pricingRole" },
+                            { $gt: [{ $size: "$$plan.pricingRole" }, 0] },
+                          ],
+                        },
+                        then: {
+                          $sortArray: {
+                            input: "$$plan.pricingRole",
+                            sortBy: { from: 1 },
+                          },
+                        },
+                        else: "$$plan.pricingRole",
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
         },
       },
-      {
-      $addFields: {
-        plansList: {
-          $map: {
-            input: "$plansList",
-            as: "plan",
-            in: {
-              $mergeObjects: [
-                "$$plan",
-                {
-                  pricingRole: {
-                    $cond: {
-                      if: {
-                        $and: [
-                          { $isArray: "$$plan.pricingRole" },
-                          { $gt: [{ $size: "$$plan.pricingRole" }, 0] }
-                        ]
-                      },
-                      then: {
-                        $sortArray: {
-                          input: "$$plan.pricingRole",
-                          sortBy: { from: 1 }
-                        }
-                      },
-                      else: "$$plan.pricingRole"
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      }
-    }
     ])
     .then(function (data) {
       if (data.length === 0) {
