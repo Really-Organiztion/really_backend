@@ -55,22 +55,20 @@ updateWalletStatus = async (req, res, id) => {
     });
 };
 
-updateCb = (obj, id) => {
-  return new Promise((resolve, reject) => {
-    walletModel.defaultSchema
-      .findOneAndUpdate(
-        {
-          _id: id,
-        },
-        obj
-      )
-      .then(function (res) {
-        resolve(res);
-      })
-      .catch(function (err) {
-        reject(null);
-      });
-  });
+updateCb = async (obj, id, session = null) => {
+  try {
+    const updated = await walletModel.defaultSchema.findOneAndUpdate(
+      { _id: id },
+      obj,
+      {
+        new: true,
+        session,
+      }
+    );
+    return updated;
+  } catch (err) {
+    return null;
+  }
 };
 
 findById = (req, res, id) => {

@@ -170,7 +170,6 @@ findAllPrivate = async (req, res) => {
         $gte: d1,
         $lt: d2,
       };
-    
     } else if (where.firstDate) {
       let d1 = new Date(where.firstDate);
       let d2 = new Date(where.firstDate);
@@ -179,9 +178,8 @@ findAllPrivate = async (req, res) => {
         $gte: d1,
         // $lt: d2,
       };
-
     }
-  
+
     if (where && where.lastDateTo) {
       let d1 = new Date(where.lastDate);
       let d2 = new Date(where.lastDateTo);
@@ -190,7 +188,6 @@ findAllPrivate = async (req, res) => {
         $gte: d1,
         $lt: d2,
       };
-
     } else if (where.lastDate) {
       let d1 = new Date(where.lastDate);
       let d2 = new Date(where.lastDate);
@@ -200,7 +197,7 @@ findAllPrivate = async (req, res) => {
         // $lt: d2,
       };
     }
- 
+
     let sort = { createdAt: -1 };
     if (where.sortByPrice) {
       sort = { "plan.price": where.sortByPrice === "asc" ? 1 : -1 };
@@ -208,8 +205,7 @@ findAllPrivate = async (req, res) => {
       const direction = where.sortByDates === "asc" ? 1 : -1;
       sort = { createdAt: direction, _id: direction };
     }
-    
-    
+
     const pipeline = [
       { $match: match },
 
@@ -308,22 +304,18 @@ updateReceiptStatusForWS = (id, type, status) => {
     });
 };
 
-create = async (req, res) => {
+create = async (req, session) => {
   req.body.firstDate = customMethods.stripTimezone(req.body.firstDate);
   req.body.lastDate = customMethods.stripTimezone(req.body.lastDate);
   req.body.code = `${req.body.plan.type}-${req.body.plan.price}-${Math.random()
     .toString(36)
     .substring(2, 8)
     .toUpperCase()}`;
-  bookingModel.defaultSchema
-    .create(req.body)
-    .then(function (doc) {
-      webSocket.sendBooking(doc);
-      res.status(200).send(doc);
-    })
-    .catch(function (err) {
-      res.status(400).send(err);
-    });
+
+  const booking = new bookingModel.defaultSchema(req.body);
+  await booking.save({ session });
+  webSocket.sendBooking(booking);
+  return booking;
 };
 
 updateBooking = (req, res, id) => {

@@ -1,6 +1,7 @@
 const bookingService = require("../services/booking.service");
 const transactionController = require("../controllers/transaction.controller");
 const logger = require("../../helpers/logging");
+const mongoose = require('mongoose');
 
 getAllData = (req, res) => {
   try {
@@ -19,30 +20,39 @@ getAllDataPrivate = (req, res) => {
 };
 
 create = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    transactionController.createTransaction(
+    const transactionPayment = await transactionController.createTransaction(
       { body: req.body.transactionPayment },
-      (errPayment, transactionPayment) => {
-        if (errPayment) {
-          res.status(400).send(errPayment);
-        } else {
-          transactionController.createTransaction(
-            { body: req.body.transactionRecive },
-            (errReceive, transactionReceive) => {
-              if (errReceive) {
-                res.status(400).send(errReceive);
-              } else {
-                bookingService.create({ body: req.body.booking }, res);
-              }
-            }
-          );
-        }
-      }
+      session
     );
+
+    const transactionReceive = await transactionController.createTransaction(
+      { body: req.body.transactionRecive },
+      session
+    );
+
+    const booking = await bookingService.create(
+      { body: req.body.booking },
+      session
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(201).send({ transactionPayment, transactionReceive, booking });
+
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
     logger.error(error);
+    res.status(400).send({ error: error.message });
   }
 };
+
 
 findById = (req, res) => {
   try {

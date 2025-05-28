@@ -84,79 +84,70 @@ getAllData = (req, res) => {
 };
 
 create = async (req, res) => {
+  const session = await mongoose.startSession();
+
   try {
-    createTransaction(req, (err, obj) => {
-      if (err) {
-        res.status(400).send(err);
-      } else {
-        res.status(200).send(obj);
-      }
-    });
-  } catch (error) {
-    logger.error(error);
+    session.startTransaction();
+
+    const result = await createTransaction(req, session);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(200).send(result);
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+
+    res.status(400).send({ error: err.message || err });
   }
 };
 
-createTransaction = async (req, callBack) => {
-  callBack = callBack || function () {};
+const createTransaction = async (req, session) => {
   let transaction = req.body;
-  // let transaction = await transactionService.create(req);
-  // if (!transaction) {
-  //   callBack("Can`t add transaction",null)
-  //   return
-  // } else {
   let where = {};
+
   if (transaction?.walletId) {
     where["_id"] = new ObjectId(transaction.walletId);
   } else {
     where["userId"] = new ObjectId(transaction.userId);
     where["currencyId"] = new ObjectId(transaction.currencyId);
   }
-  let wallet = await walletService.findOne(where);
-  if (wallet) {
-    if (transaction.type == "Payment") {
-      if (transaction.amount > wallet.activeBalance + wallet.bonus) {
-        transaction.status = "Error";
-        let _transaction = await transactionService.create({
-          body: transaction,
-        });
-        await transactionService.updateCb(transaction, transaction._id);
-        callBack("The wallet balance is insufficient", null);
-        return;
-      } else {
-        if (wallet.activeBalance >= transaction.amount) {
-          wallet.activeBalance = wallet.activeBalance - transaction.amount;
-        } else {
-          let remain = transaction.amount - wallet.activeBalance;
-          wallet.activeBalance = transaction.amount - remain;
-          wallet.bonus = wallet.bonus - remain;
-        }
-      }
-    } else if (
-      transaction.type == "Receive" &&
-      transaction.status == "Completed"
-    ) {
-      wallet.holdBalance += transaction.amount;
-    } else if (
-      transaction.type == "Bonus" &&
-      transaction.status == "Completed"
-    ) {
-      wallet.bonus += transaction.amount;
-    }
-    let _transaction = await transactionService.create({ body: transaction });
-    let walletUpdated = await walletService.updateCb(wallet, wallet._id);
-    if (walletUpdated) {
-      callBack(null, _transaction);
-      return;
-    } else {
-      callBack("Can`t update Wallet balance", null);
-      return;
-    }
-  } else {
-    callBack("Wallet Not Found", null);
-    return;
+
+  const wallet = await walletService.findOne(where, session);
+  if (!wallet) {
+    throw new Error("Wallet Not Found");
   }
-  // }
+
+  if (transaction.type === "Payment") {
+    if (transaction.amount > wallet.activeBalance + wallet.bonus) {
+      transaction.status = "Error";
+      const _transaction = await transactionService.create({ body: transaction }, session);
+      await transactionService.updateCb(transaction, transaction._id, session);
+      throw new Error("The wallet balance is insufficient");
+    } else {
+      if (wallet.activeBalance >= transaction.amount) {
+        wallet.activeBalance -= transaction.amount;
+      } else {
+        const remain = transaction.amount - wallet.activeBalance;
+        wallet.activeBalance = 0;
+        wallet.bonus -= remain;
+      }
+    }
+  } else if (transaction.type === "Receive" && transaction.status === "Completed") {
+    wallet.holdBalance += transaction.amount;
+  } else if (transaction.type === "Bonus" && transaction.status === "Completed") {
+    wallet.bonus += transaction.amount;
+  }
+
+  const _transaction = await transactionService.create({ body: transaction }, session);
+  const walletUpdated = await walletService.updateCb(wallet, wallet._id, session);
+
+  if (!walletUpdated) {
+    throw new Error("Can't update Wallet balance");
+  }
+
+  return _transaction;
 };
 
 findById = (req, res) => {
@@ -169,66 +160,75 @@ findById = (req, res) => {
 };
 
 updateTransactionStatus = async (req, res) => {
+  const session = await mongoose.startSession();
+
   try {
+    session.startTransaction();
+
     let transaction = await transactionService.findOne({ _id: req.params.id });
     if (!transaction) {
-      res.status(400).send("Can`t Find transaction");
-    } else {
-      let where = {};
-      if (transaction.walletId) {
-        where["_id"] = new ObjectId(transaction.walletId);
-      } else {
-        where["userId"] = new ObjectId(transaction.userId);
-        where["currencyId"] = new ObjectId(transaction.currencyId);
-      }
-      let wallet = await walletService.findOne(where);
-      if (wallet) {
-        if (transaction.type == "Deposit" && req.body.status == "Processing") {
-          if (
-            req.body.sessionData &&
-            req.body.sessionData.payment_status == "paid"
-          ) {
-            transaction.sessionData = req.body.sessionData;
-            transaction.status = "Completed";
-            wallet.activeBalance += transaction.amount;
-            transaction = await transactionService.updateCb(
-              transaction,
-              transaction._id
-            );
-          } else {
-            transaction.status = "Error";
-            await transactionService.updateCb(transaction, transaction._id);
-            res.status(400).send("The wallet balance is insufficient");
-            return;
-          }
-        } else if (
-          transaction.type == "Withdraw" &&
-          transaction.status == "Completed"
-        ) {
-          wallet.activeBalance -= transaction.amount;
-        } else if (transaction.type == "Active") {
-          wallet.holdBalance -= transaction.amount;
-          wallet.activeBalance += transaction.amount;
-        } else {
-          transaction = await transactionService.updateCb(
-            req.body,
-            transaction._id
-          );
-        }
-        let walletUpdated = await walletService.updateCb(wallet, wallet._id);
-        if (walletUpdated) {
-          res.status(200).send(transaction);
-        } else {
-          res.status(400).send("Can`t update Wallet balance");
-        }
-      } else {
-        res.status(400).send("Can`t update Wallet balance");
-      }
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).send("Can't find transaction");
     }
+
+    let where = {};
+    if (transaction.walletId) {
+      where["_id"] = new ObjectId(transaction.walletId);
+    } else {
+      where["userId"] = new ObjectId(transaction.userId);
+      where["currencyId"] = new ObjectId(transaction.currencyId);
+    }
+
+    let wallet = await walletService.findOne(where);
+    if (!wallet) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).send("Wallet not found");
+    }
+
+    if (transaction.type === "Deposit" && req.body.status === "Processing") {
+      if (req.body.sessionData?.payment_status === "paid") {
+        transaction.sessionData = req.body.sessionData;
+        transaction.status = "Completed";
+        wallet.activeBalance += transaction.amount;
+        transaction = await transactionService.updateCb(transaction, transaction._id, session);
+      } else {
+        transaction.status = "Error";
+        await transactionService.updateCb(transaction, transaction._id, session);
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(400).send("The wallet balance is insufficient");
+      }
+    } else if (transaction.type === "Withdraw" && transaction.status === "Completed") {
+      wallet.activeBalance -= transaction.amount;
+    } else if (transaction.type === "Active") {
+      wallet.holdBalance -= transaction.amount;
+      wallet.activeBalance += transaction.amount;
+    } else {
+      transaction = await transactionService.updateCb(req.body, transaction._id, session);
+    }
+
+    const walletUpdated = await walletService.updateCb(wallet, wallet._id, session);
+
+    if (!walletUpdated) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).send("Can't update Wallet balance");
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+    res.status(200).send(transaction);
+
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     logger.error(error);
+    res.status(500).send("Internal Server Error");
   }
 };
+
 
 // updateTransactionStatus = (req, res) => {
 //   try {

@@ -1,7 +1,7 @@
 const transactionModel = require("../models/transaction.model");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
-const axios = require('axios');
+const axios = require("axios");
 findAll = (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
@@ -63,7 +63,6 @@ updateTransactionStatus = async (req, res, id) => {
     });
 };
 thawaniSession = async (transaction) => {
-
   return new Promise(async (resolve, reject) => {
     try {
       const thawaniResponse = await axios.get(
@@ -76,7 +75,7 @@ thawaniSession = async (transaction) => {
           },
         }
       );
-      
+
       if (thawaniResponse?.data) {
         resolve({ doc: thawaniResponse.data, done: true });
       } else {
@@ -88,26 +87,19 @@ thawaniSession = async (transaction) => {
   });
 };
 
-create = async (req) => {
-  return new Promise((resolve, reject) => {
-    if (req.body) {
-      if (req.body.status == "Processing") {
-        if (req.body?.sessionData?.success) {
-          req.body.status = "Completed";
-        } else {
-          req.body.status = "Error";
-        }
+create = async (req, session = null) => {
+  if (req.body) {
+    if (req.body.status === "Processing") {
+      if (req.body?.sessionData?.success) {
+        req.body.status = "Completed";
+      } else {
+        req.body.status = "Error";
       }
     }
-    transactionModel.defaultSchema
-      .create(req.body)
-      .then(function (doc) {
-        resolve(doc);
-      })
-      .catch(function (err) {
-        reject(err);
-      });
-  });
+  }
+
+  const transaction = new transactionModel.defaultSchema(req.body);
+  return await transaction.save({ session });
 };
 
 findOne = (where) => {
