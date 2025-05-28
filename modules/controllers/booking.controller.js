@@ -28,7 +28,7 @@ create = async (req, res) => {
       { body: req.body.transactionPayment },
       session
     );
-
+    
     const transactionReceive = await transactionController.createTransaction(
       { body: req.body.transactionRecive },
       session
@@ -42,7 +42,7 @@ create = async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(201).send({ transactionPayment, transactionReceive, booking });
+    res.status(200).send({ transactionPayment, transactionReceive, booking });
 
   } catch (error) {
     await session.abortTransaction();

@@ -113,9 +113,10 @@ const createTransaction = async (req, session) => {
     where["userId"] = new ObjectId(transaction.userId);
     where["currencyId"] = new ObjectId(transaction.currencyId);
   }
-
+  
   const wallet = await walletService.findOne(where, session);
   if (!wallet) {
+
     throw new Error("Wallet Not Found");
   }
 
