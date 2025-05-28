@@ -1,7 +1,7 @@
 const bookingService = require("../services/booking.service");
 const transactionController = require("../controllers/transaction.controller");
 const logger = require("../../helpers/logging");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 getAllData = (req, res) => {
   try {
@@ -24,11 +24,24 @@ create = async (req, res) => {
   session.startTransaction();
 
   try {
+    const existingBooking = await bookingService.findExistingBooking(
+      req.body.booking.unitId,
+      req.body.booking.firstDate,
+      req.body.booking.lastDate
+    );
+
+
+    if (existingBooking) {
+      res.status(400).send("This booking already exists");
+      await session.abortTransaction();
+      session.endSession();
+      return;
+    }
     const transactionPayment = await transactionController.createTransaction(
       { body: req.body.transactionPayment },
       session
     );
-    
+
     const transactionReceive = await transactionController.createTransaction(
       { body: req.body.transactionRecive },
       session
@@ -43,7 +56,6 @@ create = async (req, res) => {
     session.endSession();
 
     res.status(200).send({ transactionPayment, transactionReceive, booking });
-
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -52,7 +64,6 @@ create = async (req, res) => {
     res.status(400).send({ error: error.message });
   }
 };
-
 
 findById = (req, res) => {
   try {
@@ -86,12 +97,12 @@ updateReceiptStatus = (req, res) => {
 //     const status = req.body.status;
 
 //     const cb = await bookingService.updateReceiptStatus(id,type,status );
-    
+
 //     if(cb.result) {
 //       res.status(200).send(cb.result);
 //     } else {
 //       res.status(400).send(cb.err);
-      
+
 //     }
 //   } catch (error) {
 //     logger.error(error);

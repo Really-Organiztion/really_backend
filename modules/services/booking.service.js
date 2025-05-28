@@ -338,6 +338,28 @@ updateBooking = (req, res, id) => {
     });
 };
 
+findExistingBooking = async (unitId, firstDate, lastDate) => {
+  try {
+    
+    const result = await bookingModel.defaultSchema.findOne({
+      unitId: new mongoose.Types.ObjectId(unitId),
+      $or: [
+        {
+          firstDate: { $lt: lastDate },
+          lastDate: { $gt: firstDate },
+        },
+      ],
+    });
+    return result;
+  } catch (err) {
+    console.error(
+      "An error occurred while searching for the watch:",
+      err.message
+    );
+    return null;
+  }
+};
+
 module.exports = {
   deleteBooking: bookingModel.genericSchema.delete,
   updateBooking,
@@ -346,6 +368,7 @@ module.exports = {
   updateReceiptStatusForWS,
   findById: bookingModel.genericSchema.findById,
   create,
+  findExistingBooking,
   findAll,
   findAllPrivate,
 };
