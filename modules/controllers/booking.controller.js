@@ -24,12 +24,24 @@ create = async (req, res) => {
   session.startTransaction();
 
   try {
+    const start = new Date(req.body.booking.firstDate);
+    const end = new Date(req.body.booking.lastDate);
+
+    if (isNaN(start) || isNaN(end)) {
+      return res.status(400).json({ error: "Invalid date format" });
+    }
+
+    if (end <= start) {
+      return res
+        .status(400)
+        .json({ error: "Last date must be after first date" });
+    }
+
     const existingBooking = await bookingService.findExistingBooking(
       req.body.booking.unitId,
       req.body.booking.firstDate,
       req.body.booking.lastDate
     );
-
 
     if (existingBooking) {
       res.status(400).send("This booking already exists");
