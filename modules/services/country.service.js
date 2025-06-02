@@ -87,10 +87,10 @@ findAll = (req, res) => {
       {
         $group,
       },
+      { $sort: { _id: -1 } },
+      { $skip: (pageNumber - 1) * pageSize },
+      { $limit: pageSize },
     ])
-    .sort({ _id: -1 })
-    .skip((pageNumber - 1) * pageSize)
-    .limit(pageSize)
     .then(function (data) {
       res.status(200).send(data);
     })
