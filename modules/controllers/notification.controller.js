@@ -60,7 +60,8 @@ const send = async (req, res) => {
       fireBase.sendFcm({ ...req.body, deviceTokenList });
 
       notificationService.createMany(notificationList);
-    } else if (req.body.action !== "Save") {
+    } 
+     if (req.body.action !== "Save") {
       if (deviceTokenList.length > 0) {
         req.body.deviceTokenList = deviceTokenList;
       }
