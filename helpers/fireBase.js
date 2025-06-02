@@ -30,7 +30,7 @@ const sendFcm = async (obj) => {
         },
         data: {
           click_action: "FLUTTER_NOTIFICATION_CLICK",
-          type: obj.type || "",
+          ...obj,
         },
       };
 
@@ -61,7 +61,7 @@ const sendFcm = async (obj) => {
         },
         data: {
           click_action: "FLUTTER_NOTIFICATION_CLICK",
-          type: obj.type || "",
+          ...obj,
         },
       }));
 
@@ -95,7 +95,7 @@ const sendFcm = async (obj) => {
         },
         data: {
           click_action: "FLUTTER_NOTIFICATION_CLICK",
-          type: obj.type || "",
+          ...obj,
         },
       };
 
