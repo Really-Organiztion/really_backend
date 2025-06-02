@@ -31,6 +31,9 @@ const send = async (req, res) => {
       const userList = await getTargetUsers(type, userIdList);
 
       if (type === "Private") {
+        if(!req.body.deviceToken) {
+          return res.status(400).send({ error: "Device token is required" });
+        }
         notificationList.push({ ...req.body });
       } else {
         for (const user of userList) {
@@ -39,14 +42,14 @@ const send = async (req, res) => {
         }
       }
 
-      fireBase.sendFcm({ ...req.body, deviceTokenList });
+      fireBase.sendFcm({ ...req.body, deviceTokenList, ...req.body.data });
 
       await notificationService.createMany(notificationList);
     }
 
     if (action !== "Save" && deviceTokenList.length > 0) {
       req.body.deviceTokenList = deviceTokenList;
-      await fireBase.sendFcm(req.body);
+      await fireBase.sendFcm(req.body, ...req.body.data);
     }
 
     return res.status(200).send({ message: "Success" });
