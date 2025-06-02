@@ -5,7 +5,19 @@ if (!admin.apps.length) {
     credential: admin.credential.cert(serviceAccount),
   });
 }
+
+
+const stringifyData = (dataObj) => {
+  const result = {};
+  for (const key in dataObj) {
+    if (dataObj[key] !== undefined && dataObj[key] !== null) {
+      result[key] = String(dataObj[key]);
+    }
+  }
+  return result;
+};
 const sendFcm = async (obj) => {
+console.log("🔥 Sending FCM to deviceToken:", obj.deviceToken);  
   try {
     const messaging = admin.messaging();
 
@@ -30,7 +42,7 @@ const sendFcm = async (obj) => {
         },
         data: {
           click_action: "FLUTTER_NOTIFICATION_CLICK",
-          ...obj,
+          ...stringifyData(obj),
         },
       };
 
@@ -61,7 +73,7 @@ const sendFcm = async (obj) => {
         },
         data: {
           click_action: "FLUTTER_NOTIFICATION_CLICK",
-          ...obj,
+          ...stringifyData(obj),
         },
       }));
 
@@ -95,7 +107,7 @@ const sendFcm = async (obj) => {
         },
         data: {
           click_action: "FLUTTER_NOTIFICATION_CLICK",
-          ...obj,
+          ...stringifyData(obj),
         },
       };
 
