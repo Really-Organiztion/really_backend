@@ -23,16 +23,16 @@ create = (req, res) => {
 
 const send = async (req, res) => {
   try {
-    const { action, type, userIdList } = req.body;
+    const { action, type, userIdList, userId } = req.body;
     let notificationList = [];
     let deviceTokenList = [];
 
     if (action !== "Send") {
-      const userList = await getTargetUsers(type, userIdList);
+      const userList = await getTargetUsers(type, userIdList, userId);
 
       if (type === "Private") {
-        if(!req.body.deviceToken) {
-          return res.status(400).send({ error: "Device token is required" });
+        if (!req.body.deviceToken) {
+          req.body.deviceToken = userList[0].deviceToken;          
         }
         notificationList.push({ ...req.body });
       } else {
@@ -59,7 +59,7 @@ const send = async (req, res) => {
   }
 };
 
-const getTargetUsers = async (type, userIdList) => {
+const getTargetUsers = async (type, userIdList, userId) => {
   const commonFilter = { status: "Active", isDeleted: false };
 
   switch (type) {
@@ -73,6 +73,9 @@ const getTargetUsers = async (type, userIdList) => {
 
     case "Public":
       return await userService.getAllIdAndDeviceToken(commonFilter);
+
+    case "Private":
+      return await userService.getAllIdAndDeviceToken({_id: userId});
 
     case "Custom":
       if (Array.isArray(userIdList) && userIdList.length > 0) {
