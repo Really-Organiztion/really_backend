@@ -49,12 +49,12 @@ const send = async (req, res) => {
 
     if (action !== "Save" && deviceTokenList.length > 0) {
       req.body.deviceTokenList = deviceTokenList;
-      await fireBase.sendFcm(req.body, ...req.body.data);
+      await fireBase.sendFcm({...req.body, ...req.body.data});
     }
 
     return res.status(200).send({ message: "Success" });
   } catch (error) {
-    logger.error(error);
+    logger.error(error);    
     return res.status(500).send({ error: "Internal Server Error" });
   }
 };
