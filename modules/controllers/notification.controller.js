@@ -32,7 +32,7 @@ const send = async (req, res) => {
 
       if (type === "Private") {
         if (!req.body.deviceToken) {
-          req.body.deviceToken = userList[0].deviceToken;          
+          req.body.deviceToken = userList?.[0]?.deviceToken;          
         }
         notificationList.push({ ...req.body });
       } else {
