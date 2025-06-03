@@ -42,14 +42,14 @@ const send = async (req, res) => {
         }
       }
 
-      fireBase.sendFcm({ ...req.body, deviceTokenList, ...req.body.data });
+      fireBase.sendFcm({ ...req.body, deviceTokenList });
 
       await notificationService.createMany(notificationList);
     }
 
     if (action !== "Save" && deviceTokenList.length > 0) {
       req.body.deviceTokenList = deviceTokenList;
-      await fireBase.sendFcm({...req.body, ...req.body.data});
+      await fireBase.sendFcm({...req.body});
     }
 
     return res.status(200).send({ message: "Success" });

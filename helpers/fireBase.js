@@ -7,17 +7,28 @@ if (!admin.apps.length) {
 }
 
 
-const stringifyData = (dataObj) => {
+const stringifyData = (obj) => {
   const result = {};
-  for (const key in dataObj) {
-    if (dataObj[key] !== undefined && dataObj[key] !== null) {
-      result[key] = String(dataObj[key]);
+
+  for (const key in obj) {
+    const value = obj[key];
+
+    if (value === undefined || value === null) continue;
+
+    if (typeof value === "object" && !Array.isArray(value)) {
+      result[key] = JSON.stringify(stringifyData(value));
+    } else {
+      result[key] = String(value);
     }
   }
+
   return result;
 };
+
+
 const sendFcm = async (obj) => {
 console.log("🔥 Sending FCM to deviceToken:", obj.deviceToken);  
+
   try {
     const messaging = admin.messaging();
 
