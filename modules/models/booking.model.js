@@ -116,6 +116,8 @@ const bookingSchema = new Schema(
     autoIndex: true,
   }
 );
+bookingSchema.index({ unitId: 1, firstDate: 1, lastDate: 1 });
+
 const genericOperations = require("../genericService");
 module.exports = {
   genericSchema: genericOperations(mongoose.model("booking", bookingSchema)),

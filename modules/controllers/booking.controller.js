@@ -41,7 +41,7 @@ create = async (req, res) => {
       req.body.booking.unitId,
       req.body.booking.firstDate,
       req.body.booking.lastDate
-    );
+    );    
 
     if (existingBooking) {
       res.status(400).send("This booking already exists");

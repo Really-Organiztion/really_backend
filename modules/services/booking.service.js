@@ -338,27 +338,42 @@ updateBooking = (req, res, id) => {
     });
 };
 
-findExistingBooking = async (unitId, firstDate, lastDate) => {
+const toUTCStartOfDay = (dateString) => {
+  const d = new Date(dateString);
+  return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+};
+
+const findExistingBooking = async (unitId, firstDate, lastDate) => {
   try {
-    
-    const result = await bookingModel.defaultSchema.findOne({
+    const first = toUTCStartOfDay(firstDate);
+    const last = toUTCStartOfDay(lastDate);
+
+    const booking = await bookingModel.defaultSchema.findOne({
       unitId: new mongoose.Types.ObjectId(unitId),
-      $or: [
-        {
-          firstDate: { $lt: lastDate },
-          lastDate: { $gt: firstDate },
-        },
-      ],
+      $expr: {
+        $and: [
+          { $lt: ["$firstDate", last] }, 
+          { $gt: ["$lastDate", first] }, 
+          {
+            $not: {
+              $or: [
+                { $eq: ["$lastDate", first] },
+                { $eq: ["$firstDate", last] }
+              ]
+            }
+          }
+        ]
+      }
     });
-    return result;
+
+    return booking || null;
   } catch (err) {
-    console.error(
-      "An error occurred while searching for the watch:",
-      err.message
-    );
+    console.error("An error occurred while searching for the booking:", err.message);
     return null;
   }
 };
+
+
 
 module.exports = {
   deleteBooking: bookingModel.genericSchema.delete,
