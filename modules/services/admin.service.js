@@ -1,7 +1,6 @@
 const adminModel = require("../models/admin.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const config = require("../../config/default.json");
 
 findAdmin = async (req, res) => {
   const username = req.body.username;
@@ -42,7 +41,7 @@ findAdmin = async (req, res) => {
     }
   }
 };
-findAllAdmins = async (req, res) => {
+findAllAdmins = async (req, res) => {  
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
   let where = {};
@@ -76,12 +75,12 @@ function createSuperAdmin(callback) {
   callback = callback || {};
   bcrypt.genSalt(10, (err, salt) => {
     if (err) return callback(err);
-    bcrypt.hash(config.superAdmin.password, salt, (err, hash) => {
+    bcrypt.hash(process.env.password, salt, (err, hash) => {
       if (err) callback(err);
       let body = {
-        username: config.superAdmin.username,
+        username: process.env.username,
         password: hash,
-        role : config.superAdmin.role,
+        role : 0,
       };
       adminModel.defaultSchema.create(body)
       .then(function (obj) {

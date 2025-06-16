@@ -1,7 +1,6 @@
 const adminService = require("../services/admin.service");
 const bcrypt = require("bcryptjs");
 const logger = require("../../helpers/logging");
-const config = require("../../config/default.json");
 const roles = require("../../helpers/roles");
 const jwt = require("jsonwebtoken");
 
@@ -132,7 +131,7 @@ logout = (req, res) => {
   // roles.logOut(req.headers);
 };
 function loginAsSuperAdmin() {
-  adminService.loginAsSuperAdmin(config.superAdmin.username, (err, data) => {
+  adminService.loginAsSuperAdmin(process.env.username, (err, data) => {
     if (err || !data)
       adminService.createSuperAdmin((data) => {
         logger.info("Super Admin Created Done");

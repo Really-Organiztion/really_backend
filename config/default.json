@@ -1,8 +1,0 @@
-{
-  "db": "mongodb://localhost:27017/ReallyBooking",
-  "superAdmin": {
-    "username": "admin",
-    "password": "Admin12#$",
-    "role" : 0
-  }
-}
