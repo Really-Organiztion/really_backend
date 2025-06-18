@@ -15,24 +15,25 @@ const roles = require("../../helpers/roles");
 
 publicRouter.post("/booking/all", bookingController.getAllData);
 publicRouter.post("/post", postController.getAllData);
-publicRouter.get("/getTimeZone", countryController.getTimeZone);
+publicRouter.get("/get-time-zone", countryController.getTimeZone);
 publicRouter.post("/post/map", postController.getAllDataMap);
-publicRouter.post("/post/filterPost", postController.getAllDataFilterPost);
+publicRouter.post("/post/filter-post", postController.getAllDataFilterPost);
 publicRouter.post("/post/:id", postController.findById);
 publicRouter.post("/image3d/all", image3dController.getAllData);
 publicRouter.get("/image3d/:id", image3dController.findById);
-publicRouter.post("/likeReel/all", likeReelController.getAllData);
-publicRouter.get("/likeReel/:id", likeReelController.findById);
+publicRouter.post("/like-reel/all", likeReelController.getAllData);
+publicRouter.get("/like-reel/:id", likeReelController.findById);
 publicRouter.post("/terms/all", termsController.getAllData);
 publicRouter.get("/terms/:id", termsController.findById);
-publicRouter.post("/favoritePost/all", favoritePostController.getAllData);
-publicRouter.get("/favoritePost/:id", favoritePostController.findById);
+publicRouter.post("/favorite-post/all", favoritePostController.getAllData);
+publicRouter.get("/favorite-post/:id", favoritePostController.findById);
 publicRouter.post("/reel/all", reelController.getAllData);
 publicRouter.get("/reel/:id", reelController.findById);
 publicRouter.post("/comment/all", commentController.getAllData);
 publicRouter.get("/unit/:id", unitController.findById);
-publicRouter.post("/unit/nearUnitsToPosts", unitController.findNearUnitsToPosts);
-publicRouter.post("/unit/nearUnits", unitController.findNearUnits);
+publicRouter.post("/unit/near-units-to-posts", unitController.findNearUnitsToPosts);
+publicRouter.post("/unit/near-units", unitController.findNearUnits);
+publicRouter.post("/unit/get-coordinates", unitController.getCoordinates);
 
 publicRouter.post("/rate/allWithComments", rateController.getAllDataWithComments);
 

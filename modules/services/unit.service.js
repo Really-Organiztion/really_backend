@@ -4,6 +4,7 @@ const webSocket = require("../../helpers/websocket");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 const crypto = require("crypto");
+const puppeteer = require("puppeteer");
 
 findAll = (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
@@ -54,8 +55,20 @@ findAll = (req, res) => {
     .find(where)
     .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["firstName","lastName","gender","phone", "profileImage"])
-    .populate("linkedBy.userId", ["firstName","lastName","gender","phone", "profileImage"])
+    .populate("userId", [
+      "firstName",
+      "lastName",
+      "gender",
+      "phone",
+      "profileImage",
+    ])
+    .populate("linkedBy.userId", [
+      "firstName",
+      "lastName",
+      "gender",
+      "phone",
+      "profileImage",
+    ])
     // .populate("servicesId", [`${toFound}`, "subServicesList"])
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
@@ -97,7 +110,13 @@ findAllFilterCb = (req, res) => {
 
     unitModel.defaultSchema
       .find(where, { _id: 1 })
-      .populate("linkedBy.userId", ["firstName","lastName","gender","phone", "profileImage"])
+      .populate("linkedBy.userId", [
+        "firstName",
+        "lastName",
+        "gender",
+        "phone",
+        "profileImage",
+      ])
 
       // .populate("servicesId", [`${toFound}`, "subServicesList"])
       .then(function (data) {
@@ -215,16 +234,16 @@ findNearUnitsToPosts = (req, res) => {
   //     },
   //   }
   // )
-       // {
-      //   $match: {
-      //     location: {
-      //       $near: {
-      //         $geometry: { type: "Point", coordinates: req.body.coordinates },
-      //         $maxDistance: req.body.distance,
-      //       },
-      //     },
-      //   },
-      // },
+  // {
+  //   $match: {
+  //     location: {
+  //       $near: {
+  //         $geometry: { type: "Point", coordinates: req.body.coordinates },
+  //         $maxDistance: req.body.distance,
+  //       },
+  //     },
+  //   },
+  // },
 
   unitModel.defaultSchema
     .aggregate([
@@ -236,7 +255,7 @@ findNearUnitsToPosts = (req, res) => {
           distanceField: "calcDistance",
         },
       },
- 
+
       {
         $lookup: {
           from: "posts",
@@ -297,9 +316,9 @@ findNearUnitsToPosts = (req, res) => {
       },
       {
         $match: {
-          postId: { $ne: null }
-        }
-      }
+          postId: { $ne: null },
+        },
+      },
     ])
     .sort({ _id: -1 })
     .skip((pageNumber - 1) * pageSize)
@@ -331,7 +350,13 @@ findNearUnits = (req, res) => {
     )
     .sort({ _id: -1 })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["firstName","lastName","gender","phone", "profileImage"])
+    .populate("userId", [
+      "firstName",
+      "lastName",
+      "gender",
+      "phone",
+      "profileImage",
+    ])
 
     .skip((pageNumber - 1) * pageSize)
     .limit(pageSize)
@@ -349,8 +374,20 @@ findById = (req, res, id) => {
   unitModel.defaultSchema
     .findById(id)
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["firstName","lastName","gender","phone", "profileImage"])
-    .populate("linkedBy.userId", ["firstName","lastName","gender","phone", "profileImage"])
+    .populate("userId", [
+      "firstName",
+      "lastName",
+      "gender",
+      "phone",
+      "profileImage",
+    ])
+    .populate("linkedBy.userId", [
+      "firstName",
+      "lastName",
+      "gender",
+      "phone",
+      "profileImage",
+    ])
     // .populate("servicesId", [`${toFound}`, "subServicesList"])
     .then(function (data) {
       res.status(200).send(data);
@@ -372,8 +409,20 @@ updateUnit = async (req, res, id) => {
       setDefaultsOnInsert: true,
     })
     .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", ["firstName","lastName","gender","phone", "profileImage"])
-    .populate("linkedBy.userId", ["firstName","lastName","gender","phone", "profileImage"])
+    .populate("userId", [
+      "firstName",
+      "lastName",
+      "gender",
+      "phone",
+      "profileImage",
+    ])
+    .populate("linkedBy.userId", [
+      "firstName",
+      "lastName",
+      "gender",
+      "phone",
+      "profileImage",
+    ])
     .then(function (data) {
       if (req.body.status === "UnderReview" && data && data.userId) {
         let request = {
@@ -385,7 +434,7 @@ updateUnit = async (req, res, id) => {
           userId: data.userId._id,
           unitId: data._id,
         };
-        
+
         requestModel.defaultSchema
           .create(request)
           .then(function (_request) {
@@ -404,6 +453,31 @@ updateUnit = async (req, res, id) => {
     });
 };
 
+const getCoordinates = async (shortUrl) => {
+  const browser = await puppeteer.launch({ headless: "new" });
+  const page = await browser.newPage();
+
+  try {
+    await page.goto(shortUrl, { waitUntil: "networkidle2", timeout: 60000 });
+
+    const finalUrl = page.url();
+    const match = finalUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+
+    if (match) {
+      const latitude = parseFloat(match[1]);
+      const longitude = parseFloat(match[2]);
+      return { latitude, longitude };
+    } else {
+      return null;
+    }
+  } catch (err) {
+    console.error("Error while getting coordinates:", err.message);
+    return null;
+  } finally {
+    await browser.close();
+  }
+};
+
 module.exports = {
   deleteUnit: unitModel.genericSchema.delete,
   updateUnit,
@@ -415,4 +489,5 @@ module.exports = {
   findCoordinatesMatch,
   findNearUnits,
   findNearUnitsToPosts,
+  getCoordinates,
 };

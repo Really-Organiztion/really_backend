@@ -66,6 +66,34 @@ deleteUnit = (req, res) => {
   }
 };
 
+getCoordinates = async (req, res) => {
+  const { url } = req.body;
+
+  if (!url || typeof url !== "string") {
+    return res
+      .status(400)
+      .json({ error: "Please provide a valid URL in the 'url' field." });
+  }
+
+  try {
+    const coords = await unitService.getCoordinates(url);
+    if (coords) {
+      return res.json({ success: true, coordinates: coords });
+    } else {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: "Unable to extract coordinates from the provided URL.",
+        });
+    }
+  } catch (err) {
+    return res
+      .status(400)
+      .json({ success: false, error: "Coordinates not found." });
+  }
+};
+
 module.exports = {
   getAllData,
   findCoordinatesMatch,
@@ -75,4 +103,5 @@ module.exports = {
   findById,
   updateUnit,
   deleteUnit,
+  getCoordinates,
 };
