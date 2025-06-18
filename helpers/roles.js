@@ -39,8 +39,8 @@ const isAuthenticatedAsUser = async (req, res, next) => {
   if (decodedData) {
     let result = await userController.findUserById(decodedData.id);
     if (result) next();
-    else res.status(400).send('Must Be User');
-  } else res.status(400).send('Token Not Correct');
+    else res.status(400).send("Must Be User");
+  } else res.status(400).send("Token Not Correct");
 };
 
 const isAuthenticatedAsAdmin = async (req, res, next) => {
@@ -48,8 +48,18 @@ const isAuthenticatedAsAdmin = async (req, res, next) => {
   if (decodedData) {
     let result = await adminController.findAdminById(decodedData.id);
     if (result) next();
-    else res.status(400).send('Must Be Admin');
-  } else res.status(400).send('Token Not Correct');
+    else res.status(400).send("Must Be Admin");
+  } else res.status(400).send("Token Not Correct");
+};
+
+const isAuthenticatedAsSuperAdmin = async (req, res, next) => {
+  const decodedData = getDecodedToken(req.headers);
+  if (decodedData) {
+    let result = await adminController.findAdminById(decodedData.id);
+
+    if (result && result.role == 0) next();
+    else res.status(400).send("Must Be Admin");
+  } else res.status(400).send("Token Not Correct");
 };
 
 module.exports = {
@@ -57,5 +67,6 @@ module.exports = {
   getToken,
   getDecodedToken,
   isAuthenticatedAsAdmin,
+  isAuthenticatedAsSuperAdmin,
   isAuthenticatedAsUser,
 };

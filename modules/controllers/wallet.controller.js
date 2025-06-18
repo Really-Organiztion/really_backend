@@ -1,4 +1,5 @@
 const walletService = require("../services/wallet.service");
+const adminSettingService = require("../services/adminSetting.service");
 const logger = require("../../helpers/logging");
 
 getAllData = (req, res) => {
@@ -50,6 +51,16 @@ deleteWallet = (req, res) => {
   }
 };
 
+addBonus = async (obj) => {
+  try {
+    const adminSetting = await adminSettingService.getOneCb();
+    walletService.addBonus(obj , adminSetting);
+  } catch (error) {
+    
+    logger.error(error);
+  }
+};
+
 module.exports = {
   getAllData,
   create,
@@ -57,4 +68,5 @@ module.exports = {
   updateWalletStatus,
   updateWallet,
   deleteWallet,
+  addBonus,
 };

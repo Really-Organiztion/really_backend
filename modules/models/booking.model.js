@@ -109,6 +109,18 @@ const bookingSchema = new Schema(
       enum: ReceiptStatus,
       default: "waiting",
     },
+    payEvery: {
+      type: Number,
+      default: 0,
+    },
+    paidCounts: {
+      type: Number,
+      default: 0,
+    },
+    refId: {
+      type: ObjectId,
+      ref: "user",
+    },
   },
   {
     timestamps: true,

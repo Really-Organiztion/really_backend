@@ -132,6 +132,31 @@ create = (req, res) => {
     });
 };
 
+addBonus = (obj, adminSetting) => {
+  
+  return new Promise((resolve, reject) => {
+    walletModel.defaultSchema
+      .findOneAndUpdate(
+        {
+          userId: obj.userId,
+          currencyId: obj.currencyId,
+          status: "Working",
+          isDeleted: false,
+        },
+        { $inc: { bonus: adminSetting.bookingBounus } }
+      )
+
+      .then(function (res) {
+        
+        resolve(res);
+      })
+      .catch(function (err) {
+
+        reject(null);
+      });
+  });
+};
+
 module.exports = {
   deleteWallet: walletModel.genericSchema.delete,
   updateWallet: walletModel.genericSchema.update,
@@ -141,4 +166,5 @@ module.exports = {
   findAll,
   findOne,
   updateCb,
+  addBonus,
 };

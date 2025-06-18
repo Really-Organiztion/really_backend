@@ -146,8 +146,20 @@ const userSchema = new Schema(
   }
 );
 
- userSchema.index({ nationalID: 1, nativeCountryId: 1 }, { unique: true,sparse:true });
- userSchema.index({ phone: 1, }, { unique: true, partialFilterExpression: { phone: { $exists: true } } });
+userSchema.index(
+  { nationalID: 1, nativeCountryId: 1 },
+  { unique: true, sparse: true }
+);
+userSchema.index(
+  { phone: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      socialMediaToken: { $exists: false },
+      phone: { $type: "string" },
+    },
+  }
+);
 const genericOperations = require("../genericService");
 // userSchema.virtual("countries", {
 //   ref: "country",

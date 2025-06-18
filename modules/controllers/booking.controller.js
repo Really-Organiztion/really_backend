@@ -1,5 +1,6 @@
 const bookingService = require("../services/booking.service");
 const transactionController = require("../controllers/transaction.controller");
+const walletController = require("../controllers/wallet.controller");
 const logger = require("../../helpers/logging");
 const mongoose = require("mongoose");
 
@@ -41,7 +42,7 @@ create = async (req, res) => {
       req.body.booking.unitId,
       req.body.booking.firstDate,
       req.body.booking.lastDate
-    );    
+    );
 
     if (existingBooking) {
       res.status(400).send("This booking already exists");
@@ -63,6 +64,18 @@ create = async (req, res) => {
       { body: req.body.booking },
       session
     );
+
+    if (!booking) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).send("Can't create booking");
+    } else if (booking.refId && booking.plan?.currencyId) {
+      
+      walletController.addBonus({
+        userId: booking.refId,
+        currencyId: booking.plan.currencyId,
+      });
+    }
 
     await session.commitTransaction();
     session.endSession();
