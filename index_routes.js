@@ -7,7 +7,6 @@ router.use(passport.session());
 require("./helpers/passport")(passport);
 
 const errorMiddleware = require("./helpers/error");
-
 const routes = require("./modules/routes");
 const userAuthRouter = require("./modules/routers/userAuth.router");
 const countryRouter = require("./modules/routers/country.router");
@@ -22,7 +21,7 @@ router.use("/user-auth", userAuthRouter);
 router.use("/admin-auth", adminAuthRouter);
 router.use("/country", countryRouter);
 router.use("/service-type", serviceTypeRouter);
-router.use("/upload-file", uploadFileRouter);
+router.use("/uploadFile", uploadFileRouter);
 router.use("/payment", paymentRouter);
 
 router.use(
