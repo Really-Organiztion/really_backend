@@ -8,7 +8,7 @@ authRouter.post("/login", (req, res, next) => {
 });
 
 // Authentication with Social Media Accounts
-authRouter.post("/socialMediaLogin", (req, res, next) => {
+authRouter.post("/social-media-login", (req, res, next) => {
   userController.socialMediaLogin(req, res);
 });
 
@@ -17,19 +17,19 @@ authRouter.post("/register", (req, res, next) => {
   userController.createUser(req, res);
 });
 // Registration with Social Media Accounts
-authRouter.post("/socialMediaRegister", (req, res, next) => {
+authRouter.post("/social-media-register", (req, res, next) => {
   userController.socialMediaRegister(req, res);
 });
-authRouter.post("/verifyEmail", (req, res, next) => {
+authRouter.post("/verify-email", (req, res, next) => {
   userController.verifyEmail(req, res);
 });
-authRouter.post("/generatOptEmail", (req, res, next) => {
+authRouter.post("/generat-opt-email", (req, res, next) => {
   userController.generatOptEmail(req, res);
 });
-authRouter.get("/getOptEmail", (req, res, next) => {
+authRouter.get("/get-opt-email", (req, res, next) => {
   userController.getOptEmail(req, res);
 });
-authRouter.route("/forgetPassword").put((req, res) => {
+authRouter.route("/forget-password").put((req, res) => {
   userController.forgetPassword(req, res);
 });
 authRouter.get("/logout", (req, res, next) => {

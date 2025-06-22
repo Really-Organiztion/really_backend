@@ -16,7 +16,7 @@ termsRouter.delete(
 );
 
 termsRouter.put(
-  "/deleteReturn/:id",
+  "/delete-return/:id",
   roles.isAuthenticatedAsAdmin,
   termsController.deleteReturn
 );

@@ -18,7 +18,7 @@ reelRouter.delete(
 );
 
 reelRouter.put(
-  "/deleteReturn/:id",
+  "/delete-return/:id",
  
   reelController.deleteReturn
 );

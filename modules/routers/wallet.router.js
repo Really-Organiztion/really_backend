@@ -12,7 +12,7 @@ walletRouter.put(
   walletController.updateWallet
 );
 walletRouter.put(
-  "/updateStatus/:id",
+  "/update-status/:id",
   
   walletController.updateWalletStatus
 );

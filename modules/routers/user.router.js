@@ -13,19 +13,19 @@ userRouter.route("/").post((req, res) => {
 
 userRouter.delete("/:id", userController.deleteUser);
 userRouter.put(
-  "/deleteReturn/:id",
+  "/delete-return/:id",
   userController.deleteReturn
 );
 
 
-userRouter.route("/changePassword/:id").put((req, res) => {
+userRouter.route("/change-password/:id").put((req, res) => {
   userController.changePassword(req, res);
 });
-userRouter.route("/updateIdentity/:id").put((req, res) => {
+userRouter.route("/update-identity/:id").put((req, res) => {
   userController.updateIdentity(req, res);
 });
 
-userRouter.route("/changeEmail/:id").put((req, res) => {
+userRouter.route("/change-email/:id").put((req, res) => {
   userController.changeEmail(req, res);
 });
 

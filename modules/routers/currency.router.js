@@ -18,7 +18,7 @@ currencyRouter.delete(
 );
 
 currencyRouter.put(
-  "/deleteReturn/:id",
+  "/delete-return/:id",
   roles.isAuthenticatedAsAdmin,
   currencyController.deleteReturn
 );

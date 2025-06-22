@@ -19,7 +19,7 @@ countryRouter.delete(
 );
 
 countryRouter.put(
-  "/deleteReturn/:id",
+  "/delete-return/:id",
   roles.isAuthenticatedAsAdmin,
   countryController.deleteReturn
 );

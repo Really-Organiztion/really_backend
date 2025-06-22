@@ -12,7 +12,7 @@ requestRouter.put(
   requestController.updateRequest
 );
 requestRouter.delete("/:id",roles.isAuthenticatedAsAdmin, requestController.deleteRequest);
-requestRouter.delete("/isDelete/:id", requestController.isDeleteRequest);
-requestRouter.post("/deleteAll",roles.isAuthenticatedAsAdmin, requestController.deleteAllRequest);
+requestRouter.delete("/is-delete/:id", requestController.isDeleteRequest);
+requestRouter.post("/delete-all",roles.isAuthenticatedAsAdmin, requestController.deleteAllRequest);
 
 module.exports = requestRouter;

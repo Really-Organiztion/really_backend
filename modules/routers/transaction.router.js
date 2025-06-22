@@ -13,7 +13,7 @@ transactionRouter.put(
   transactionController.updateTransaction
 );
 transactionRouter.put(
-  "/updateStatus/:id",
+  "/update-status/:id",
   
   transactionController.updateTransactionStatus
 );

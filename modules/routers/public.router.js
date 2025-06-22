@@ -35,6 +35,6 @@ publicRouter.post("/unit/near-units-to-posts", unitController.findNearUnitsToPos
 publicRouter.post("/unit/near-units", unitController.findNearUnits);
 publicRouter.post("/unit/get-coordinates", unitController.getCoordinates);
 
-publicRouter.post("/rate/allWithComments", rateController.getAllDataWithComments);
+publicRouter.post("/rate/all-with-comments", rateController.getAllDataWithComments);
 
 module.exports = publicRouter;

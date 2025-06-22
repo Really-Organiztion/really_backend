@@ -12,12 +12,11 @@ bookingRouter.put(
   bookingController.updateBooking
 );
 bookingRouter.put(
-  "/updateStatus/:id",
-  
+  "/update-status/:id",
   bookingController.updateBookingStatus
 );
 bookingRouter.put(
-  "/updateReceiptStatus/:type/:id",
+  "/update-receipt-status/:type/:id",
   
   bookingController.updateReceiptStatus
 );

@@ -16,11 +16,11 @@ adminRouter.put(
   adminController.updateAdmin
 );
 adminRouter.put(
-  "/updateRole/:id/:admin",
+  "/updateR-role/:id/:admin",
   roles.isAuthenticatedAsAdmin,
   adminController.updateRoleAdmin
 );
-adminRouter.route("/changePassword/:id").put((req, res) => {
+adminRouter.route("/change-password/:id").put((req, res) => {
 
   const id = req.params.id;
   

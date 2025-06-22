@@ -18,11 +18,11 @@ const adminAuthRouter = require("./modules/routers/adminAuth.router");
 const paymentRouter = require("./modules/routers/payment.router");
 
 router.use("/public", publicRouter);
-router.use("/userAuth", userAuthRouter);
-router.use("/adminAuth", adminAuthRouter);
+router.use("/user-auth", userAuthRouter);
+router.use("/admin-auth", adminAuthRouter);
 router.use("/country", countryRouter);
-router.use("/serviceType", serviceTypeRouter);
-router.use("/uploadFile", uploadFileRouter);
+router.use("/service-type", serviceTypeRouter);
+router.use("/upload-file", uploadFileRouter);
 router.use("/payment", paymentRouter);
 
 router.use(
