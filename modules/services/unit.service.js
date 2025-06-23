@@ -174,13 +174,67 @@ create = async (req, res) => {
     });
 };
 
-findCoordinatesMatch = (req, res) => {
+
+const extractLatLngFromLink = (link) => {
+  const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
+  const match = link.match(regex);
+  if (match) {
+    return [parseFloat(match[2]), parseFloat(match[1])];
+  }
+
+  const altRegex = /[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/;
+  const altMatch = link.match(altRegex);
+  if (altMatch) {
+    return [parseFloat(altMatch[2]), parseFloat(altMatch[1])];
+  }
+
+  return null;
+};
+
+const extractLatLngWithPuppeteer = async (link) => {
+  try {
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    const page = await browser.newPage();
+    await page.goto(link, { waitUntil: "networkidle2" });
+
+    const finalUrl = page.url();
+    await browser.close();
+
+    const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
+    const match = finalUrl.match(regex);
+
+    if (match) {
+      const lat = parseFloat(match[1]);
+      const lng = parseFloat(match[2]);
+
+      console.log("✅ Extracted coordinates:", [lat, lng]); 
+      console.log("✅ Coordinates [lng, lat] (Mongo format):", [lng, lat]);
+
+      return [lng, lat];
+    }
+
+    console.warn("⚠️ No coordinates found in final URL.");
+    return null;
+  } catch (err) {
+    console.error("❌ Error extracting coordinates:", err.message);
+    return null;
+  }
+};
+
+const findCoordinatesMatch = async (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
-  unitModel.defaultSchema
-    .find({
+
+  let geoQuery = {};
+
+  if (req.body.coordinates && Array.isArray(req.body.coordinates)) {
+    geoQuery = {
       location: {
         $geoIntersects: {
           $geometry: {
@@ -189,33 +243,51 @@ findCoordinatesMatch = (req, res) => {
           },
         },
       },
-    })
-    .sort({ _id: -1 })
-    .populate("countryId", [`${toFound}`, "code", "numericCode"])
-    .populate("userId", [
-      "firstName",
-      "lastName",
-      "gender",
-      "phone",
-      "profileImage",
-    ])
-    .populate("linkedBy.userId", [
-      "firstName",
-      "lastName",
-      "gender",
-      "phone",
-      "profileImage",
-    ])
-    // .populate("servicesId", [`${toFound}`, "subServicesList"])
-    .skip((pageNumber - 1) * pageSize)
-    .limit(pageSize)
-    .then(function (unit) {
-      res.status(200).send(unit);
-    })
-    .catch(function (err) {
-      res.status(400).send(err);
-    });
+    };
+  } else if (req.body.gLocationLink) {
+    let point = extractLatLngFromLink(req.body.gLocationLink);
+    console.log(point,"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
+
+    if (!point && req.body.gLocationLink.includes("maps.app.goo.gl")) {
+      point = await extractLatLngWithPuppeteer(req.body.gLocationLink);
+    }
+    console.log(point,"vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
+
+    if (point) {
+      geoQuery = {
+        location: {
+          $geoIntersects: {
+            $geometry: {
+              type: "Point",
+              coordinates: point,
+            },
+          },
+        },
+      };
+    } else {
+      return res.status(400).send({ error: "Invalid location link format" });
+    }
+  } else {
+    return res.status(400).send({ error: "No coordinates or location link provided" });
+  }
+
+  try {
+    const units = await unitModel.defaultSchema
+      .find(geoQuery)
+      .sort({ _id: -1 })
+      .populate("countryId", [`${toFound}`, "code", "numericCode"])
+      .populate("userId", ["firstName", "lastName", "gender", "phone", "profileImage"])
+      .populate("linkedBy.userId", ["firstName", "lastName", "gender", "phone", "profileImage"])
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize);
+
+    res.status(200).send(units);
+  } catch (err) {
+    res.status(400).send(err);
+  }
 };
+
+
 
 findNearUnitsToPosts = (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
