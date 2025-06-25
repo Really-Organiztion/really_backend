@@ -183,7 +183,6 @@ const extractLatLngFromLink = (link) => {
   if (accurateMatch) {
     const lat = parseFloat(accurateMatch[1]);
     const lng = parseFloat(accurateMatch[2]);
-    console.log("🎯 Extracted from !3d...!4d...", [lng, lat]);
     return [lng, lat];
   }
 
@@ -193,7 +192,6 @@ const extractLatLngFromLink = (link) => {
   if (match) {
     const lat = parseFloat(match[1]);
     const lng = parseFloat(match[2]);
-    console.log("📍 Extracted from @LAT,LNG", [lng, lat]);
     return [lng, lat];
   }
 
@@ -203,14 +201,12 @@ const extractLatLngFromLink = (link) => {
   if (altMatch) {
     const lat = parseFloat(altMatch[1]);
     const lng = parseFloat(altMatch[2]);
-    console.log("🔍 Extracted from ?q=", [lng, lat]);
     return [lng, lat];
   }
 
   return null;
 };
 
-// 🧠 استخلاص الإحداثيات من روابط مختصرة باستخدام Puppeteer
 const extractLatLngWithPuppeteer = async (link) => {
   try {
     const browser = await puppeteer.launch({
@@ -222,25 +218,20 @@ const extractLatLngWithPuppeteer = async (link) => {
     await page.goto(link, { waitUntil: "networkidle2" });
 
     const finalUrl = page.url();
-    console.log("🔗 Final Puppeteer URL:", finalUrl);
 
     await browser.close();
 
     const point = extractLatLngFromLink(finalUrl);
     if (point) {
-      console.log("✅ Extracted from URL:", point);
       return point;
     }
 
-    console.warn("⚠️ No coordinates extracted from final URL.");
     return null;
   } catch (err) {
-    console.error("❌ Error extracting coordinates:", err.message);
     return null;
   }
 };
 
-// 🌍 دالة البحث عن الـ units حسب الإحداثيات
 const findCoordinatesMatch = async (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
@@ -262,13 +253,11 @@ const findCoordinatesMatch = async (req, res) => {
     };
   } else if (req.body.gLocationLink) {
     let point = extractLatLngFromLink(req.body.gLocationLink);
-    console.log("📌 Link-extracted point:", point);
 
     if (!point && req.body.gLocationLink.includes("maps.app.goo.gl")) {
       point = await extractLatLngWithPuppeteer(req.body.gLocationLink);
     }
 
-    console.log("📌 Final used point:", point);
 
     if (point) {
       geoQuery = {
