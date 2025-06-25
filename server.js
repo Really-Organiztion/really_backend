@@ -8,13 +8,13 @@ const session = require("express-session");
 const server = require("http").createServer(app);
 const wss = new WebSocket.Server({ server: server });
 
-require("dotenv").config(); // Set .env values to process
-
-const indexRoutes = require("./index_routes"); // this is for calling routes
+require("dotenv").config(); 
+app.set("trust proxy", 1)
+const indexRoutes = require("./index_routes"); 
 const logger = require("./helpers/logging");
 
-require("./helpers/middleware")(app); // this is for calling middleware
-require("./helpers/db_handler")(); // this is for calling Data base
+require("./helpers/middleware")(app);
+require("./helpers/db_handler")(); 
 app.get("/test", (req, res, next) => {
   res.send("App express on vrecel is done");
 });
@@ -34,5 +34,5 @@ const port = process.env.PORT || 4000;
 server.listen(port, function () {
   logger.info(`Server is listening on port : ${port}`);
 });
-require("./helpers/websocket").webs(wss); // this is for calling middleware
+require("./helpers/websocket").webs(wss);
 module.exports = server;
