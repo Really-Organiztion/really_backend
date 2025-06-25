@@ -174,7 +174,6 @@ create = async (req, res) => {
     });
 };
 
-
 const extractLatLngFromLink = (link) => {
   const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
   const match = link.match(regex);
@@ -194,12 +193,17 @@ const extractLatLngFromLink = (link) => {
 const extractLatLngWithPuppeteer = async (link) => {
   try {
     const browser = await puppeteer.launch({
-      headless: "new",
+      headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
 
     const page = await browser.newPage();
-    await page.goto(link, { waitUntil: "networkidle2" });
+
+    await page.setUserAgent(
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
+    );
+
+    await page.goto(link, { waitUntil: "networkidle2", timeout: 30000 });
 
     const finalUrl = page.url();
     await browser.close();
@@ -210,17 +214,12 @@ const extractLatLngWithPuppeteer = async (link) => {
     if (match) {
       const lat = parseFloat(match[1]);
       const lng = parseFloat(match[2]);
-
-      console.log("✅ Extracted coordinates:", [lat, lng]); 
-      console.log("✅ Coordinates [lng, lat] (Mongo format):", [lng, lat]);
-
-      return [lng, lat];
+      return [lat, lng];
     }
 
-    console.warn("⚠️ No coordinates found in final URL.");
     return null;
   } catch (err) {
-    console.error("❌ Error extracting coordinates:", err.message);
+    console.error("❌ Puppeteer error:", err.message || err);
     return null;
   }
 };
@@ -246,12 +245,10 @@ const findCoordinatesMatch = async (req, res) => {
     };
   } else if (req.body.gLocationLink) {
     let point = extractLatLngFromLink(req.body.gLocationLink);
-    console.log(point,"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
 
     if (!point && req.body.gLocationLink.includes("maps.app.goo.gl")) {
       point = await extractLatLngWithPuppeteer(req.body.gLocationLink);
     }
-    console.log(point,"vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
 
     if (point) {
       geoQuery = {
@@ -268,7 +265,9 @@ const findCoordinatesMatch = async (req, res) => {
       return res.status(400).send({ error: "Invalid location link format" });
     }
   } else {
-    return res.status(400).send({ error: "No coordinates or location link provided" });
+    return res
+      .status(400)
+      .send({ error: "No coordinates or location link provided" });
   }
 
   try {
@@ -276,8 +275,20 @@ const findCoordinatesMatch = async (req, res) => {
       .find(geoQuery)
       .sort({ _id: -1 })
       .populate("countryId", [`${toFound}`, "code", "numericCode"])
-      .populate("userId", ["firstName", "lastName", "gender", "phone", "profileImage"])
-      .populate("linkedBy.userId", ["firstName", "lastName", "gender", "phone", "profileImage"])
+      .populate("userId", [
+        "firstName",
+        "lastName",
+        "gender",
+        "phone",
+        "profileImage",
+      ])
+      .populate("linkedBy.userId", [
+        "firstName",
+        "lastName",
+        "gender",
+        "phone",
+        "profileImage",
+      ])
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize);
 
@@ -286,8 +297,6 @@ const findCoordinatesMatch = async (req, res) => {
     res.status(400).send(err);
   }
 };
-
-
 
 findNearUnitsToPosts = (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
