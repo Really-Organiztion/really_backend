@@ -175,6 +175,7 @@ create = async (req, res) => {
 };
 
 
+
 const extractLatLngFromLink = (link) => {
   const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
   const match = link.match(regex);
@@ -199,28 +200,41 @@ const extractLatLngWithPuppeteer = async (link) => {
     });
 
     const page = await browser.newPage();
-    await page.goto(link, { waitUntil: "networkidle2" });
+    await page.goto(link, { waitUntil: "networkidle2", timeout: 60000 });
 
     const finalUrl = page.url();
     console.log("🔗 Final Puppeteer URL:", finalUrl);
 
-    await browser.close();
-
+    // أولوية 1: من URL
     const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
     const match = finalUrl.match(regex);
-
     if (match) {
       const lat = parseFloat(match[1]);
       const lng = parseFloat(match[2]);
-
-      console.log("✅ Extracted coordinates:", [lat, lng]); 
-      console.log("✅ Coordinates [lng, lat] (Mongo format):", [lng, lat]);
-
-      return [lng,lat ];
+      console.log("✅ Extracted from URL:", [lng, lat]);
+      await browser.close();
+      return [lng, lat];
     }
 
-    console.warn("⚠️ No coordinates found in final URL.");
+    // أولوية 2: من meta tag
+    const metaContent = await page
+      .$eval('meta[property="og:description"]', el => el.content)
+      .catch(() => null);
+    if (metaContent) {
+      const metaMatch = metaContent.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
+      if (metaMatch) {
+        const lat = parseFloat(metaMatch[1]);
+        const lng = parseFloat(metaMatch[2]);
+        console.log("✅ Extracted from meta tag:", [lng, lat]);
+        await browser.close();
+        return [lng, lat];
+      }
+    }
+
+    console.warn("⚠️ Coordinates not found from URL or Meta.");
+    await browser.close();
     return null;
+
   } catch (err) {
     console.error("❌ Error extracting coordinates:", err.message);
     return null;
@@ -248,12 +262,13 @@ const findCoordinatesMatch = async (req, res) => {
     };
   } else if (req.body.gLocationLink) {
     let point = extractLatLngFromLink(req.body.gLocationLink);
-    console.log(point,"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
+    console.log("📌 Link-extracted point:", point);
 
     if (!point && req.body.gLocationLink.includes("maps.app.goo.gl")) {
       point = await extractLatLngWithPuppeteer(req.body.gLocationLink);
     }
-    console.log(point,"vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
+
+    console.log("📌 Final used point:", point);
 
     if (point) {
       geoQuery = {
@@ -285,6 +300,7 @@ const findCoordinatesMatch = async (req, res) => {
 
     res.status(200).send(units);
   } catch (err) {
+    console.error("❌ Error querying DB:", err.message);
     res.status(400).send(err);
   }
 };
