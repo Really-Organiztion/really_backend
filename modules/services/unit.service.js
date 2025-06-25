@@ -251,6 +251,7 @@ const findCoordinatesMatch = async (req, res) => {
     }
 
     if (point) {
+      console.log("📍 Extracted coordinates:", point);
       geoQuery = {
         location: {
           $geoIntersects: {

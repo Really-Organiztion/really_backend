@@ -187,17 +187,14 @@ module.exports = {
 
 // //     fcm.send(message, (err, response) => {
 // //       if (err) {
-// //         console.log(err,"vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
 
 // //         // callback({ err });
 // //       } else {
-// //         console.log(response,"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
 
 // //         // callback({ response: JSON.parse(response) });
 // //       }
 // //     });
 // //   } catch (err) {
-// //     console.log(err,"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
 // //     // callback({ err });
 // //   }
