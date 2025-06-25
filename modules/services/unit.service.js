@@ -216,7 +216,7 @@ const extractLatLngWithPuppeteer = async (link) => {
       console.log("✅ Extracted coordinates:", [lat, lng]); 
       console.log("✅ Coordinates [lng, lat] (Mongo format):", [lng, lat]);
 
-      return [lat,lng ];
+      return [lng,lat ];
     }
 
     console.warn("⚠️ No coordinates found in final URL.");
