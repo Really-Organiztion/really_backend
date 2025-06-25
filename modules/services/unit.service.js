@@ -177,21 +177,40 @@ create = async (req, res) => {
 
 
 const extractLatLngFromLink = (link) => {
+  // حاول تجيب !3dLAT!4dLNG
+  const accurateRegex = /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/;
+  const accurateMatch = link.match(accurateRegex);
+  if (accurateMatch) {
+    const lat = parseFloat(accurateMatch[1]);
+    const lng = parseFloat(accurateMatch[2]);
+    console.log("🎯 Extracted from !3d...!4d...", [lng, lat]);
+    return [lng, lat];
+  }
+
+  // fallback: @LAT,LNG
   const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
   const match = link.match(regex);
   if (match) {
-    return [parseFloat(match[2]), parseFloat(match[1])];
+    const lat = parseFloat(match[1]);
+    const lng = parseFloat(match[2]);
+    console.log("📍 Extracted from @LAT,LNG", [lng, lat]);
+    return [lng, lat];
   }
 
+  // fallback: ?q=LAT,LNG
   const altRegex = /[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/;
   const altMatch = link.match(altRegex);
   if (altMatch) {
-    return [parseFloat(altMatch[2]), parseFloat(altMatch[1])];
+    const lat = parseFloat(altMatch[1]);
+    const lng = parseFloat(altMatch[2]);
+    console.log("🔍 Extracted from ?q=", [lng, lat]);
+    return [lng, lat];
   }
 
   return null;
 };
 
+// 🧠 استخلاص الإحداثيات من روابط مختصرة باستخدام Puppeteer
 const extractLatLngWithPuppeteer = async (link) => {
   try {
     const browser = await puppeteer.launch({
@@ -200,47 +219,28 @@ const extractLatLngWithPuppeteer = async (link) => {
     });
 
     const page = await browser.newPage();
-    await page.goto(link, { waitUntil: "networkidle2", timeout: 60000 });
+    await page.goto(link, { waitUntil: "networkidle2" });
 
     const finalUrl = page.url();
     console.log("🔗 Final Puppeteer URL:", finalUrl);
 
-    // أولوية 1: من URL
-    const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
-    const match = finalUrl.match(regex);
-    if (match) {
-      const lat = parseFloat(match[1]);
-      const lng = parseFloat(match[2]);
-      console.log("✅ Extracted from URL:", [lng, lat]);
-      await browser.close();
-      return [lng, lat];
-    }
-
-    // أولوية 2: من meta tag
-    const metaContent = await page
-      .$eval('meta[property="og:description"]', el => el.content)
-      .catch(() => null);
-    if (metaContent) {
-      const metaMatch = metaContent.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
-      if (metaMatch) {
-        const lat = parseFloat(metaMatch[1]);
-        const lng = parseFloat(metaMatch[2]);
-        console.log("✅ Extracted from meta tag:", [lng, lat]);
-        await browser.close();
-        return [lng, lat];
-      }
-    }
-
-    console.warn("⚠️ Coordinates not found from URL or Meta.");
     await browser.close();
-    return null;
 
+    const point = extractLatLngFromLink(finalUrl);
+    if (point) {
+      console.log("✅ Extracted from URL:", point);
+      return point;
+    }
+
+    console.warn("⚠️ No coordinates extracted from final URL.");
+    return null;
   } catch (err) {
     console.error("❌ Error extracting coordinates:", err.message);
     return null;
   }
 };
 
+// 🌍 دالة البحث عن الـ units حسب الإحداثيات
 const findCoordinatesMatch = async (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
@@ -300,7 +300,6 @@ const findCoordinatesMatch = async (req, res) => {
 
     res.status(200).send(units);
   } catch (err) {
-    console.error("❌ Error querying DB:", err.message);
     res.status(400).send(err);
   }
 };
