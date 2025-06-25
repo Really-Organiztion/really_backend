@@ -202,6 +202,8 @@ const extractLatLngWithPuppeteer = async (link) => {
     await page.goto(link, { waitUntil: "networkidle2" });
 
     const finalUrl = page.url();
+    console.log("🔗 Final Puppeteer URL:", finalUrl);
+
     await browser.close();
 
     const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
