@@ -142,10 +142,20 @@ updateUnitCb = (obj, where) => {
 };
 
 create = async (req, res) => {
-  if (req.body.location && req.body.location.coordinates) {
-    req.body.location.coordinates = [req.body.location.coordinates];
-  }
+  if (req.body.location && Array.isArray(req.body.location.coordinates)) {
+    const originalCoords = req.body.location.coordinates;
 
+    const polygonCoords = Array.isArray(originalCoords[0][0])
+      ? originalCoords
+      : [originalCoords];
+
+    const reversedCoords = polygonCoords.map((ring) =>
+      ring.map(([lng, lat]) => [lat, lng])
+    );
+
+    req.body.location.coordinates = reversedCoords;
+  }
+  
   unitModel.defaultSchema
     .create(req.body)
     .then(function (doc) {
@@ -174,10 +184,7 @@ create = async (req, res) => {
     });
 };
 
-
-
 const extractLatLngFromLink = (link) => {
-  // حاول تجيب !3dLAT!4dLNG
   const accurateRegex = /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/;
   const accurateMatch = link.match(accurateRegex);
   if (accurateMatch) {
@@ -186,7 +193,6 @@ const extractLatLngFromLink = (link) => {
     return [lng, lat];
   }
 
-  // fallback: @LAT,LNG
   const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
   const match = link.match(regex);
   if (match) {
@@ -195,7 +201,6 @@ const extractLatLngFromLink = (link) => {
     return [lng, lat];
   }
 
-  // fallback: ?q=LAT,LNG
   const altRegex = /[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/;
   const altMatch = link.match(altRegex);
   if (altMatch) {
@@ -241,12 +246,17 @@ const findCoordinatesMatch = async (req, res) => {
   let geoQuery = {};
 
   if (req.body.coordinates && Array.isArray(req.body.coordinates)) {
+    const reversedCoordinates = req.body.coordinates.map(([lat, lng]) => [
+      lng,
+      lat,
+    ]);
+
     geoQuery = {
       location: {
         $geoIntersects: {
           $geometry: {
             type: "Polygon",
-            coordinates: [req.body.coordinates],
+            coordinates: [reversedCoordinates],
           },
         },
       },
@@ -257,7 +267,6 @@ const findCoordinatesMatch = async (req, res) => {
     if (!point && req.body.gLocationLink.includes("maps.app.goo.gl")) {
       point = await extractLatLngWithPuppeteer(req.body.gLocationLink);
     }
-
 
     if (point) {
       geoQuery = {
@@ -274,7 +283,9 @@ const findCoordinatesMatch = async (req, res) => {
       return res.status(400).send({ error: "Invalid location link format" });
     }
   } else {
-    return res.status(400).send({ error: "No coordinates or location link provided" });
+    return res
+      .status(400)
+      .send({ error: "No coordinates or location link provided" });
   }
 
   try {
@@ -282,8 +293,20 @@ const findCoordinatesMatch = async (req, res) => {
       .find(geoQuery)
       .sort({ _id: -1 })
       .populate("countryId", [`${toFound}`, "code", "numericCode"])
-      .populate("userId", ["firstName", "lastName", "gender", "phone", "profileImage"])
-      .populate("linkedBy.userId", ["firstName", "lastName", "gender", "phone", "profileImage"])
+      .populate("userId", [
+        "firstName",
+        "lastName",
+        "gender",
+        "phone",
+        "profileImage",
+      ])
+      .populate("linkedBy.userId", [
+        "firstName",
+        "lastName",
+        "gender",
+        "phone",
+        "profileImage",
+      ])
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize);
 
@@ -292,8 +315,6 @@ const findCoordinatesMatch = async (req, res) => {
     res.status(400).send(err);
   }
 };
-
-
 
 findNearUnitsToPosts = (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
@@ -322,18 +343,27 @@ findNearUnitsToPosts = (req, res) => {
   //     },
   //   },
   // },
+  let reversedCoordinates;
+
+  if (
+    Array.isArray(req.body.coordinates) &&
+    req.body.coordinates.length === 2 &&
+    typeof req.body.coordinates[0] === "number" &&
+    typeof req.body.coordinates[1] === "number"
+  ) {
+    reversedCoordinates = [req.body.coordinates[1], req.body.coordinates[0]];
+  }
 
   unitModel.defaultSchema
     .aggregate([
       {
         $geoNear: {
-          near: { type: "Point", coordinates: req.body.coordinates },
+          near: { type: "Point", coordinates: reversedCoordinates },
           spherical: true,
           maxDistance: req.body.distance,
           distanceField: "calcDistance",
         },
       },
-
       {
         $lookup: {
           from: "posts",
@@ -414,13 +444,25 @@ findNearUnits = (req, res) => {
   const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
+
+  let reversedCoordinates;
+
+  if (
+    Array.isArray(req.body.coordinates) &&
+    req.body.coordinates.length === 2 &&
+    typeof req.body.coordinates[0] === "number" &&
+    typeof req.body.coordinates[1] === "number"
+  ) {
+    reversedCoordinates = [req.body.coordinates[1], req.body.coordinates[0]];
+  }
+
   unitModel.defaultSchema
     .find(
       // { location : { $near : req.body.coordinates, $maxDistance: 5510 } }
       {
         location: {
           $near: {
-            $geometry: { type: "Point", coordinates: req.body.coordinates },
+            $geometry: { type: "Point", coordinates: reversedCoordinates },
             $maxDistance: req.body.distance,
           },
         },
