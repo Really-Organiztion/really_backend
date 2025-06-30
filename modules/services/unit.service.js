@@ -155,7 +155,7 @@ create = async (req, res) => {
 
     req.body.location.coordinates = reversedCoords;
   }
-  
+
   unitModel.defaultSchema
     .create(req.body)
     .then(function (doc) {
@@ -244,7 +244,7 @@ const findCoordinatesMatch = async (req, res) => {
   const toFound = lang === "en" ? "name" : "nameAr";
 
   let geoQuery = {};
-
+  let point = null;
   if (req.body.coordinates && Array.isArray(req.body.coordinates)) {
     const reversedCoordinates = req.body.coordinates.map(([lat, lng]) => [
       lng,
@@ -262,7 +262,7 @@ const findCoordinatesMatch = async (req, res) => {
       },
     };
   } else if (req.body.gLocationLink) {
-    let point = extractLatLngFromLink(req.body.gLocationLink);
+    point = extractLatLngFromLink(req.body.gLocationLink);
 
     if (!point && req.body.gLocationLink.includes("maps.app.goo.gl")) {
       point = await extractLatLngWithPuppeteer(req.body.gLocationLink);
@@ -309,9 +309,24 @@ const findCoordinatesMatch = async (req, res) => {
       ])
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize);
+    let response = {
+      list: units,
+      count: units.length,
+    };
+    if (req.body.gLocationLink) {
+      if (point) {
+        response.coordinates = {
+          lat: point[1],
+          lng: point[0],
+        };
+      }
+    }
+    console.log(response);
 
-    res.status(200).send(units);
+    res.status(200).send(response);
   } catch (err) {
+    console.log(err);
+
     res.status(400).send(err);
   }
 };
