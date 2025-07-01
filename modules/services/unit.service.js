@@ -143,7 +143,9 @@ updateUnitCb = (obj, where) => {
 
 create = async (req, res) => {
 
-  
+  if(req.body.location && req.body.location.coordinates) {
+    req.body.location.coordinates = [req.body.location.coordinates];
+  }
   unitModel.defaultSchema
     .create(req.body)
     .then(function (doc) {
