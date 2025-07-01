@@ -1,7 +1,8 @@
 const postService = require("../services/post.service");
 const unitService = require("../services/unit.service");
 const logger = require("../../helpers/logging");
-
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 getAllData = (req, res) => {
   try {
     postService.findAll(req, res);
@@ -38,8 +39,8 @@ getAllDataFilterPost = async (req, res) => {
 
 create = async (req, res) => {
   try {
-    let unit = await unitService.getUnitCb(req.body.unitId);
-
+    let unit = await unitService.getUnitCb({_id : req.body.unitId, isDeleted : false});
+    
     if (unit.error) {
       return res.status(400).send(unit.error); 
     }
@@ -87,13 +88,16 @@ deletePost = async (req, res) => {
   try {
     const id = req.params.id;
     let post = await postService.deletePost(req, res, id);
-
+    console.log(post);
+    
     if (post) {
       await unitService.updateUnitCb(
         { status: "Accepted" },
         { _id: post.unitId, status: "Published" }
       );
       res.status(200).send("The post has been deleted");
+    } else {
+      res.status(400).send("Can`t delete post or not found");
     }
   } catch (error) {
     logger.error(error);

@@ -31,7 +31,12 @@ create = async (req, res) => {
     if (isNaN(start) || isNaN(end)) {
       return res.status(400).json({ error: "Invalid date format" });
     }
-
+    if (start <= new Date()) {
+      return res
+        .status(400)
+        .json({ error: "First date must be in the future" });
+    }
+    
     if (end <= start) {
       return res
         .status(400)
@@ -70,7 +75,6 @@ create = async (req, res) => {
       session.endSession();
       return res.status(400).send("Can't create booking");
     } else if (booking.refId && booking.plan?.currencyId) {
-      
       walletController.addBonus({
         userId: booking.refId,
         currencyId: booking.plan.currencyId,

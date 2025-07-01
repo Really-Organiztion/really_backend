@@ -70,7 +70,8 @@ module.exports = function (Collection) {
       isDeleted: true,
     })
       .then(function (models) {
-        res.status(200).send("Deleted is done");
+        if (!models) res.status(400).send("Not found");
+        else res.status(200).send("Deleted is done");
       })
       .catch(function (err) {
         res.status(400).send(err);

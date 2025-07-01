@@ -65,7 +65,7 @@ socialMediaLogin = async (req, res) => {
   const email = req.body.email;
   userModel.defaultSchema
     .findOneAndUpdate(
-      { email },
+      { email , isDeleted: false},
       { $set: { socialMediaToken: req.body.socialMediaToken } },
       {
         new: true,

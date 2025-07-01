@@ -492,6 +492,9 @@ findById = (req, res, id) => {
     ])
     // .populate("servicesId", [`${toFound}`, "subServicesList"])
     .then(function (data) {
+      if(!data) {
+        return res.status(400).json({ error: "Unit not found" });
+      }
       res.status(200).send(data);
     })
     .catch(function (err) {
@@ -499,9 +502,9 @@ findById = (req, res, id) => {
     });
 };
 
-const getUnitCb = async (id) => {
+const getUnitCb = async (where) => {
   try {
-    const unit = await unitModel.defaultSchema.findById(id, { status: 1 });
+    const unit = await unitModel.defaultSchema.findOne(where, { status: 1 });
     return {doc: unit || null};
   } catch (err) {
     return {error: err.message};
