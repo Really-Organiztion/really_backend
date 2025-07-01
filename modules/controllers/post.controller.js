@@ -38,11 +38,25 @@ getAllDataFilterPost = async (req, res) => {
 
 create = async (req, res) => {
   try {
+    let unit = await unitService.getUnitCb(req.body.unitId);
+
+    if (unit.error) {
+      return res.status(400).send(unit.error); 
+    }
+
+    if (!unit.doc) {
+      return res.status(404).send("Unit not found"); 
+    }
+
+    if (unit.doc.status !== "Accepted") {
+      return res.status(400).send("Unit not accepted");
+    }
+
     let post = await postService.create(req, res);
     if (post) {
       await unitService.updateUnitCb(
         { status: "Published" },
-        { _id: post.unitId,status : "Accepted" }
+        { _id: post.unitId, status: "Accepted" }
       );
       res.status(200).send(post);
     } else {
@@ -73,7 +87,7 @@ deletePost = async (req, res) => {
   try {
     const id = req.params.id;
     let post = await postService.deletePost(req, res, id);
-    
+
     if (post) {
       await unitService.updateUnitCb(
         { status: "Accepted" },

@@ -142,20 +142,8 @@ updateUnitCb = (obj, where) => {
 };
 
 create = async (req, res) => {
-  if (req.body.location && Array.isArray(req.body.location.coordinates)) {
-    const originalCoords = req.body.location.coordinates;
 
-    const polygonCoords = Array.isArray(originalCoords[0][0])
-      ? originalCoords
-      : [originalCoords];
-
-    const reversedCoords = polygonCoords.map((ring) =>
-      ring.map(([lng, lat]) => [lat, lng])
-    );
-
-    req.body.location.coordinates = reversedCoords;
-  }
-
+  
   unitModel.defaultSchema
     .create(req.body)
     .then(function (doc) {
@@ -246,17 +234,13 @@ const findCoordinatesMatch = async (req, res) => {
   let geoQuery = {};
   let point = null;
   if (req.body.coordinates && Array.isArray(req.body.coordinates)) {
-    const reversedCoordinates = req.body.coordinates.map(([lat, lng]) => [
-      lng,
-      lat,
-    ]);
 
     geoQuery = {
       location: {
         $geoIntersects: {
           $geometry: {
             type: "Polygon",
-            coordinates: [reversedCoordinates],
+            coordinates: [req.body.coordinates],
           },
         },
       },
@@ -321,7 +305,6 @@ const findCoordinatesMatch = async (req, res) => {
         };
       }
     }
-    console.log(response);
 
     res.status(200).send(response);
   } catch (err) {
@@ -358,22 +341,13 @@ findNearUnitsToPosts = (req, res) => {
   //     },
   //   },
   // },
-  let reversedCoordinates;
-
-  if (
-    Array.isArray(req.body.coordinates) &&
-    req.body.coordinates.length === 2 &&
-    typeof req.body.coordinates[0] === "number" &&
-    typeof req.body.coordinates[1] === "number"
-  ) {
-    reversedCoordinates = [req.body.coordinates[1], req.body.coordinates[0]];
-  }
+  
 
   unitModel.defaultSchema
     .aggregate([
       {
         $geoNear: {
-          near: { type: "Point", coordinates: reversedCoordinates },
+          near: { type: "Point", coordinates: req.body.coordinates },
           spherical: true,
           maxDistance: req.body.distance,
           distanceField: "calcDistance",
@@ -460,16 +434,7 @@ findNearUnits = (req, res) => {
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
 
-  let reversedCoordinates;
 
-  if (
-    Array.isArray(req.body.coordinates) &&
-    req.body.coordinates.length === 2 &&
-    typeof req.body.coordinates[0] === "number" &&
-    typeof req.body.coordinates[1] === "number"
-  ) {
-    reversedCoordinates = [req.body.coordinates[1], req.body.coordinates[0]];
-  }
 
   unitModel.defaultSchema
     .find(
@@ -477,7 +442,7 @@ findNearUnits = (req, res) => {
       {
         location: {
           $near: {
-            $geometry: { type: "Point", coordinates: reversedCoordinates },
+            $geometry: { type: "Point", coordinates: req.body.coordinates },
             $maxDistance: req.body.distance,
           },
         },
@@ -530,6 +495,15 @@ findById = (req, res, id) => {
     .catch(function (err) {
       res.status(400).send(err);
     });
+};
+
+const getUnitCb = async (id) => {
+  try {
+    const unit = await unitModel.defaultSchema.findById(id, { status: 1 });
+    return {doc: unit || null};
+  } catch (err) {
+    return {error: err.message};
+  }
 };
 
 updateUnit = async (req, res, id) => {
@@ -625,4 +599,5 @@ module.exports = {
   findNearUnits,
   findNearUnitsToPosts,
   getCoordinates,
+  getUnitCb,
 };
