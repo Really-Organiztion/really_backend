@@ -65,7 +65,7 @@ socialMediaLogin = async (req, res) => {
   const email = req.body.email;
   userModel.defaultSchema
     .findOneAndUpdate(
-      { email , isDeleted: false},
+      { email },
       { $set: { socialMediaToken: req.body.socialMediaToken } },
       {
         new: true,
@@ -74,6 +74,9 @@ socialMediaLogin = async (req, res) => {
     )
     .then(function (user) {
       if (!user) res.status(400).send("Invalid email");
+      else if (user.isDeleted) {
+        res.status(400).send("This user was deleted");
+      }
       else {
         const ONE_WEEK = 604800;
         const token = jwt.sign(
