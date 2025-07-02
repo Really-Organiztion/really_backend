@@ -13,6 +13,27 @@ app.set("trust proxy", 1)
 const indexRoutes = require("./index_routes"); 
 const logger = require("./helpers/logging");
 
+const allowedOrigins = [
+  'https://reallybooking.com',
+  'https://www.reallybooking.com'
+];
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  
+  next();
+});
+
 require("./helpers/middleware")(app);
 require("./helpers/db_handler")(); 
 app.get("/test", (req, res, next) => {
