@@ -8,36 +8,42 @@ const session = require("express-session");
 const server = require("http").createServer(app);
 const wss = new WebSocket.Server({ server: server });
 
-require("dotenv").config(); 
-app.set("trust proxy", 1)
-const indexRoutes = require("./index_routes"); 
+require("dotenv").config();
+app.set("trust proxy", 1);
+const indexRoutes = require("./index_routes");
 const logger = require("./helpers/logging");
 
 const allowedOrigins = [
-  'https://reallybooking.com',
-  'https://www.reallybooking.com'
+  "https://reallybooking.com",
+  "https://www.reallybooking.com",
+  "http://localhost:49488",
 ];
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  console.log(origin,"zzzzzzzzz");
-  
-  // if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-  // }
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Max-Age', '86400');
-  if (req.method === 'OPTIONS') {
+  console.log(origin, "zzzzzzzzz");
+
+  if (allowedOrigins.includes(origin)) {
+    console.log("allowed origin");
+    
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+  }
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Max-Age", "86400");
+  if (req.method === "OPTIONS") {
     return res.sendStatus(200);
   }
-  
+
   next();
 });
 
 require("./helpers/middleware")(app);
-require("./helpers/db_handler")(); 
+require("./helpers/db_handler")();
 app.get("/test", (req, res, next) => {
   res.send("App express on vrecel is done");
 });
