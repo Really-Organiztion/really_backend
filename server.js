@@ -42,6 +42,8 @@ app.use((req, res, next) => {
   next();
 });
 
+
+
 require("./helpers/middleware")(app);
 require("./helpers/db_handler")();
 app.get("/test", (req, res, next) => {
@@ -58,7 +60,10 @@ app.use(
 app.use("/api/", indexRoutes);
 app.use("/attachments", express.static(path.join(__dirname, "./attachments")));
 app.use(express.static("public"));
-
+app.use((req, res, next) => {
+  console.log("Request URL:", req.originalUrl);
+  next();
+});
 const port = process.env.PORT || 4000;
 server.listen(port, function () {
   logger.info(`Server is listening on port : ${port}`);
