@@ -31,7 +31,7 @@ create = async (req, res) => {
     if (isNaN(start) || isNaN(end)) {
       return res.status(400).json({ error: "Invalid date format" });
     }
-    if (start <= new Date()) {
+    if (start < new Date()) {
       return res
         .status(400)
         .json({ error: "First date must be in the future" });
