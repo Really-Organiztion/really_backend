@@ -41,6 +41,17 @@ app.use((req, res, next) => {
 
   next();
 });
+app.use((req, res, next) => {
+  console.log("Request URL:", req.originalUrl);
+  next();
+});
+app.use("/ReportServer", (req, res) => {
+  res.status(403).json({ error: "Access denied" });
+});
+
+app.use("/geoserver", (req, res) => {
+  res.status(403).json({ error: "Not available" });
+});
 
 
 
@@ -60,10 +71,7 @@ app.use(
 app.use("/api/", indexRoutes);
 app.use("/attachments", express.static(path.join(__dirname, "./attachments")));
 app.use(express.static("public"));
-app.use((req, res, next) => {
-  console.log("Request URL:", req.originalUrl);
-  next();
-});
+
 const port = process.env.PORT || 4000;
 server.listen(port, function () {
   logger.info(`Server is listening on port : ${port}`);
