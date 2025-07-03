@@ -16,7 +16,7 @@ const logger = require("./helpers/logging");
 const allowedOrigins = [
   "https://reallybooking.com",
   "https://www.reallybooking.com",
-  "http://localhost:49488",
+  "http://localhost",
 ];
 
 app.use((req, res, next) => {
