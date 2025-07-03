@@ -12,11 +12,23 @@ findAll = (req, res) => {
   if (!req.body || !req.body.isDeleted) {
     where["isDeleted"] = false;
   }
+
   if (req.body.userId) {
     where["userId"] = new ObjectId(req.body.userId);
   }
+
   if (req.body.currencyId) {
     where["currencyId"] = new ObjectId(req.body.currencyId);
+  }
+
+  if (req.body.statusList && req.body.statusList.length > 0) {
+    where.status = { $in: req.body.statusList };
+    delete req.body.statusList;
+  }
+
+    if (req.body.typeList && req.body.typeList.length > 0) {
+    where.type = { $in: req.body.typeList };
+    delete req.body.typeList;
   }
 
   transactionModel.defaultSchema
