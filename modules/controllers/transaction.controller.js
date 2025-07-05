@@ -34,6 +34,7 @@ thawaniSession = async (req, res) => {
 
     let thawaniResponse = await transactionService.thawaniSession(
       transaction,
+      body.is_test,
       res
     );
 
@@ -113,17 +114,19 @@ const createTransaction = async (req, session) => {
     where["userId"] = new ObjectId(transaction.userId);
     where["currencyId"] = new ObjectId(transaction.currencyId);
   }
-  
+
   const wallet = await walletService.findOne(where, session);
   if (!wallet) {
-
     throw new Error("Wallet Not Found");
   }
 
   if (transaction.type === "Payment") {
     if (transaction.amount > wallet.activeBalance + wallet.bonus) {
       transaction.status = "Error";
-      const _transaction = await transactionService.create({ body: transaction }, session);
+      const _transaction = await transactionService.create(
+        { body: transaction },
+        session
+      );
       await transactionService.updateCb(transaction, transaction._id, session);
       throw new Error("The wallet balance is insufficient");
     } else {
@@ -135,14 +138,27 @@ const createTransaction = async (req, session) => {
         wallet.bonus -= remain;
       }
     }
-  } else if (transaction.type === "Receive" && transaction.status === "Completed") {
+  } else if (
+    transaction.type === "Receive" &&
+    transaction.status === "Completed"
+  ) {
     wallet.holdBalance += transaction.amount;
-  } else if (transaction.type === "Bonus" && transaction.status === "Completed") {
+  } else if (
+    transaction.type === "Bonus" &&
+    transaction.status === "Completed"
+  ) {
     wallet.bonus += transaction.amount;
   }
 
-  const _transaction = await transactionService.create({ body: transaction }, session);
-  const walletUpdated = await walletService.updateCb(wallet, wallet._id, session);
+  const _transaction = await transactionService.create(
+    { body: transaction },
+    session
+  );
+  const walletUpdated = await walletService.updateCb(
+    wallet,
+    wallet._id,
+    session
+  );
 
   if (!walletUpdated) {
     throw new Error("Can't update Wallet balance");
@@ -193,24 +209,43 @@ updateTransactionStatus = async (req, res) => {
         transaction.sessionData = req.body.sessionData;
         transaction.status = "Completed";
         wallet.activeBalance += transaction.amount;
-        transaction = await transactionService.updateCb(transaction, transaction._id, session);
+        transaction = await transactionService.updateCb(
+          transaction,
+          transaction._id,
+          session
+        );
       } else {
         transaction.status = "Error";
-        await transactionService.updateCb(transaction, transaction._id, session);
+        await transactionService.updateCb(
+          transaction,
+          transaction._id,
+          session
+        );
         await session.abortTransaction();
         session.endSession();
         return res.status(400).send("The wallet balance is insufficient");
       }
-    } else if (transaction.type === "Withdraw" && transaction.status === "Completed") {
+    } else if (
+      transaction.type === "Withdraw" &&
+      transaction.status === "Completed"
+    ) {
       wallet.activeBalance -= transaction.amount;
     } else if (transaction.type === "Active") {
       wallet.holdBalance -= transaction.amount;
       wallet.activeBalance += transaction.amount;
     } else {
-      transaction = await transactionService.updateCb(req.body, transaction._id, session);
+      transaction = await transactionService.updateCb(
+        req.body,
+        transaction._id,
+        session
+      );
     }
 
-    const walletUpdated = await walletService.updateCb(wallet, wallet._id, session);
+    const walletUpdated = await walletService.updateCb(
+      wallet,
+      wallet._id,
+      session
+    );
 
     if (!walletUpdated) {
       await session.abortTransaction();
@@ -221,7 +256,6 @@ updateTransactionStatus = async (req, res) => {
     await session.commitTransaction();
     session.endSession();
     res.status(200).send(transaction);
-
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -229,7 +263,6 @@ updateTransactionStatus = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-
 
 // updateTransactionStatus = (req, res) => {
 //   try {

@@ -8,6 +8,7 @@ helpers/serviceAccountKey.json
 node_modules/
 dist/
 attachments/
+.env
 # Compiled Java class files
 *.class
 

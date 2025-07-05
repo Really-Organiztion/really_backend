@@ -74,15 +74,21 @@ updateTransactionStatus = async (req, res, id) => {
       res.status(400).send(err);
     });
 };
-thawaniSession = async (transaction) => {
+thawaniSession = async (transaction,is_test) => {
   return new Promise(async (resolve, reject) => {
     try {
+      let url = "https://checkout.thawani.om/api/v1/checkout/session";
+      let api_key = process.env.THAWANI_API_KEY
+      if(is_test){
+        url = "https://uatcheckout.thawani.om/api/v1/checkout/session"
+        api_key = process.env.THAWANI_TEST_API_KEY
+      }
       const thawaniResponse = await axios.get(
-        `https://uatcheckout.thawani.om/api/v1/checkout/session/${transaction.sessionData.session_id}`,
+        `${url}/${transaction.sessionData.session_id}`,
         {
           headers: {
             Accept: "application/json",
-            "thawani-api-key": "rRQ26GcsZzoEhbrP2HZvLYDbn9C9et",
+            "thawani-api-key": api_key,
             "Content-Type": "application/json",
           },
         }

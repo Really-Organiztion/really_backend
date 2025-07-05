@@ -21,7 +21,7 @@ create = (req, res) => {
   }
 };
 
-const send = async (req, res) => {
+ send = async (req, res) => {
   try {
     const { action, type, userIdList, userId } = req.body;
     let notificationList = [];
