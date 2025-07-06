@@ -79,10 +79,12 @@ thawaniSession = async (transaction,is_test) => {
     try {
       let url = "https://checkout.thawani.om/api/v1/checkout/session";
       let api_key = process.env.THAWANI_API_KEY
-      if(is_test){
+      if(is_test) {
         url = "https://uatcheckout.thawani.om/api/v1/checkout/session"
         api_key = process.env.THAWANI_TEST_API_KEY
       }
+      console.log(is_test , api_key);
+      
       const thawaniResponse = await axios.get(
         `${url}/${transaction.sessionData.session_id}`,
         {
