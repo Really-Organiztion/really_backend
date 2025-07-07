@@ -691,12 +691,16 @@ sendEmail = (req, res) => {
       contentType: file.mimetype,
     };
   });
-  
+
   let mailOptions = {
     from: process.env.GMAILUSER,
     to: body.email,
     subject: body.subject,
-    html: `
+  };
+  console.log(body.isHtml, typeof body.isHtml);
+  
+    if(body.isHtml == 'yes') {
+    mailOptions.html = `
         <!DOCTYPE html>
         <html>
         <head>
@@ -714,15 +718,19 @@ sendEmail = (req, res) => {
           </div>
         </body>
         </html>
-      `,
-    attachments: attachments,
+      `;
+  } else {
+    mailOptions.text = body.message
+  }
+  if(attachments.length > 0) {
+    mailOptions.attachments = attachments
   };
-  
+
   mailer.transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      res.status(400).send(error);
+      res.status(400).send({done : false , error: error});
     } else {
-      res.status(200).send(info.response);
+      res.status(200).send({done: true, info: info.response});
     }
   });
 };
