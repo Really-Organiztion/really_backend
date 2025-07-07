@@ -703,6 +703,7 @@ sendEmail = (req, res) => {
       `,
   };
 
+  
   mailer.transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       res.status(400).send(error);
