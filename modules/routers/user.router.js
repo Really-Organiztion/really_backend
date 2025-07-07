@@ -3,11 +3,12 @@ const userRouter = express.Router();
 const logger = require("../../helpers/logging");
 const userController = require("../controllers/user.controller");
 const roles = require("../../helpers/roles");
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
 
 userRouter.post("/all", userController.getAllData);
 
 userRouter.route("/").post((req, res) => {
-  // Validation
   userController.createUser(req, res);
 });
 
@@ -24,11 +25,7 @@ userRouter.route("/update-identity/:id").put((req, res) => {
 userRouter.route("/change-email/:id").put((req, res) => {
   userController.changeEmail(req, res);
 });
-userRouter.post(
-  "/send-email",
-  roles.isAuthenticatedAsAdmin,
-  userController.sendEmail
-);
+userRouter.post("/send-email",upload.array('files'), userController.sendEmail);
 
 userRouter.get("/:id", userController.findById);
 

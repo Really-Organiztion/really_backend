@@ -678,6 +678,20 @@ findById = (req, res, id) => {
 
 sendEmail = (req, res) => {
   let body = req.body;
+  let files = req.files || [];
+
+  if (!body.email || !body.subject || !body.message) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+  
+  let attachments = files.map((file) => {
+    return {
+      filename: file.originalname,
+      content: file.buffer,
+      contentType: file.mimetype,
+    };
+  });
+  
   let mailOptions = {
     from: process.env.GMAILUSER,
     to: body.email,
@@ -701,8 +715,8 @@ sendEmail = (req, res) => {
         </body>
         </html>
       `,
+    attachments: attachments,
   };
-
   
   mailer.transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
