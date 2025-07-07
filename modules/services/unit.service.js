@@ -215,8 +215,11 @@ const extractLatLngWithPuppeteer = async (link) => {
     const finalUrl = page.url();
 
     await browser.close();
-
+    console.log(finalUrl, "finalUrl");
+    
     const point = extractLatLngFromLink(finalUrl);
+    console.log(point, "point");
+
     if (point) {
       return point;
     }

@@ -136,6 +136,15 @@ updateIdentity = (req, res) => {
     logger.error(error);
   }
 };
+
+sendEmail = (req, res) => {
+  try {
+    userService.sendEmail(req, res);
+  } catch (error) {
+    logger.error(error);
+  }
+};
+
 changeEmail = async (req, res) => {
   try {
     const id = req.params.id;
@@ -198,6 +207,7 @@ module.exports = {
   changePassword,
   updateIdentity,
   changeEmail,
+  sendEmail,
   forgetPassword,
   findUserById,
   socialMediaRegister,

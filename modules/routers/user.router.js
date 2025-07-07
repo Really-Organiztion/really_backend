@@ -12,11 +12,7 @@ userRouter.route("/").post((req, res) => {
 });
 
 userRouter.delete("/:id", userController.deleteUser);
-userRouter.put(
-  "/delete-return/:id",
-  userController.deleteReturn
-);
-
+userRouter.put("/delete-return/:id", userController.deleteReturn);
 
 userRouter.route("/change-password/:id").put((req, res) => {
   userController.changePassword(req, res);
@@ -28,6 +24,11 @@ userRouter.route("/update-identity/:id").put((req, res) => {
 userRouter.route("/change-email/:id").put((req, res) => {
   userController.changeEmail(req, res);
 });
+userRouter.post(
+  "/send-email",
+  roles.isAuthenticatedAsAdmin,
+  userController.sendEmail
+);
 
 userRouter.get("/:id", userController.findById);
 

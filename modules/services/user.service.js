@@ -76,8 +76,7 @@ socialMediaLogin = async (req, res) => {
       if (!user) res.status(400).send("Invalid email");
       else if (user.isDeleted) {
         res.status(400).send("This user was deleted");
-      }
-      else {
+      } else {
         const ONE_WEEK = 604800;
         const token = jwt.sign(
           {
@@ -677,6 +676,42 @@ findById = (req, res, id) => {
     });
 };
 
+sendEmail = (req, res) => {
+  let body = req.body;
+  let mailOptions = {
+    from: process.env.GMAILUSER,
+    to: body.email,
+    subject: body.subject,
+    html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Email Verification</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <div style="max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+            <div style="text-align: center;">
+              <img src="" alt="Really Booking Logo" style="width: 120px; margin-bottom: 20px;">
+            </div>
+           
+            <h1 style="text-align: center; color: #007BFF;">${body.message}</h1>
+      
+          </div>
+        </body>
+        </html>
+      `,
+  };
+
+  mailer.transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      res.status(400).send(error);
+    } else {
+      res.status(200).send(info.response);
+    }
+  });
+};
+
 module.exports = {
   deleteReturn: userModel.genericSchema.deleteReturn,
   deleteUser: userModel.genericSchema.delete,
@@ -691,6 +726,7 @@ module.exports = {
   getOptEmail,
   forgetPassword,
   updateIdentity,
+  sendEmail,
   changeEmail,
   findUserAccount: findUser,
   findUserById,
