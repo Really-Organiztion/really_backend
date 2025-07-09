@@ -3,85 +3,145 @@ const walletService = require("../services/wallet.service");
 const logger = require("../../helpers/logging");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
+
 thawaniSession = async (req, res) => {
   try {
-    let body = req.body;
-    let transaction = await transactionService.findOne({
-      transactionNo: body.transactionNo,
-      userId: new ObjectId(body.userId),
-    });
-    if (!transaction) {
-      res.status(400).json({ error: "Transaction is not found" });
-      return;
-    }
+    const result = await handleThawaniSessionLogic(req.body);
 
-    let wallet = await walletService.findOne({
-      _id: new ObjectId(transaction.walletId),
-    });
-    if (!wallet) {
-      res.status(400).json({ error: "Wallet is not found" });
-      return;
-    }
-    if (wallet.userId.toString() != transaction.userId.toString()) {
-      res.status(400).json({ error: "The user does not own this wallet" });
-      return;
-    }
-
-    if (!transaction?.sessionData?.session_id) {
-      res.status(400).json({ error: "Transaction session is not found" });
-      return;
-    }
-
-    let thawaniResponse = await transactionService.thawaniSession(
-      transaction,
-      body.is_test,
-      res
-    );
-
-    if (thawaniResponse.done) {
-      transaction.sessionData = thawaniResponse.doc.data;
-
-      if (
-        (body.status == "cancel" &&
-          thawaniResponse.doc?.data?.payment_status == "unpaid") ||
-        thawaniResponse.doc?.data?.payment_status == "cancelled"
-      ) {
-        transactionService.deleteCb(transaction._id);
-        transaction.status = "Canceled";
-      } else if (
-        body.status == "success" &&
-        thawaniResponse.doc?.data.payment_status == "paid"
-      ) {
-        if (transaction.status != "Completed") {
-          wallet.activeBalance += transaction.amount;
-          walletService.updateCb(wallet, wallet._id);
-        }
-
-        transaction.status = "Completed";
-        transactionService.updateCb(transaction, transaction._id);
-      } else if (
-        body.status == "success" &&
-        thawaniResponse.doc?.data.payment_status != "paid"
-      ) {
-        res.status(400).send(thawaniResponse);
-        return;
-      }
-
-      res.status(200).send(transaction);
+    if (result.status === 200) {
+      res.status(200).send(result.data);
     } else {
-      res.status(400).send(thawaniResponse);
+      res.status(result.status).json({ error: result.error });
     }
   } catch (error) {
     logger.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-getAllData = (req, res) => {
+const handleThawaniSessionLogic = async (body) => {
+  let transaction = await transactionService.findOne({
+    transactionNo: body.transactionNo,
+    userId: new ObjectId(body.userId),
+  });
+  if (!transaction) return { status: 400, error: "Transaction is not found" };
+
+  let wallet = await walletService.findOne({
+    _id: new ObjectId(transaction.walletId),
+  });
+  if (!wallet) return { status: 400, error: "Wallet is not found" };
+
+  if (wallet.userId.toString() != transaction.userId.toString())
+    return { status: 400, error: "The user does not own this wallet" };
+
+  if (!transaction?.sessionData?.session_id)
+    return { status: 400, error: "Transaction session is not found" };
+
+  let thawaniResponse = await transactionService.thawaniSession(
+    transaction,
+    body.isTest
+  );
+
+  if (!thawaniResponse.done) return { status: 400, error: thawaniResponse };
+
+  transaction.sessionData = thawaniResponse.doc.data;
+
+  if (
+    (body.status === "cancel" &&
+      thawaniResponse.doc?.data?.payment_status === "unpaid") ||
+    thawaniResponse.doc?.data?.payment_status === "cancelled"
+  ) {
+    transactionService.deleteCb(transaction._id);
+    transaction.status = "Canceled";
+  } else if (
+    body.status === "success" &&
+    thawaniResponse.doc?.data?.payment_status === "paid"
+  ) {
+    if (transaction.status !== "Completed") {
+      wallet.activeBalance += transaction.amount;
+      walletService.updateCb(wallet, wallet._id);
+    }
+
+    transaction.status = "Completed";
+    transactionService.updateCb(transaction, transaction._id);
+  } else if (
+    body.status === "success" &&
+    thawaniResponse.doc?.data?.payment_status !== "paid"
+  ) {
+    return { status: 400, error: thawaniResponse };
+  }
+
+  return { status: 200, data: transaction };
+};
+
+getAllData = async (req, res) => {
   try {
-    transactionService.findAll(req, res);
+    req.body = req.body || {}; // Ensure it's an object
+
+    const isHandledTransaction =
+      Array.isArray(req.body.statusList) &&
+      req.body.statusList.length === 1 &&
+      req.body.statusList[0] === "NewTransaction";
+
+    const data = await transactionService.findAll(req);
+
+    if (isHandledTransaction) {
+      const list = await Promise.all(
+        data.map(async (item) => {
+          let result = await handleThawaniSessionNew(item);
+          return result.done ? result.data : item;
+        })
+      );
+      return res.status(200).send(list);
+    } else {
+      return res.status(200).send(data);
+    }
   } catch (error) {
     logger.error(error);
+    return res.status(400).send({ error: "Error while getting data" });
   }
+};
+
+
+const handleThawaniSessionNew = async (body) => {
+  let transaction = await transactionService.findOne({
+    transactionNo: body.transactionNo,
+    userId: new ObjectId(body.userId),
+  });
+  if (!transaction) return { done: false, error: "Transaction is not found" };
+
+  let wallet = await walletService.findOne({
+    _id: new ObjectId(transaction.walletId),
+  });
+  if (!wallet) return { done: false, error: "Wallet is not found" };
+
+  if (wallet.userId.toString() != transaction.userId.toString())
+    return { done: false, error: "The user does not own this wallet" };
+
+  if (!transaction?.sessionData?.session_id)
+    return { done: false, error: "Transaction session is not found" };
+
+  let thawaniResponse = await transactionService.thawaniSession(
+    transaction,
+    false
+  );
+
+  if (!thawaniResponse.done) return { done: false, error: thawaniResponse };
+
+  transaction.sessionData = thawaniResponse.doc.data;
+
+  if (thawaniResponse.doc?.data?.payment_status === "paid") {
+    wallet.activeBalance += transaction.amount;
+    walletService.updateCb(wallet, wallet._id);
+
+    transaction.status = "Completed";
+    transactionService.updateCb(transaction, transaction._id);
+  } else if (thawaniResponse.doc?.data?.payment_status === "cancelled") {
+    transactionService.deleteCb(transaction._id);
+    transaction.status = "Canceled";
+  }
+
+  return { done: true, data: transaction };
 };
 
 create = async (req, res) => {

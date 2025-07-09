@@ -697,7 +697,6 @@ sendEmail = (req, res) => {
     to: body.email,
     subject: body.subject,
   };
-  console.log(body.isHtml, typeof body.isHtml);
   
     if(body.isHtml == 'yes') {
     mailOptions.html = `
