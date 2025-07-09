@@ -76,8 +76,9 @@ const handleThawaniSessionLogic = async (body) => {
 
 getAllData = async (req, res) => {
   try {
-    req.body = req.body || {}; // Ensure it's an object
-
+    req.body = req.body || {}; 
+    let isTest =req.body.isTest || false;
+    delete req.body.isTest;
     const isHandledTransaction =
       Array.isArray(req.body.statusList) &&
       req.body.statusList.length === 1 &&
@@ -88,7 +89,7 @@ getAllData = async (req, res) => {
     if (isHandledTransaction) {
       const list = await Promise.all(
         data.map(async (item) => {
-          let result = await handleThawaniSessionNew(item);
+          let result = await handleThawaniSessionNew({transactionNo: item.transactionNo, userId: item.userId, isTest});
           return result.done ? result.data : item;
         })
       );
@@ -123,7 +124,7 @@ const handleThawaniSessionNew = async (body) => {
 
   let thawaniResponse = await transactionService.thawaniSession(
     transaction,
-    false
+    body.isTest
   );
 
   if (!thawaniResponse.done) return { done: false, error: thawaniResponse };
