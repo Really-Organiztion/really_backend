@@ -49,6 +49,9 @@ const bookingSchema = new Schema(
         required: true,
         enum: ["Fully", "Partly"],
       },
+      discount: {
+        type: Number,
+      },
       insReq: {
         type: Boolean,
       },
@@ -72,6 +75,20 @@ const bookingSchema = new Schema(
       },
       maxLimit: {
         type: Number,
+      },
+      pricingRole: [
+        {
+          price: {
+            type: Number,
+          },
+          from: {
+            type: Number,
+          },
+        },
+      ],
+      paymentPartly: {
+        type: [Number],
+        default: [],
       },
     },
     status: {
