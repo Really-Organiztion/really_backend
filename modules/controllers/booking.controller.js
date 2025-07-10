@@ -36,7 +36,7 @@ create = async (req, res) => {
     //     .status(400)
     //     .json({ error: "First date must be in the future" });
     // }
-    
+
     if (end <= start) {
       return res
         .status(400)

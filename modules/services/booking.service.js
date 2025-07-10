@@ -340,7 +340,15 @@ updateBooking = (req, res, id) => {
 
 const toUTCStartOfDay = (dateString) => {
   const d = new Date(dateString);
-  return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  return new Date(
+    Date.UTC(
+      d.getFullYear(),
+      d.getMonth(),
+      d.getDate(),
+      d.getHours(),
+      d.getMinutes()
+    )
+  );
 };
 
 const findExistingBooking = async (unitId, firstDate, lastDate) => {
@@ -352,28 +360,29 @@ const findExistingBooking = async (unitId, firstDate, lastDate) => {
       unitId: new mongoose.Types.ObjectId(unitId),
       $expr: {
         $and: [
-          { $lt: ["$firstDate", last] }, 
-          { $gt: ["$lastDate", first] }, 
+          { $lt: ["$firstDate", last] },
+          { $gt: ["$lastDate", first] },
           {
             $not: {
               $or: [
                 { $eq: ["$lastDate", first] },
-                { $eq: ["$firstDate", last] }
-              ]
-            }
-          }
-        ]
-      }
+                { $eq: ["$firstDate", last] },
+              ],
+            },
+          },
+        ],
+      },
     });
 
     return booking || null;
   } catch (err) {
-    console.error("An error occurred while searching for the booking:", err.message);
+    console.error(
+      "An error occurred while searching for the booking:",
+      err.message
+    );
     return null;
   }
 };
-
-
 
 module.exports = {
   deleteBooking: bookingModel.genericSchema.delete,
