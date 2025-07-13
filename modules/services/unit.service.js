@@ -142,8 +142,7 @@ updateUnitCb = (obj, where) => {
 };
 
 create = async (req, res) => {
-
-  if(req.body.location && req.body.location.coordinates) {
+  if (req.body.location && req.body.location.coordinates) {
     req.body.location.coordinates = [req.body.location.coordinates];
   }
   unitModel.defaultSchema
@@ -174,29 +173,22 @@ create = async (req, res) => {
     });
 };
 
+
 const extractLatLngFromLink = (link) => {
-  const accurateRegex = /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/;
-  const accurateMatch = link.match(accurateRegex);
-  if (accurateMatch) {
-    const lat = parseFloat(accurateMatch[1]);
-    const lng = parseFloat(accurateMatch[2]);
-    return [lng, lat];
-  }
+  const patterns = [
+    /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/,
+    /@(-?\d+\.\d+),(-?\d+\.\d+)/,
+    /[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/,
+    /[?&]query=(-?\d+\.\d+),(-?\d+\.\d+)/,
+  ];
 
-  const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
-  const match = link.match(regex);
-  if (match) {
-    const lat = parseFloat(match[1]);
-    const lng = parseFloat(match[2]);
-    return [lng, lat];
-  }
-
-  const altRegex = /[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/;
-  const altMatch = link.match(altRegex);
-  if (altMatch) {
-    const lat = parseFloat(altMatch[1]);
-    const lng = parseFloat(altMatch[2]);
-    return [lng, lat];
+  for (const pattern of patterns) {
+    const match = link.match(pattern);
+    if (match) {
+      const lat = parseFloat(match[1]);
+      const lng = parseFloat(match[2]);
+      return [lng, lat];
+    }
   }
 
   return null;
@@ -205,30 +197,60 @@ const extractLatLngFromLink = (link) => {
 const extractLatLngWithPuppeteer = async (link) => {
   try {
     const browser = await puppeteer.launch({
-      headless: "new",
+      headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
 
     const page = await browser.newPage();
     await page.goto(link, { waitUntil: "networkidle2" });
 
+    // انتظر عشان الصفحة تفتح redirect
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
     const finalUrl = page.url();
+    console.log("🔗 Final URL:", finalUrl);
 
-    await browser.close();
-    console.log(finalUrl, "finalUrl");
-    
-    const point = extractLatLngFromLink(finalUrl);
-    console.log(point, "point");
-
+    // 1. نحاول نجيب الإحداثيات من الرابط النهائي
+    let point = extractLatLngFromLink(finalUrl);
     if (point) {
+      await browser.close();
       return point;
     }
 
+    // 2. نقرأ من محتوى الصفحة
+    const html = await page.content();
+
+    // أ. "latitude":30.123,"longitude":31.456
+    let coordsMatch = html.match(
+      /"latitude":\s*(-?\d+\.\d+),\s*"longitude":\s*(-?\d+\.\d+)/
+    );
+    if (coordsMatch) {
+      const lat = parseFloat(coordsMatch[1]);
+      const lng = parseFloat(coordsMatch[2]);
+      await browser.close();
+      return [lng, lat];
+    }
+
+    // ب. "center":{"lat":30.123,"lng":31.456}
+    coordsMatch = html.match(
+      /"center":\s*\{\s*"lat":\s*(-?\d+\.\d+),\s*"lng":\s*(-?\d+\.\d+)\s*\}/
+    );
+    if (coordsMatch) {
+      const lat = parseFloat(coordsMatch[1]);
+      const lng = parseFloat(coordsMatch[2]);
+      await browser.close();
+      return [lng, lat];
+    }
+
+    // فشل
+    await browser.close();
     return null;
   } catch (err) {
+    console.error("❌ Puppeteer error:", err);
     return null;
   }
 };
+
 
 const findCoordinatesMatch = async (req, res) => {
   const pageNumber = req.query.pageNumber ? req.query.pageNumber : 1;
@@ -239,7 +261,6 @@ const findCoordinatesMatch = async (req, res) => {
   let geoQuery = {};
   let point = null;
   if (req.body.coordinates && Array.isArray(req.body.coordinates)) {
-
     geoQuery = {
       location: {
         $geoIntersects: {
@@ -252,6 +273,7 @@ const findCoordinatesMatch = async (req, res) => {
     };
   } else if (req.body.gLocationLink) {
     point = extractLatLngFromLink(req.body.gLocationLink);
+    console.log("url :", req.body.gLocationLink);
 
     if (!point && req.body.gLocationLink.includes("maps.app.goo.gl")) {
       point = await extractLatLngWithPuppeteer(req.body.gLocationLink);
@@ -346,7 +368,6 @@ findNearUnitsToPosts = (req, res) => {
   //     },
   //   },
   // },
-  
 
   unitModel.defaultSchema
     .aggregate([
@@ -439,8 +460,6 @@ findNearUnits = (req, res) => {
   const lang = req.query.lang ? req.query.lang : "en";
   const toFound = lang === "en" ? "name" : "nameAr";
 
-
-
   unitModel.defaultSchema
     .find(
       // { location : { $near : req.body.coordinates, $maxDistance: 5510 } }
@@ -495,7 +514,7 @@ findById = (req, res, id) => {
     ])
     // .populate("servicesId", [`${toFound}`, "subServicesList"])
     .then(function (data) {
-      if(!data) {
+      if (!data) {
         return res.status(400).json({ error: "Unit not found" });
       }
       res.status(200).send(data);
@@ -508,9 +527,9 @@ findById = (req, res, id) => {
 const getUnitCb = async (where) => {
   try {
     const unit = await unitModel.defaultSchema.findOne(where, { status: 1 });
-    return {doc: unit || null};
+    return { doc: unit || null };
   } catch (err) {
-    return {error: err.message};
+    return { error: err.message };
   }
 };
 
