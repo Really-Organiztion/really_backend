@@ -85,7 +85,6 @@ findAll = (req, res) => {
           // rate: { $first: `$rate` },
           // isTrusted: { $first: `$isTrusted` },
           // isSeparated: { $first: `$isSeparated` },
-          // username: { $first: `$user.username` },
           // role: { $first: `$user.role` },
           // phone: { $first: `$user.phone` },
           // phonesList: { $first: `$user.phonesList` },

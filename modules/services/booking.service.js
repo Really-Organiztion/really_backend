@@ -95,7 +95,6 @@ findAll = (req, res) => {
     .limit(pageSize)
     // .populate("unitId", ["type"])
     // .populate("plan.currencyId", [`${toFound}`, "code", "numericCode", "color"])
-    // .populate("userId", ["username", "phone"])
     .then(function (data) {
       let _data = [];
       for (let i = 0; i < data.length; i++) {

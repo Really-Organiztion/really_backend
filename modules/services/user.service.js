@@ -124,9 +124,6 @@ findAllUsers = async (req, res) => {
   } else {
     where["isDeleted"] = false;
   }
-  if (where["username"]) {
-    where["username"] = { $regex: where["username"], $options: "i" };
-  }
 
   if (where["job"]) {
     where["job"] = { $regex: where["job"], $options: "i" };
@@ -170,7 +167,6 @@ findAllUsers = async (req, res) => {
     where.$or = [
       { firstName: { $regex: where["search"], $options: "i" } },
       { lastName: { $regex: where["search"], $options: "i" } },
-      { username: { $regex: where["search"], $options: "i" } },
       { email: { $regex: where["search"], $options: "i" } },
       { phone: { $regex: where["search"], $options: "i" } },
       { status: { $regex: where["search"], $options: "i" } },
@@ -563,9 +559,9 @@ createUser = async (req, res) => {
   } else {
     req.body.verifyIdentityType = "Empty";
   }
-  if (!req.body.phone) {
-    return res.status(400).send("Phone is required");
-  }
+  // if (!req.body.phone) {
+  //   return res.status(400).send("Phone is required");
+  // }
   let optModel = {
     otp: Math.floor(Math.random() * 90000) + 10000,
     email: req.body.email,

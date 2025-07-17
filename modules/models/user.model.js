@@ -17,12 +17,9 @@ const userSchema = new Schema(
       minlength: 3,
       maxlength: 30,
     },
-    username: {
-      type: String,
-      required: true,
-      unique: true,
-      minlength: 5,
-      maxlength: 30,
+    recommendedBy: {
+      type: ObjectId,
+      ref: "user",
     },
     email: {
       type: String,
@@ -150,16 +147,17 @@ userSchema.index(
   { nationalID: 1, nativeCountryId: 1 },
   { unique: true, sparse: true }
 );
+
 userSchema.index(
   { phone: 1 },
   {
     unique: true,
     partialFilterExpression: {
-      socialMediaToken: { $exists: false },
-      phone: { $type: "string" },
-    },
+      phone: { $exists: true, $type: "string" }
+    }
   }
 );
+
 const genericOperations = require("../genericService");
 // userSchema.virtual("countries", {
 //   ref: "country",

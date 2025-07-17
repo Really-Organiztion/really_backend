@@ -38,7 +38,6 @@ findAll = (req) => {
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       // .populate("currencyId", [`${toFound}`, "code", "numericCode", "color"])
-      // .populate("userId", ["username", "phone"])
       .then(resolve)
       .catch(reject);
   });
