@@ -2,9 +2,9 @@ const rateLimit = require("express-rate-limit");
 
 const ipBanMap = new Map();
 
-const banDurationMs = 5 * 60 * 1000;
-const maxRequests = 150;
-const windowMs = 5 * 60 * 1000;
+const banDurationMs = 1 * 60 * 1000;
+const maxRequests = 3;
+const windowMs = 1 * 60 * 1000;
 
 function checkIpBan(req, res, next) {
   const ip = req.ip;
