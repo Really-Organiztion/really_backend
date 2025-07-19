@@ -7,11 +7,23 @@ const session = require("express-session");
 
 const server = require("http").createServer(app);
 const wss = new WebSocket.Server({ server: server });
+const { limiter, checkIpBan } = require("./helpers/rateLimiter");
 
+app.use(checkIpBan);
+
+app.use(limiter);
 require("dotenv").config();
 app.set("trust proxy", 1);
 const indexRoutes = require("./index_routes");
 const logger = require("./helpers/logging");
+
+app.use((req, res, next) => {
+  const userAgent = req.headers['user-agent'];
+  if (!userAgent || userAgent.includes("curl") || userAgent.includes("python")) {
+    return res.status(403).send("Bot access denied");
+  }
+  next();
+});
 
 const allowedOrigins = [
   "https://reallybooking.com",
