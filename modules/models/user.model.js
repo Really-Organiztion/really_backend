@@ -20,12 +20,15 @@ const userSchema = new Schema(
     recommendedBy: {
       sourceType : {
         type: String,
-        enum: ["Friend", "SocialMedia", "Employee", "GoogleAds", "appStore", "Website", "Other"],
+        enum: ["Friend", "SocialMedia", "Employee", "GoogleAds", "AppStore", "Website", "Other"],
       },
       userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
       },
+      other : {
+        type : String,
+      }
     },
 
     email: {
