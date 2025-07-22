@@ -190,11 +190,10 @@ findAllUsers = async (req, res) => {
   }
 
   if (where["phone"]) {
-    where.$or = [
-      { phone: { $regex: where["phone"], $options: "i" } },
-      { phonesList: { $regex: where["phone"], $options: "i" } },
-    ];
+    where.$or = [{ phone: where["phone"] }, { phonesList: where["phone"] }];
+    delete where["phone"];
   }
+  console.log(where);
 
   let users = await userModel.defaultSchema
     .find(where)
@@ -679,7 +678,7 @@ sendEmail = (req, res) => {
   if (!body.email || !body.subject || !body.message) {
     return res.status(400).json({ error: "Missing required fields" });
   }
-  
+
   let attachments = files.map((file) => {
     return {
       filename: file.originalname,
@@ -693,8 +692,8 @@ sendEmail = (req, res) => {
     to: body.email,
     subject: body.subject,
   };
-  
-    if(body.isHtml == 'yes') {
+
+  if (body.isHtml == "yes") {
     mailOptions.html = `
         <!DOCTYPE html>
         <html>
@@ -715,17 +714,17 @@ sendEmail = (req, res) => {
         </html>
       `;
   } else {
-    mailOptions.text = body.message
+    mailOptions.text = body.message;
   }
-  if(attachments.length > 0) {
-    mailOptions.attachments = attachments
-  };
+  if (attachments.length > 0) {
+    mailOptions.attachments = attachments;
+  }
 
   mailer.transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      res.status(400).send({done : false , error: error});
+      res.status(400).send({ done: false, error: error });
     } else {
-      res.status(200).send({done: true, info: info.response});
+      res.status(200).send({ done: true, info: info.response });
     }
   });
 };

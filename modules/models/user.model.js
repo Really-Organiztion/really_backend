@@ -18,9 +18,16 @@ const userSchema = new Schema(
       maxlength: 30,
     },
     recommendedBy: {
-      type: ObjectId,
-      ref: "user",
+      sourceType : {
+        type: String,
+        enum: ["Friend", "SocialMedia", "employee", "googleAds", "appStore", "website", "other"],
+      },
+      user_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+      },
     },
+
     email: {
       type: String,
       required: true,
@@ -153,8 +160,8 @@ userSchema.index(
   {
     unique: true,
     partialFilterExpression: {
-      phone: { $exists: true, $type: "string" }
-    }
+      phone: { $exists: true, $type: "string" },
+    },
   }
 );
 
