@@ -1,15 +1,8 @@
 const express = require("express");
-const paymentRouter = express.Router();
+const router = express.Router();
 const paymentController = require("../controllers/payment.controller");
 
-paymentRouter.post(
-  "/key",
-  paymentController.generatePaymentKeyWithOrderRegistration
-);
-paymentRouter.post(
-  "/notification-callback",
-  paymentController.notificationCallback
-);
-paymentRouter.get("/response-callback", paymentController.responseCallback);
+router.post("/pay", paymentController.initiatePayment);
+router.get("/callback", paymentController.callbackHandler);
 
-module.exports = paymentRouter;
+module.exports = router;

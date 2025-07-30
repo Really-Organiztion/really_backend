@@ -22,6 +22,7 @@ const userRouter = require("./routers/user.router");
 const fcmRouter = require("./routers/fcm.router");
 const notificationRouter = require("./routers/notification.router");
 const adminSettingRouter = require("./routers/adminSetting.router");
+const paymentRouter = require("./routers/payment.router");
 
 router.use("/admin-setting", adminSettingRouter);
 router.use("/admin", adminRouter);
@@ -44,5 +45,6 @@ router.use("/booking", bookingRouter);
 router.use("/user", userRouter);
 router.use("/fcm", fcmRouter);
 router.use("/notification", notificationRouter);
+router.use("/payment", paymentRouter);
 
 module.exports = router;

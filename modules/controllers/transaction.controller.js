@@ -38,8 +38,7 @@ const handleThawaniSessionLogic = async (body) => {
     return { status: 400, error: "Transaction session is not found" };
 
   let thawaniResponse = await transactionService.thawaniSession(
-    transaction,
-    body.isTest
+    transaction
   );
 
   if (!thawaniResponse.done) return { status: 400, error: thawaniResponse };
@@ -77,8 +76,7 @@ const handleThawaniSessionLogic = async (body) => {
 getAllData = async (req, res) => {
   try {
     req.body = req.body || {}; 
-    let isTest =req.body.isTest || false;
-    delete req.body.isTest;
+    
     const isHandledTransaction =
       Array.isArray(req.body.statusList) &&
       req.body.statusList.length === 1 &&
@@ -89,7 +87,7 @@ getAllData = async (req, res) => {
     if (isHandledTransaction) {
       const list = await Promise.all(
         data.map(async (item) => {
-          let result = await handleThawaniSessionNew({transactionNo: item.transactionNo, userId: item.userId, isTest});
+          let result = await handleThawaniSessionNew({transactionNo: item.transactionNo, userId: item.userId});
           return result.done ? result.data : item;
         })
       );
@@ -123,8 +121,7 @@ const handleThawaniSessionNew = async (body) => {
     return { done: false, error: "Transaction session is not found" };
 
   let thawaniResponse = await transactionService.thawaniSession(
-    transaction,
-    body.isTest
+    transaction
   );
 
   if (!thawaniResponse.done) return { done: false, error: thawaniResponse };
