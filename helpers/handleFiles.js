@@ -53,37 +53,107 @@ const handleFilesUpload = (req, res) => {
   if (!validFilesTypes.includes(req.params.fileType)) {
     return res.status(400).send("The fileType is incorrect");
   }
+
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      const path = `attachments/${req.params.pathName}/${req.params.fileType}/`;
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+
+      const dateFolder = `${year}-${month}-${day}`;
+      const path = `attachments/${req.params.pathName}/${req.params.fileType}/${dateFolder}/`;
+
       fs.mkdirSync(path, { recursive: true });
       cb(null, path);
     },
     filename: function (req, file, cb) {
-      const unqieName = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      cb(null, unqieName + "-" + file.originalname);
+      const uniqueName = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      cb(null, uniqueName + "-" + file.originalname);
     },
   });
+
   const upload = multer({ storage: storage });
+
   upload.array("file", 50)(req, res, function (err) {
     if (err) {
-      return res.status(400).send(err, "Error uploading file");
+      return res.status(400).send(err.message || "Error uploading file");
     }
     if (req.files) {
-      let files = [];
-      req.files.forEach((_files) => {
-        files.push({
-          url:
-            "/api/uploadFile/" +
-            req.params.pathName +
-            "/" +
-            req.params.fileType +
-            "/" +
-            _files.filename,
-          type: _files.mimetype,
-          size: _files.size,
-        });
-      });
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+      const dateFolder = `${year}-${month}-${day}`;
+
+      let files = req.files.map((_file) => ({
+        url:
+          "/api/uploadFile/" +
+          req.params.pathName +
+          "/" +
+          req.params.fileType +
+          "/" +
+          dateFolder +
+          "/" +
+          _file.filename,
+        type: _file.mimetype,
+        size: _file.size,
+      }));
+
+      return res.status(200).send(files);
+    } else {
+      return res.status(400).send("Error uploading file");
+    }
+  });
+};
+
+const handleFilesUploadAny = (req, res) => {
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+
+      const dateFolder = `${year}-${month}-${day}`;
+      const path = `attachments/${req.params.pathName}/${req.params.fileType}/${dateFolder}/`;
+
+      fs.mkdirSync(path, { recursive: true });
+      cb(null, path);
+    },
+    filename: function (req, file, cb) {
+      const uniqueName = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      cb(null, uniqueName + "-" + file.originalname);
+    },
+  });
+
+  const upload = multer({ storage: storage });
+
+  upload.array("file", 50)(req, res, function (err) {
+    if (err) {
+      return res.status(400).send(err.message || "Error uploading file");
+    }
+    if (req.files) {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+      const dateFolder = `${year}-${month}-${day}`;
+
+      let files = req.files.map((_file) => ({
+        url:
+          "/api/uploadFile/" +
+          req.params.pathName +
+          "/" +
+          req.params.fileType +
+          "/" +
+          dateFolder +
+          "/" +
+          _file.filename,
+        type: _file.mimetype,
+        size: _file.size,
+      }));
+
       return res.status(200).send(files);
     } else {
       return res.status(400).send("Error uploading file");
@@ -160,25 +230,23 @@ deleteFile = (req, res) => {
 };
 
 deleteFiles = (req, res) => {
-  
   if (!req.body || !req.body.urlList) {
     return res.status(400).send("Url not found");
   }
   let data = {
-    deletedCount : 0,
-    notFoundList : [],
-  }
+    deletedCount: 0,
+    notFoundList: [],
+  };
   for (let i = 0; i < req.body.urlList.length; i++) {
     let path = req.body.urlList[i].replace("/api/uploadFile", "attachments");
-    if(fs.existsSync(path)){
-      data.deletedCount += 1
+    if (fs.existsSync(path)) {
+      data.deletedCount += 1;
       fs.unlinkSync(path);
     } else {
-      data.notFoundList.push(req.body.urlList[i])
+      data.notFoundList.push(req.body.urlList[i]);
     }
   }
   return res.status(200).send(data);
-
 };
 
 deleteFileCb = async (url, cb) => {
@@ -208,6 +276,7 @@ readFile = async (key) => {
 module.exports = {
   handleFileUpload,
   handleFilesUpload,
+  handleFilesUploadAny,
   getFile,
   saveFiles,
   readFile,
